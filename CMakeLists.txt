@@ -17,3 +17,23 @@ message("We have to check pthread library on win* platform")
 
 add_definitions(-std=c++0x -pthread -g)
 
+aux_source_directory(. srcs)
+
+include_directories(.)
+
+# platform_defined
+if (UNIX)
+	message(STATUS "unix found, using impl/unix")
+	aux_source_directory(impl/unix impl_srcs)
+elseif(APPLE)
+	message(STATUS "apple found, using impl/apple")
+	aux_source_directory(impl/apple impl_srcs)
+elseif(WIN32)
+	message(STATUS "win32 found, using impl/win32")
+	aux_source_directory(impl/win32 impl_srcs)
+else()
+	message(SEND_ERROR "Unknown platform")
+endif()
+
+add_library(${PROJECT_NAME} SHARED ${srcs} ${impl_srcs})
+
