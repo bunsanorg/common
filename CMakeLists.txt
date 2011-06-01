@@ -35,5 +35,5 @@ else()
 	message(SEND_ERROR "Unknown platform")
 endif()
 
-add_library(${PROJECT_NAME} SHARED ${srcs} ${impl_srcs})
+add_library(${PROJECT_NAME} STATIC ${srcs} ${impl_srcs})
 
