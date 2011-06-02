@@ -19,6 +19,7 @@ namespace bunsan
 		virtual void join();
 		virtual void stop();
 		virtual bool is_running();
+		virtual ~xmlrpc_service();
 	protected:
 		typedef std::unique_lock<std::mutex> guard;
 		typedef xmlrpc_c::registryPtr registry_ptr;
