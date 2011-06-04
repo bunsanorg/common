@@ -37,3 +37,10 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${srcs} ${impl_srcs})
 
+# install
+
+file(GLOB headers . "*.hpp")
+install(FILES ${headers} DESTINATION include/bunsan)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+
