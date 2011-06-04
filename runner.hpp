@@ -3,6 +3,9 @@
 
 namespace bunsan
 {
+	/*!
+	 * \brief class which runs function in constructor
+	 */
 	class runner
 	{
 	public:

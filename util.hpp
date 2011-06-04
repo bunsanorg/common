@@ -31,7 +31,7 @@ namespace bunsan
 	void read_info(const std::string &filename, Ptree &pt, const std::locale &loc = std::locale())
 	{
 		boost::filesystem::initial_path();
-		boost::filesystem::current_path(boost::filesystem::path(filename).parent_path());
+		boost::filesystem::current_path(boost::filesystem::absolute(boost::filesystem::path(filename)).parent_path());
 		boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().native(), pt);
 		boost::filesystem::current_path(boost::filesystem::initial_path());
 	}
