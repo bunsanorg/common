@@ -23,6 +23,7 @@ namespace bunsan
 		 * \return wether service is running
 		 */
 		virtual bool is_running()=0;
+		virtual inline ~service(){}
 	};
 }
 
