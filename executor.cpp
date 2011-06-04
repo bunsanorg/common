@@ -1,6 +1,5 @@
 #include "executor.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 
@@ -43,12 +42,12 @@ void bunsan::executor::process(argument &arg, const boost::property_tree::ptree:
 bunsan::executor::executor(const boost::property_tree::ptree &command): next_positional(0)
 {
 	DLOG(creating executor object from boost::property_tree::ptree);
-	BOOST_FOREACH(const boost::property_tree::ptree::value_type &arg_value, command)
+	for (const auto &arg_value: command)
 	{
 		argument arg;
 		if (arg_value.first=="c")
 		{
-			BOOST_FOREACH(const boost::property_tree::ptree::value_type &arg_subvalue, arg_value.second)
+			for (const auto &arg_subvalue: arg_value.second)
 			{
 				process(arg, arg_subvalue);
 			}
