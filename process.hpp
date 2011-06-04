@@ -13,7 +13,7 @@ namespace bunsan
 		virtual void wait()=0;
 		virtual bool completed()=0;
 		virtual int return_code()=0;
-		inline virtual ~process() throw(){}
+		virtual inline ~process() throw(){}
 	};
 	typedef std::shared_ptr<process> process_ptr;
 }
