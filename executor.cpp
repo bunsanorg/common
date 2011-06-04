@@ -65,7 +65,7 @@ bunsan::executor::executor(const boost::property_tree::ptree &command): next_pos
 void bunsan::executor::operator()() const
 {
 	DLOG(trying to execute);
-	int code = execute();
+	int code = sync();
 	if (code)
 		throw bunsan::return_code(code);
 }
@@ -113,13 +113,10 @@ private:
 	const std::vector<boost::optional<std::string>> *positional;
 };
 
-#include "impl/execute.hpp"
+#include "execute.hpp"
 
-int bunsan::executor::execute() const
+void prepare(std::vector<std::string> &args, args_visitor &visitor, const std::vector<bunsan::executor::argument> &arguments, const std::vector<bunsan::executor::string_opt> &positional)
 {
-	DLOG(trying to execute);
-	std::vector<std::string> args(arguments.size());
-	args_visitor visitor(&positional);
 	for (size_t i = 0; i<arguments.size(); ++i)
 	{
 		for (size_t j = 0; j<arguments[i].size(); ++j)
@@ -127,7 +124,24 @@ int bunsan::executor::execute() const
 			args[i] = (boost::apply_visitor(visitor, arguments[i][j]));
 		}
 	}
-	return bunsan::impl::execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
+}
+
+int bunsan::executor::sync() const
+{
+	DLOG(trying to execute);
+	std::vector<std::string> args(arguments.size());
+	args_visitor visitor(&positional);
+	prepare(args, visitor, arguments, positional);
+	return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
+}
+
+bunsan::process_ptr bunsan::executor::async() const
+{
+	DLOG(trying to execute);
+	std::vector<std::string> args(arguments.size());
+	args_visitor visitor(&positional);
+	prepare(args, visitor, arguments, positional);
+	return bunsan::async_execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
 }
 
 bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command was finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
