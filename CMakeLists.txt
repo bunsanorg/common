@@ -3,7 +3,7 @@ project(bunsan_common)
 cmake_minimum_required(VERSION 2.8)
 
 # BOOST
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package (Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -35,7 +35,7 @@ else()
 	message(SEND_ERROR "Unknown platform")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${srcs} ${impl_srcs})
+add_library(${PROJECT_NAME} SHARED ${srcs} ${impl_srcs})
 
 # install
 
