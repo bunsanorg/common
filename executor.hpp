@@ -1,3 +1,6 @@
+#ifndef EXECUTOR_HPP
+#define EXECUTOR_HPP
+
 #include <stdexcept>
 #include <string>
 
@@ -124,4 +127,6 @@ namespace bunsan
 		void process(argument &arg, const boost::property_tree::ptree::value_type &arg_value);
 	};
 }
+
+#endif //EXECUTOR_HPP
 

@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "util.hpp"
+#include "helpers.hpp"
 
 bunsan::process_impl::process_impl(pid_t pid_): pid(pid_), completed_(false){}
 
@@ -39,8 +40,9 @@ void bunsan::process_impl::wait()
 	SLOG("waiting for child "<<pid);
 	if (pid!=waitpid(pid, &stat, 0))
 	{
-		DLOG(waitpid error);
-		throw std::runtime_error("waitpid error");
+		int err = errno;
+		SLOG("waitpid error: \""<<bunsan::impl::strerror(err)<<"\"");
+		throw std::runtime_error("waitpid error: \""+bunsan::impl::strerror(err)+"\"");
 	}
 	else
 	{
