@@ -16,6 +16,7 @@
 #include "util.hpp"
 #include "process.hpp"
 #include "process_impl.hpp"
+#include "helpers.hpp"
 
 template <typename S>
 void quote(S &out, const std::string &str)
@@ -49,24 +50,13 @@ void quote(S &out, const std::string &str)
 	return WEXITSTATUS(code);
 }*/
 
-namespace bunsan
+int bunsan::sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
 {
-	std::string strerror(int err)
-	{
-		static const size_t buflen = 200;
-		char msg[buflen];
-		strerror_r(err, msg, buflen);
-		return msg;
-	}
-}
-
-int bunsan::sync_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args)
-{
-	process_ptr p = async_execute(cwd, args);
+	process_ptr p = async_execute(cwd, file, args, use_path);
 	return p->return_code();
 }
 
-bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args)
+bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
 {
 	static const size_t arglen = 100;
 	SLOG("trying to execute the following args from dir "<<cwd);
@@ -86,7 +76,7 @@ bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, co
 	if (pid==-1)
 	{
 		DLOG(fork error);
-		throw std::runtime_error(bunsan::strerror(err));
+		throw std::runtime_error(bunsan::impl::strerror(err));
 	}
 	else if (!pid)
 	{// child
@@ -95,10 +85,16 @@ bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, co
 		{
 			DLOG(child: success);
 			DLOG(child: trying to exec);
-			if (execvp(argv[0], &argv[0])==-1)
+			int ret;
+			if (use_path)
+				ret = execvp(file.c_str(), &argv[0]);
+			else
+				ret = execv(file.c_str(), &argv[0]);
+			if (ret==-1)
 			{
 				int err = errno;
-				SLOG(bunsan::strerror(err));
+				SLOG(bunsan::impl::strerror(err));
+				_exit(252);
 			}
 		}
 		else
