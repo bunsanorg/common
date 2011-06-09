@@ -16,6 +16,7 @@ namespace bunsan
 		virtual void terminate();
 		virtual void kill();
 		virtual void wait();
+		virtual bool wait(boost::posix_time::time_duration timeout);
 		virtual bool completed();
 		virtual int return_code();
 		virtual ~process_impl() throw();
