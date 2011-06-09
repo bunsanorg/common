@@ -51,6 +51,25 @@ void bunsan::process_impl::wait()
 	}
 }
 
+bool bunsan::process_impl::wait(boost::posix_time::time_duration timeout)
+{
+	using namespace boost::posix_time;
+	if (completed())
+		return true;
+	SLOG("starting wait loop for child "<<pid);
+	ptime begin(microsec_clock::local_time());
+	ptime end = begin+timeout;
+	useconds_t usec = timeout.total_microseconds()/10;// TODO magic number
+#warning unchecked overflow
+	if (usec<=0)
+		usec = 100;
+	while (ptime(microsec_clock::local_time())<end && !completed())
+	{
+		usleep(usec);
+	}
+	return completed();
+}
+
 int bunsan::process_impl::return_code()
 {
 	if (!completed())
@@ -66,15 +85,16 @@ bunsan::process_impl::~process_impl() throw()
 	if (!completed())
 	{
 #warning bad implementation
+#warning no error check
 		terminate();
-		if (completed())
+		if (wait(boost::posix_time::seconds(1)))
+		{
 			return;
+		}
 		else
-			sleep(1);
-		if (!completed())
 		{
 			kill();
-			waitpid(pid, &stat, 0);
+			waitpid(pid, &stat, 0);// should return fast
 		}
 	}
 }
