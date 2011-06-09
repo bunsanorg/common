@@ -28,7 +28,7 @@ void bunsan::process_impl::kill()
 
 bool bunsan::process_impl::completed()
 {
-	if (completed_ || pid==waitpid(pid, &stat, WNOHANG))
+	if (completed_ || ::kill(pid, 0) || pid==waitpid(pid, &stat, WNOHANG))
 		completed_ = true;
 	return completed_;
 }
@@ -38,10 +38,11 @@ void bunsan::process_impl::wait()
 	if (completed())
 		return;
 	SLOG("waiting for child "<<pid);
-	if (pid!=waitpid(pid, &stat, 0))
+	pid_t ret = pid!=waitpid(pid, &stat, 0);
+	int err = errno;
+	if (ret!=0 && ret!=pid)
 	{
-		int err = errno;
-		SLOG("waitpid error: \""<<bunsan::impl::strerror(err)<<"\"");
+		SLOG("waitpid error: ("<<"return_code=="<<ret<<")\" "<<bunsan::impl::strerror(err)<<"\"");
 		throw std::runtime_error("waitpid error: \""+bunsan::impl::strerror(err)+"\"");
 	}
 	else
@@ -73,7 +74,7 @@ bool bunsan::process_impl::wait(boost::posix_time::time_duration timeout)
 int bunsan::process_impl::return_code()
 {
 	if (!completed())
-		wait();
+		this->wait();
 	if (WIFEXITED(stat))
 		return WEXITSTATUS(stat);
 	else
@@ -82,6 +83,7 @@ int bunsan::process_impl::return_code()
 
 bunsan::process_impl::~process_impl() throw()
 {
+	DLOG(destroying);
 	if (!completed())
 	{
 #warning bad implementation
