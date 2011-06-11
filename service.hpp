@@ -8,7 +8,8 @@ namespace bunsan
 	public:
 		/*!
 		 * \brief start service
-		 * non-blocking call, thread will run in different thread
+		 *
+		 * non-blocking call, service will run in different thread
 		 */
 		virtual void start()=0;
 		/*!
@@ -17,6 +18,9 @@ namespace bunsan
 		virtual void join()=0;
 		/*!
 		 * \brief stop service
+		 *
+		 * non-blocking call, service will continue execution, but soon should do clean-up actions and stop.
+		 * after stop you should use join before next start
 		 */
 		virtual void stop()=0;
 		/*!
