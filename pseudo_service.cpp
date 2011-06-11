@@ -18,6 +18,7 @@ void bunsan::pseudo_service::stop()
 {
 	guard lk(run_lock);
 	running = false;
+	joiner.notify_all();
 }
 
 bool bunsan::pseudo_service::is_running()
