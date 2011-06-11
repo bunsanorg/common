@@ -28,6 +28,7 @@ void bunsan::xmlrpc_service::start()
 
 void bunsan::xmlrpc_service::join()
 {
+	guard lk(lock);
 	thread.join();
 }
 
