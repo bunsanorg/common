@@ -12,6 +12,8 @@ namespace bunsan
 		 * \brief start service
 		 *
 		 * non-blocking call, service will run in different thread
+		 *
+		 * if service was started before, it will do restart
 		 */
 		virtual void start()=0;
 		/*!
@@ -22,7 +24,6 @@ namespace bunsan
 		 * \brief stop service
 		 *
 		 * non-blocking call, service will continue execution, but soon should do clean-up actions and stop.
-		 * after stop you should use join before next start
 		 */
 		virtual void stop()=0;
 		/*!
