@@ -2,10 +2,16 @@
 #define UTIL_HPP
 
 #include <iostream>
+#include <sstream>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#define SLOG(M) std::cerr<<"["<<__FILE__<<":"<<__LINE__<<":"<<__func__<<":"<<boost::posix_time::second_clock::local_time()<<"] "<<M<<std::endl
+#define SLOG(M) do\
+		{\
+			std::stringstream buf;\
+			buf<<"["<<__FILE__<<":"<<__LINE__<<":"<<__func__<<":"<<boost::posix_time::second_clock::local_time()<<"] "<<M<<std::endl;\
+			std::cerr<<buf.str()<<std::flush;\
+		} while (false)
 #define DLOG(M) SLOG(#M)
 
 #include <locale>
