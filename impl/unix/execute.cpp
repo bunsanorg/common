@@ -5,6 +5,7 @@
 #include <map>
 
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 
 #include <boost/scoped_array.hpp>
@@ -50,15 +51,10 @@ void quote(S &out, const std::string &str)
 	return WEXITSTATUS(code);
 }*/
 
-int bunsan::sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
+static bunsan::process_ptr async_execute_(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, const boost::filesystem::path &stdin_file, bool use_path, bool use_stdin_file)
 {
-	process_ptr p = async_execute(cwd, file, args, use_path);
-	return p->return_code();
-}
-
-bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
-{
-	static const size_t arglen = 100;
+	using namespace bunsan;
+	static const size_t arglen = 256;
 	SLOG("trying to execute the following args from dir "<<cwd);
 	boost::scoped_array<char [arglen]> argv_st(new char [args.size()][arglen]);
 	std::vector<char *> argv(args.size()+1);
@@ -71,7 +67,7 @@ bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, co
 	}
 	argv[args.size()] = 0;
 	DLOG(trying to fork);
-	pid_t pid = vfork();
+	pid_t pid = fork();
 	int err = errno;
 	if (pid==-1)
 	{
@@ -84,6 +80,16 @@ bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, co
 		if (!chdir(cwd.c_str()))
 		{
 			DLOG(child: success);
+			if (use_stdin_file)
+			{
+				DLOG(child: trying to reopen stdin);
+				if (!freopen(stdin_file.c_str(), "r", stdin))
+				{
+					DLOG(child: error);
+					DLOG(child: do _exit);
+					_exit(251);
+				}
+			}
 			DLOG(child: trying to exec);
 			int ret;
 			if (use_path)
@@ -127,4 +133,26 @@ int bunsan::impl::sync_execute(const boost::filesystem::path &cwd, const std::ve
 	throw std::runtime_error(std::string(__FILE__)+":"+std::string(__LINE__)+": unimplemented yet");
 }
 #endif
+
+int bunsan::sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
+{
+	process_ptr p = async_execute(cwd, file, args, use_path);
+	return p->return_code();
+}
+
+int bunsan::sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, const boost::filesystem::path &stdin_file, bool use_path)
+{
+	process_ptr p = async_execute(cwd, file, args, stdin_file, use_path);
+	return p->return_code();
+}
+
+bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, bool use_path)
+{
+	return async_execute_(cwd, file, args, "", use_path, false);
+}
+
+bunsan::process_ptr bunsan::async_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &file, const std::vector<std::string> &args, const boost::filesystem::path &stdin_file, bool use_path)
+{
+	return async_execute_(cwd, file, args, boost::filesystem::absolute(stdin_file), use_path, true);
+}
 
