@@ -3,26 +3,30 @@
 void bunsan::complex_service::start()
 {
 	for (service_ptr &s: services)
-		s->start();
+		if (s)
+			s->start();
 }
 
 void bunsan::complex_service::join()
 {
 	for (service_ptr &s: services)
-		s->join();
+		if (s)
+			s->join();
 }
 
 void bunsan::complex_service::stop()
 {
 	for (service_ptr &s: services)
-		s->stop();
+		if (s)
+			s->stop();
 }
 
 bool bunsan::complex_service::is_running()
 {
 	for (service_ptr &s: services)
-		if (s->is_running())
-			return true;
+		if (s)
+			if (s->is_running())
+				return true;
 	return false;
 }
 
