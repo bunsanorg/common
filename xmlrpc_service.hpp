@@ -26,9 +26,9 @@ namespace bunsan
 		typedef std::shared_ptr<xmlrpc_c::serverAbyss> server_ptr;
 		virtual void create_server()=0;
 		server_ptr server;
-		std::thread thread;
-		std::mutex lock;
 	private:
+		std::thread thread;
+		std::mutex slock, tlock;
 		void run();
 	};
 }
