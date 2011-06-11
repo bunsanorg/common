@@ -1,6 +1,8 @@
 #ifndef SERVICE_HPP
 #define SERVICE_HPP
 
+#include <memory>
+
 namespace bunsan
 {
 	class service
@@ -29,6 +31,7 @@ namespace bunsan
 		virtual bool is_running()=0;
 		virtual inline ~service(){}
 	};
+	typedef std::shared_ptr<service> service_ptr;
 }
 
 #endif //SERVICE_HPP
