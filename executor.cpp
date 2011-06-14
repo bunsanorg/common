@@ -134,15 +134,6 @@ int bunsan::executor::sync() const
 	return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
 }
 
-bunsan::process_ptr bunsan::executor::async() const
-{
-	DLOG(trying to execute);
-	std::vector<std::string> args(arguments.size());
-	args_visitor visitor(&positional);
-	prepare(args, visitor, arguments, positional);
-	return bunsan::async_execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
-}
-
 bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command was finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
 
 bunsan::return_code::operator int() const throw()
