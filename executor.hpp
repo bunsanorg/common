@@ -9,7 +9,6 @@
 #include <boost/filesystem/path.hpp>
 
 #include "util.hpp"
-#include "process.hpp"
 
 namespace bunsan
 {
@@ -41,10 +40,6 @@ namespace bunsan
 		 * \return return code
 		 */
 		int sync() const;
-		/*!
-		 * \brief asynchronous command execution
-		 */
-		process_ptr async() const;
 		// \todo named argument support
 		/*!
 		 * \brief add positional argument
@@ -68,12 +63,6 @@ namespace bunsan
 			return tmp.add_argument(args...).sync();
 		}
 		template <typename ... Args>
-		process_ptr async(const Args &...args) const
-		{
-			executor tmp(*this);
-			return tmp.add_argument(args...).async();
-		}
-		template <typename ... Args>
 		void operator()(const Args &...args) const
 		{
 			executor tmp(*this);
@@ -90,18 +79,6 @@ namespace bunsan
 		{
 			executor exc(command);
 			return exc.sync(args...);
-		}
-		template <typename T, typename ... Args>
-		static process_ptr run_async_from(const boost::filesystem::path &cwd, const T &command, const Args &...args)
-		{
-			executor exc(command);
-			return exc.current_path(cwd).async(args...);
-		}
-		template <typename T, typename ... Args>
-		static process_ptr run_async(const T &command, const Args &...args)
-		{
-			executor exc(command);
-			return exc.async(args...);
 		}
 		template <typename T, typename ... Args>
 		static void exec_from(const boost::filesystem::path &cwd, const T &command, const Args &...args)
