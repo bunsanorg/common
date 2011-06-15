@@ -36,6 +36,7 @@ else()
 endif()
 
 add_library(${PROJECT_NAME} SHARED ${srcs} ${impl_srcs})
+target_link_libraries(${PROJECT_NAME} zmq)
 
 # install
 
