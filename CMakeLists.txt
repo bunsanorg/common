@@ -36,7 +36,7 @@ else()
 endif()
 
 add_library(${PROJECT_NAME} SHARED ${srcs} ${impl_srcs})
-target_link_libraries(${PROJECT_NAME} zmq)
+target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${xmlrpc_link_lib})
 
 # install
 
