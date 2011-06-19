@@ -2,6 +2,18 @@ project(bunsan_common)
 
 cmake_minimum_required(VERSION 2.8)
 
+set(
+	xmlrpc_link_lib
+	xmlrpc++
+	xmlrpc_client++
+	xmlrpc_cpp
+	xmlrpc_server++
+	xmlrpc_server_abyss++
+	xmlrpc_server_cgi++
+	xmlrpc_server_pstream++
+	xmlrpc_util
+)
+
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -44,4 +56,9 @@ file(GLOB headers . "*.hpp")
 install(FILES ${headers} DESTINATION include/bunsan)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+
+# testing
+
+enable_testing()
+add_subdirectory(tests ${PROJECT_BINARY_DIR}/tests)
 
