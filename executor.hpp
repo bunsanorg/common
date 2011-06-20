@@ -8,6 +8,7 @@
 #include <boost/variant.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include "execute.hpp"
 #include "util.hpp"
 
 namespace bunsan
@@ -36,6 +37,10 @@ namespace bunsan
 		 */
 		void operator()() const;
 		/*!
+		 * \return executing context
+		 */
+		bunsan::process::context context() const;
+		/*!
 		 * \brief run command synchronous with specified arguments
 		 * \return return code
 		 */
@@ -46,6 +51,10 @@ namespace bunsan
 		 * \return *this
 		 */
 		executor &add_argument(const std::string &arg);
+		/*!
+		 * \brief set named argument
+		 */
+		executor &set_argument(const std::string &key, const std::string &arg);
 		/*!
 		 * \brief set current work directory for process
 		 */
@@ -96,17 +105,25 @@ namespace bunsan
 			executor exc(command);
 			exc(args...);
 		}
-	public: // TODO should be private
+	public:
+		static constexpr const char *current_path_key = "current_path";
+		static constexpr const char *executable_key = "executable";
+		typedef boost::variant<size_t, std::string> reference;
+		typedef boost::variant<reference, std::string> token;
+		typedef std::vector<token> string;
 		typedef boost::optional<std::string> string_opt;
-		typedef boost::variant<std::string, size_t> substring;
-		typedef std::vector<substring> argument;
+		typedef std::map<std::string, std::string> dict;
 	private:
-		std::vector<argument> arguments;
+		std::vector<string> arguments;
 		std::vector<string_opt> positional;
-		boost::optional<boost::filesystem::path> current_path_;
-		boost::optional<boost::filesystem::path> exec_;
+		//boost::optional<boost::filesystem::path> current_path_;
+		//boost::optional<boost::filesystem::path> exec_;
 		size_t next_positional;
-		void process(argument &arg, const boost::property_tree::ptree::value_type &arg_value);
+		dict named;
+		class token_visitor;
+		class ref_visitor;
+		void prepare(std::vector<std::string> &args, token_visitor &visitor) const;
+		void process(string &arg, const boost::property_tree::ptree::value_type &arg_value);
 	};
 }
 
