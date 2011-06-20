@@ -29,6 +29,7 @@ void quote(S &out, const std::string &str)
 	out<<'"';
 }
 
+#if 0
 int bunsan::sync_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args)
 {
 	std::stringstream sout;
@@ -57,4 +58,5 @@ int bunsan::sync_execute(const boost::filesystem::path &cwd, const std::vector<s
 		return WEXITSTATUS(code);
 	}
 }
+#endif
 
