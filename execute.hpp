@@ -9,7 +9,8 @@
 
 namespace bunsan
 {
-	int sync_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args);
+	int sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &executable, const std::vector<std::string> &args, bool use_path=true);
+	int sync_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args, bool use_path=true);
 }
 
 #endif //IMPL_EXECUTE_HPP
