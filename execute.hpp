@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <boost/optional.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace bunsan
@@ -43,7 +44,7 @@ namespace bunsan
 			}
 			inline const boost::filesystem::path &current_path() const
 			{
-				return current_path_;
+				return current_path_.get();
 			}
 			inline context &executable(const boost::filesystem::path &executable_)
 			{
@@ -52,7 +53,7 @@ namespace bunsan
 			}
 			inline const boost::filesystem::path &executable() const
 			{
-				return executable_;
+				return executable_.get();
 			}
 			inline context &argv(const std::vector<std::string> &argv_)
 			{
@@ -72,9 +73,25 @@ namespace bunsan
 			{
 				return use_path_;
 			}
+			inline void build()
+			{
+				if (!current_path_)
+					current_path_ = boost::filesystem::current_path();
+				if (!executable_)
+				{
+					if (use_path_)
+					{
+						if (argv_.empty())
+							throw std::runtime_error("Nothing to execute!");
+						executable_ = argv_.at(0);
+					}
+					else
+						executable_ = boost::filesystem::absolute(argv_.at(0));
+				}
+			}
 		private:
-			boost::filesystem::path current_path_;
-			boost::filesystem::path executable_;
+			boost::optional<boost::filesystem::path> current_path_;
+			boost::optional<boost::filesystem::path> executable_;
 			std::vector<std::string> argv_;
 			bool use_path_;
 		};
@@ -85,9 +102,7 @@ namespace bunsan
 		}
 		inline int sync_execute(const boost::filesystem::path &cwd, const std::vector<std::string> &args, bool use_path=true)
 		{
-			if (args.empty())
-				throw std::runtime_error("Nothing to execute!");
-			return sync_execute(cwd, args.at(0), args, use_path);
+			return sync_execute(context().current_path(cwd).argv(args).use_path(use_path));
 		}
 	}
 	using process::sync_execute;
