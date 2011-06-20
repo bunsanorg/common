@@ -8,35 +8,40 @@
 bunsan::executor::executor(const std::string &command): positional(0), next_positional(0)
 {
 	SLOG("creating executor object from \""<<command<<"\"");
-	substring str = command;
-	argument arg;
-	arg.push_back(str);
-	arguments.push_back(arg);
+	arguments.push_back(string(1, token(command)));
 }
 
-void bunsan::executor::process(argument &arg, const boost::property_tree::ptree::value_type &arg_value)
+void bunsan::executor::process(string &arg, const boost::property_tree::ptree::value_type &arg_value)
 {
-	//DLOG();
-	if (arg_value.first=="t")
+	token tk;
+	if (arg_value.first=="t" || arg_value.first=="text")
 	{
-		substring str = arg_value.second.get_value<std::string>();
-		SLOG("text type \""<<str<<"\"");
-		arg.push_back(str);
+		std::string txt = arg_value.second.get_value<std::string>();
+		tk = txt;
+		SLOG("text type \""<<txt<<"\"");
 	}
-	else if (arg_value.first=="p")
+	else if (arg_value.first=="p" || arg_value.first=="positional")
 	{
 		size_t ph = arg_value.second.get_value<size_t>();
 		SLOG("positional placeholder \""<<ph<<"\"");
-		substring str = ph;
+		reference pos = ph;
 		if (positional.size()<=ph)
 			positional.resize(ph+1);
-		arg.push_back(str);
+		tk = pos;
+	}
+	else if (arg_value.first=="n" || arg_value.first=="named")
+	{
+		std::string ph = arg_value.second.get_value<std::string>();
+		SLOG("named placeholder \""<<ph<<"\"");
+		reference nmd = ph;
+		tk = nmd;
 	}
 	else
 	{
 		SLOG("unknown type \""<<arg_value.first<<"\"");
 		throw std::runtime_error("unknown ["+arg_value.first+"]");
 	}
+	arg.push_back(tk);
 }
 
 bunsan::executor::executor(const boost::property_tree::ptree &command): next_positional(0)
@@ -44,22 +49,22 @@ bunsan::executor::executor(const boost::property_tree::ptree &command): next_pos
 	DLOG(creating executor object from boost::property_tree::ptree);
 	for (const auto &arg_value: command)
 	{
-		argument arg;
-		if (arg_value.first=="c")
+		string arg;
+		if (arg_value.first=="c" || arg_value.first=="complex")
 		{
+			SLOG("complex type");
 			for (const auto &arg_subvalue: arg_value.second)
 			{
 				process(arg, arg_subvalue);
 			}
+			SLOG("end of complex type");
 		}
-		else if (arg_value.first=="e")
+		else if (arg_value.first=="d" || arg_value.first=="definition")
 		{
-			executable(arg_value.second.get_value<std::string>());
-			continue;
-		}
-		else if (arg_value.first=="w")
-		{
-			current_path(arg_value.second.get_value<std::string>());
+			for (const auto &arg_subvalue: arg_value.second)
+			{
+				named[arg_subvalue.first] = arg_subvalue.second.get_value<std::string>();
+			}
 			continue;
 		}
 		else
@@ -83,83 +88,110 @@ bunsan::executor &bunsan::executor::add_argument(const std::string &arg)
 {
 	SLOG("adding argument \""<<arg<<"\"");
 	if (next_positional<positional.size())
-	{
-		positional[next_positional] = arg;
-		++next_positional;
-	}
+		positional[next_positional++] = arg;
 	else
-	{
-		substring str = arg;
-		argument arg;
-		arg.push_back(str);
-		arguments.push_back(arg);
-	}
+		arguments.push_back(string(1, token(arg)));
+	return *this;
+}
+
+bunsan::executor &bunsan::executor::set_argument(const std::string &key, const std::string &arg)
+{
+	SLOG("setting named argument \""<<key<<"\" to \""<<arg<<"\"");
+	named[key] = arg;
 	return *this;
 }
 
 bunsan::executor &bunsan::executor::current_path(const boost::filesystem::path &cwd)
 {
 	SLOG("setting cwd to "<<cwd);
-	current_path_ = cwd;
+	named[current_path_key] = cwd.native();
 	return *this;
 }
 
 bunsan::executor &bunsan::executor::executable(const boost::filesystem::path &exec_)
 {
 	SLOG("setting executable to "<<exec_);
-	this->exec_ = exec_;
+	named[executable_key] = exec_.native();
 	return *this;
 }
 
-class args_visitor: public boost::static_visitor<std::string>
+class bunsan::executor::ref_visitor: public boost::static_visitor<std::string>
 {
 public:
-	explicit args_visitor(const std::vector<boost::optional<std::string>> *positional_): positional(positional_){}
-	std::string operator()(const std::string &str)
+	ref_visitor(const std::vector<string_opt> *positional_, const dict *named_): positional(positional_), named(named_){}
+	std::string operator()(const std::string &key)
 	{
-		SLOG("returning std::string from std::string=\""<<str<<"\"");
-		return str;
+		SLOG("named: returning std::string=\""<<named->at(key)<<"\" from std::string=\""<<key<<"\"");
+		return named->at(key);
 	}
-	std::string operator()(size_t n)
+	std::string operator()(size_t index)
 	{
-		SLOG("returning std::string=\""<<positional->at(n).get()<<"\" from size_t=\""<<n<<"\"");
-		return positional->at(n).get();
+		SLOG("positional: returning std::string=\""<<positional->at(index).get()<<"\" from size_t=\""<<index<<"\"");
+		return positional->at(index).get();
 	}
 private:
-	const std::vector<boost::optional<std::string>> *positional;
+	const std::vector<string_opt> *positional;
+	const dict *named;
+};
+
+class bunsan::executor::token_visitor: public boost::static_visitor<std::string>
+{
+public:
+	token_visitor(const std::vector<string_opt> *positional_, const dict *named_): positional(positional_), named(named_), rvisitor(positional_, named_){}
+	std::string operator()(const std::string &str)
+	{
+		SLOG("text: returning std::string from std::string=\""<<str<<"\"");
+		return str;
+	}
+	std::string operator()(const reference &ref)
+	{
+		return boost::apply_visitor(rvisitor, ref);
+	}
+private:
+	ref_visitor rvisitor;
+	const std::vector<string_opt> *positional;
+	const dict *named;
 };
 
 #include "execute.hpp"
 
-void prepare(std::vector<std::string> &args, args_visitor &visitor, const std::vector<bunsan::executor::argument> &arguments, const std::vector<bunsan::executor::string_opt> &positional)
+void bunsan::executor::prepare(std::vector<std::string> &args, token_visitor &visitor) const
 {
 	for (size_t i = 0; i<arguments.size(); ++i)
 	{
-		for (size_t j = 0; j<arguments[i].size(); ++j)
+		args[i].clear();
+		for (const auto &j: arguments[i])
 		{
-			args[i] = (boost::apply_visitor(visitor, arguments[i][j]));
+			args[i] += boost::apply_visitor(visitor, j);
 		}
+		/*for (size_t j = 0; j<arguments[i].size(); ++j)
+		{
+			args[i] = boost::apply_visitor(visitor, arguments[i][j]);//XXX???
+		}*/
 	}
+}
+
+bunsan::process::context bunsan::executor::context() const
+{
+	DLOG(trying to create context);
+	std::vector<std::string> args(arguments.size());
+	token_visitor visitor(&positional, &named);
+	prepare(args, visitor);
+	bunsan::process::context ctx;
+	ctx.argv(args);
+	auto iter = named.find(executable_key);
+	if (iter!=named.end())
+		ctx.executable(iter->second);
+	iter = named.find(current_path_key);
+	if (iter!=named.end())
+		ctx.current_path(iter->second);
+	return ctx;
 }
 
 int bunsan::executor::sync() const
 {
 	DLOG(trying to execute);
-	std::vector<std::string> args(arguments.size());
-	args_visitor visitor(&positional);
-	prepare(args, visitor, arguments, positional);
-	if (exec_)
-		return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_.get(), args, false);
-	else
-	{
-		if (args.empty())
-			throw std::runtime_error("Nothing to execute");
-		boost::filesystem::path exec_ = args.at(0);
-		if (exec_.is_absolute())
-			return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_, args, false);
-		else
-			return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_, args, true);
-	}
+	return bunsan::process::sync_execute(context());
 }
 
 bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command was finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
