@@ -5,8 +5,10 @@
 
 #include "util.hpp"
 
-int bunsan::process::sync_execute(const bunsan::process::context &ctx_)
+int bunsan::process::sync_execute(const bunsan::process::context &ctx__)
 {
+	bunsan::process::context ctx_(ctx__);
+	ctx_.build();
 	SLOG("trying to execute "<<ctx_.executable()<<" in "<<ctx_.current_path()<<(ctx_.use_path()?" using path":" without using path"));
 	boost::process::context ctx;
 	if (!ctx_.current_path().empty())
@@ -20,7 +22,7 @@ int bunsan::process::sync_execute(const bunsan::process::context &ctx_)
 		if (!ctx_.executable().empty() && ++ctx_.executable().begin()==ctx_.executable().end())
 			exec_ = boost::process::find_executable_in_path(ctx_.executable().native());
 		else
-			throw std::runtime_error("You can't try find executable in PATH using non-basename executable name ");
+			throw std::runtime_error("You can't try find executable in PATH using empty or non-basename executable name ");
 	}
 	else
 		exec_ = boost::filesystem::absolute(ctx_.executable()).native();
