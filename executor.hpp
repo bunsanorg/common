@@ -50,6 +50,10 @@ namespace bunsan
 		 * \brief set current work directory for process
 		 */
 		executor &current_path(const boost::filesystem::path &cwd);
+		/*!
+		 * \brief set executable file (without 0 argument will be used
+		 */
+		executor &executable(const boost::filesystem::path &exec_);
 		template <typename ... Args>
 		executor &add_argument(const std::string &arg, const Args &...args)
 		{
@@ -100,6 +104,7 @@ namespace bunsan
 		std::vector<argument> arguments;
 		std::vector<string_opt> positional;
 		boost::optional<boost::filesystem::path> current_path_;
+		boost::optional<boost::filesystem::path> exec_;
 		size_t next_positional;
 		void process(argument &arg, const boost::property_tree::ptree::value_type &arg_value);
 	};

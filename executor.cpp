@@ -52,6 +52,16 @@ bunsan::executor::executor(const boost::property_tree::ptree &command): next_pos
 				process(arg, arg_subvalue);
 			}
 		}
+		else if (arg_value.first=="e")
+		{
+			executable(arg_value.second.get_value<std::string>());
+			continue;
+		}
+		else if (arg_value.first=="w")
+		{
+			current_path(arg_value.second.get_value<std::string>());
+			continue;
+		}
 		else
 		{
 			process(arg, arg_value);
@@ -94,6 +104,13 @@ bunsan::executor &bunsan::executor::current_path(const boost::filesystem::path &
 	return *this;
 }
 
+bunsan::executor &bunsan::executor::executable(const boost::filesystem::path &exec_)
+{
+	SLOG("setting executable to "<<exec_);
+	this->exec_ = exec_;
+	return *this;
+}
+
 class args_visitor: public boost::static_visitor<std::string>
 {
 public:
@@ -131,7 +148,18 @@ int bunsan::executor::sync() const
 	std::vector<std::string> args(arguments.size());
 	args_visitor visitor(&positional);
 	prepare(args, visitor, arguments, positional);
-	return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), args);
+	if (exec_)
+		return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_.get(), args, false);
+	else
+	{
+		if (args.empty())
+			throw std::runtime_error("Nothing to execute");
+		boost::filesystem::path exec_ = args.at(0);
+		if (exec_.is_absolute())
+			return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_, args, false);
+		else
+			return bunsan::sync_execute(current_path_.get_value_or(boost::filesystem::current_path()), exec_, args, true);
+	}
 }
 
 bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command was finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
