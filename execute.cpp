@@ -7,7 +7,12 @@
 
 int bunsan::process::sync_execute(const bunsan::process::context &ctx__)
 {
-	bunsan::process::context ctx_(ctx__);
+	bunsan::process::context ctx = ctx__;
+	return sync_execute(std::move(ctx));
+}
+
+int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
+{
 	ctx_.build();
 	SLOG("trying to execute "<<ctx_.executable()<<" in "<<ctx_.current_path()<<(ctx_.use_path()?" using path":" without using path"));
 	boost::process::context ctx;
@@ -35,5 +40,31 @@ int bunsan::process::sync_execute(const bunsan::process::context &ctx__)
 		return status.exit_status();
 	else
 		return -1;
+}
+
+bunsan::process::context &bunsan::process::context::operator=(context &&ctx)
+{
+	current_path_ = std::move(ctx.current_path_);
+	executable_ = std::move(ctx.executable_);
+	argv_ = std::move(ctx.argv_);
+	use_path_ = ctx.use_path_;
+	return *this;
+}
+
+void bunsan::process::context::build()
+{
+	if (!current_path_)
+		current_path_ = boost::filesystem::current_path();
+	if (!executable_)
+	{
+		if (use_path_)
+		{
+			if (argv_.empty())
+				throw std::runtime_error("Nothing to execute!");
+			executable_ = argv_.at(0);
+		}
+		else
+			executable_ = boost::filesystem::absolute(argv_.at(0));
+	}
 }
 
