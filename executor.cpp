@@ -1,9 +1,9 @@
-#include "executor.hpp"
+#include "bunsan/executor.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 
-#include "util.hpp"
+#include "bunsan/util.hpp"
 
 bunsan::executor::executor(const std::string &command): positional(0), next_positional(0)
 {
@@ -153,7 +153,7 @@ private:
 	const dict *named;
 };
 
-#include "execute.hpp"
+#include "bunsan/execute.hpp"
 
 void bunsan::executor::prepare(std::vector<std::string> &args, token_visitor &visitor) const
 {

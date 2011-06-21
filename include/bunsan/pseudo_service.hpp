@@ -4,7 +4,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "service.hpp"
+#include "bunsan/service.hpp"
 
 namespace bunsan
 {
