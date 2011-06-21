@@ -22,14 +22,7 @@ namespace bunsan
 							argv_(std::move(ctx.argv_)),
 							use_path_(ctx.use_path_){}
 			context &operator=(const context &)=default;
-			inline context &operator=(context &&ctx)
-			{
-				current_path_ = std::move(ctx.current_path_);
-				executable_ = std::move(ctx.executable_);
-				argv_ = std::move(ctx.argv_);
-				use_path_ = ctx.use_path_;
-				return *this;
-			}
+			context &operator=(context &&ctx);
 			inline bool operator==(const context &ctx) const
 			{
 				return	current_path_==ctx.current_path_ &&
@@ -73,22 +66,7 @@ namespace bunsan
 			{
 				return use_path_;
 			}
-			inline void build()
-			{
-				if (!current_path_)
-					current_path_ = boost::filesystem::current_path();
-				if (!executable_)
-				{
-					if (use_path_)
-					{
-						if (argv_.empty())
-							throw std::runtime_error("Nothing to execute!");
-						executable_ = argv_.at(0);
-					}
-					else
-						executable_ = boost::filesystem::absolute(argv_.at(0));
-				}
-			}
+			void build();
 		private:
 			boost::optional<boost::filesystem::path> current_path_;
 			boost::optional<boost::filesystem::path> executable_;
@@ -96,6 +74,7 @@ namespace bunsan
 			bool use_path_;
 		};
 		int sync_execute(const context &ctx);
+		int sync_execute(context &&ctx);
 		inline int sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &executable, const std::vector<std::string> &args, bool use_path=true)
 		{
 			return sync_execute(context().current_path(cwd).executable(executable).argv(args).use_path(use_path));
