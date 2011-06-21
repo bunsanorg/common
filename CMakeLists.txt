@@ -31,7 +31,7 @@ add_definitions(-std=c++0x -pthread -g)
 
 aux_source_directory(. srcs)
 
-include_directories(.)
+include_directories(include)
 
 # platform_defined
 if (UNIX)
@@ -52,9 +52,7 @@ target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${xmlrpc_link_lib})
 
 # install
 
-file(GLOB headers . "*.hpp")
-install(FILES ${headers} DESTINATION include/bunsan)
-
+install(DIRECTORY include DESTINATION .)
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 
 # testing

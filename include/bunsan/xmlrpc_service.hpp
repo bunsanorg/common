@@ -8,7 +8,7 @@
 #include <xmlrpc-c/registry.hpp>
 #include <xmlrpc-c/girerr.hpp>
 
-#include "service.hpp"
+#include "bunsan/service.hpp"
 
 namespace bunsan
 {

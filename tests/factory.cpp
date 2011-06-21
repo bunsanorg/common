@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "factory.hpp"
+#include "bunsan/factory.hpp"
 
 int main()
 {
