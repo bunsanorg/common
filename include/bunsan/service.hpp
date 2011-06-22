@@ -27,7 +27,7 @@ namespace bunsan
 		 */
 		virtual void stop()=0;
 		/*!
-		 * \return wether service is running
+		 * \return whether service is running
 		 */
 		virtual bool is_running()=0;
 		virtual inline ~service(){}
