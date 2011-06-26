@@ -164,10 +164,6 @@ void bunsan::executor::prepare(std::vector<std::string> &args, token_visitor &vi
 		{
 			args[i] += boost::apply_visitor(visitor, j);
 		}
-		/*for (size_t j = 0; j<arguments[i].size(); ++j)
-		{
-			args[i] = boost::apply_visitor(visitor, arguments[i][j]);//XXX???
-		}*/
 	}
 }
 
@@ -185,6 +181,9 @@ bunsan::process::context bunsan::executor::context() const
 	iter = named.find(current_path_key);
 	if (iter!=named.end())
 		ctx.current_path(iter->second);
+	iter = named.find(use_path_key);
+	if (iter!=named.end())
+		ctx.use_path(iter->second=="true" || iter->second=="yes" || iter->second=="1"); // TODO bad code
 	return ctx;
 }
 

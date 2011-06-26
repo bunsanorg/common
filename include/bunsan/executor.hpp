@@ -106,6 +106,7 @@ namespace bunsan
 	public:
 		static constexpr const char *current_path_key = "current_path";
 		static constexpr const char *executable_key = "executable";
+		static constexpr const char *use_path_key = "use_path";
 		typedef boost::variant<size_t, std::string> reference;
 		typedef boost::variant<reference, std::string> token;
 		typedef std::vector<token> string;
