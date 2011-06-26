@@ -53,18 +53,15 @@ bunsan::process::context &bunsan::process::context::operator=(context &&ctx)
 
 void bunsan::process::context::build()
 {
+	if (argv_.empty())
+		throw std::runtime_error("Nothing to execute! Empty argv.");
 	if (!current_path_)
 		current_path_ = boost::filesystem::current_path();
 	if (!executable_)
-	{
-		if (use_path_)
-		{
-			if (argv_.empty())
-				throw std::runtime_error("Nothing to execute!");
-			executable_ = argv_.at(0);
-		}
-		else
-			executable_ = boost::filesystem::absolute(argv_.at(0));
-	}
+		executable_ = argv_.at(0);
+	if (!use_path_)// if user haven't set this variable, we have to set it depending executable string
+		use_path_ = executable_.get().filename()==executable_.get();
+	if (!use_path_.get())// if we do not use path, it is prefered to have absolute path to the executable file
+		executable_ = boost::filesystem::absolute(executable_.get());
 }
 

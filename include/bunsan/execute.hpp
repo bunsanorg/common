@@ -64,14 +64,25 @@ namespace bunsan
 			}
 			inline bool use_path() const
 			{
-				return use_path_;
+				return use_path_.get();
 			}
+			/*!
+			 * \brief prepare context to execution
+			 *
+			 * \post all properties are initialized
+			 */
 			void build();
+			inline context built() const
+			{
+				context tmp(*this);
+				tmp.build();
+				return tmp;
+			}
 		private:
 			boost::optional<boost::filesystem::path> current_path_;
 			boost::optional<boost::filesystem::path> executable_;
 			std::vector<std::string> argv_;
-			bool use_path_;
+			boost::optional<bool> use_path_;
 		};
 		int sync_execute(const context &ctx);
 		int sync_execute(context &&ctx);

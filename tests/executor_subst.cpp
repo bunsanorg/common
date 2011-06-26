@@ -19,7 +19,7 @@ int main()
 		"t 3\n");
 	read_info(in_1, pt);
 	vs out_1 = {"1", "2", "3"};
-	assert(executor(pt).context().argv()==out_1);
+	assert(executor(pt).context().built().argv()==out_1);
 	ss in_2(
 		"t 1\n"
 		"p 0\n"
@@ -29,7 +29,7 @@ int main()
 		"p 1\n");
 	read_info(in_2, pt);
 	vs out_2 = {"1", "2", "3", "4", "5", "6"};
-	assert(executor(pt).add_argument("2", "6", "4").context().argv()==out_2);
+	assert(executor(pt).add_argument("2", "6", "4").context().built().argv()==out_2);
 	ss in_3(
 		"t 1\n"		//1
 		"c\n"		//234
@@ -45,7 +45,7 @@ int main()
 		"}\n");
 	read_info(in_3, pt);
 	vs out_3 = {"1", "234", "5", "678"};
-	assert(executor(pt).add_argument("2", "678", "5", "4").context().argv()==out_3);
+	assert(executor(pt).add_argument("2", "678", "5", "4").context().built().argv()==out_3);
 	ss in_4(
 		"n first\n"	//1
 		"c\n"		//_2_3_4
@@ -71,7 +71,7 @@ int main()
 			.set_argument("third", "_3")
 			.set_argument("_4", "_4")
 			.set_argument("_5", "_5")
-			.set_argument("_6", "7").context().argv()==out_4);
+			.set_argument("_6", "7").context().built().argv()==out_4);
 	ss in_5(
 		"n first\n"	//1
 		"c\n"		//_2_3_4
@@ -99,13 +99,13 @@ int main()
 		"}\n");
 	read_info(in_5, pt);
 	vs out_5 = out_4;
-	assert(executor(pt).add_argument("6", "8", "5").context().argv()==out_5);
+	assert(executor(pt).add_argument("6", "8", "5").context().built().argv()==out_5);
 	ss in_6(
 		"t 1\n"
 		"t 2\n"
 		"p 1\n");
 	read_info(in_6, pt);
 	vs out_6 = {"1", "2", "3", "4"};
-	assert(executor(pt).add_argument("O_O", "3", "4").context().argv()==out_6);
+	assert(executor(pt).add_argument("O_O", "3", "4").context().built().argv()==out_6);
 }
 
