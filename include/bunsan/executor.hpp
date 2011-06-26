@@ -17,7 +17,6 @@ namespace bunsan
 	{
 	public:
 		explicit return_code(int code_);
-		//virtual const char *what() const throw();
 		operator int() const throw();
 	private:
 		int code;
@@ -45,7 +44,6 @@ namespace bunsan
 		 * \return return code
 		 */
 		int sync() const;
-		// \todo named argument support
 		/*!
 		 * \brief add positional argument
 		 * \return *this
@@ -60,7 +58,7 @@ namespace bunsan
 		 */
 		executor &current_path(const boost::filesystem::path &cwd);
 		/*!
-		 * \brief set executable file (without 0 argument will be used
+		 * \brief set executable file (without 0 argument will be used)
 		 */
 		executor &executable(const boost::filesystem::path &exec_);
 		template <typename ... Args>
@@ -116,8 +114,6 @@ namespace bunsan
 	private:
 		std::vector<string> arguments;
 		std::vector<string_opt> positional;
-		//boost::optional<boost::filesystem::path> current_path_;
-		//boost::optional<boost::filesystem::path> exec_;
 		size_t next_positional;
 		dict named;
 		class token_visitor;
