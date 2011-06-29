@@ -36,7 +36,7 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 		return -1;
 }
 
-void bunsan::process::context::build()
+void bunsan::process::context::build_()
 {
 	if (argv_.empty() && !executable_)
 		throw std::runtime_error("Nothing to execute! Empty argv and executable is not set.");
