@@ -153,8 +153,6 @@ private:
 	const dict *named;
 };
 
-#include "bunsan/execute.hpp"
-
 void bunsan::executor::prepare(std::vector<std::string> &args, token_visitor &visitor) const
 {
 	for (size_t i = 0; i<arguments.size(); ++i)
