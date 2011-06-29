@@ -36,15 +36,6 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 		return -1;
 }
 
-bunsan::process::context &bunsan::process::context::operator=(context &&ctx)
-{
-	current_path_ = std::move(ctx.current_path_);
-	executable_ = std::move(ctx.executable_);
-	argv_ = std::move(ctx.argv_);
-	use_path_ = ctx.use_path_;
-	return *this;
-}
-
 void bunsan::process::context::build()
 {
 	if (argv_.empty() && !executable_)

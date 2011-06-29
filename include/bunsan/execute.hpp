@@ -20,15 +20,31 @@ namespace bunsan
 			inline context(context &&ctx):	current_path_(std::move(ctx.current_path_)),
 							executable_(std::move(ctx.executable_)),
 							argv_(std::move(ctx.argv_)),
-							use_path_(ctx.use_path_){}
-			context &operator=(const context &)=default;
-			context &operator=(context &&ctx);
+							use_path_(std::move(ctx.use_path_)){}
+			context &operator=(const context &ctx)
+			{
+				context ctx_(ctx);
+				this->swap(ctx_);
+				return *this;
+			}
+			inline context &operator=(context &&ctx) throw()
+			{
+				this->swap(ctx);
+				return *this;
+			}
 			inline bool operator==(const context &ctx) const
 			{
 				return	current_path_==ctx.current_path_ &&
 					executable_==ctx.executable_ &&
 					argv_==ctx.argv_ &&
 					use_path_==ctx.use_path_;
+			}
+			inline void swap(context &ctx) throw()
+			{
+				current_path_.swap(ctx.current_path_);
+				executable_.swap(ctx.executable_);
+				argv_.swap(ctx.argv_);
+				use_path_.swap(ctx.use_path_);
 			}
 			inline context &current_path(const boost::filesystem::path &current_path_)
 			{
@@ -84,6 +100,10 @@ namespace bunsan
 			std::vector<std::string> argv_;
 			boost::optional<bool> use_path_;
 		};
+		inline void swap(context &a, context &b) throw()
+		{
+			a.swap(b);
+		}
 		int sync_execute(const context &ctx);
 		int sync_execute(context &&ctx);
 		inline int sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &executable, const std::vector<std::string> &args, bool use_path=true)
