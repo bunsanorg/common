@@ -87,14 +87,20 @@ namespace bunsan
 			 *
 			 * \post all properties are initialized
 			 */
-			void build();
+			inline void build()
+			{
+				context ctx(*this);
+				ctx.build_();
+				this->swap(ctx);
+			}
 			inline context built() const
 			{
-				context tmp(*this);
-				tmp.build();
-				return tmp;
+				context ctx(*this);
+				ctx.build_();
+				return ctx;
 			}
 		private:
+			void build_();
 			boost::optional<boost::filesystem::path> current_path_;
 			boost::optional<boost::filesystem::path> executable_;
 			std::vector<std::string> argv_;
