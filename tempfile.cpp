@@ -2,10 +2,6 @@
 
 #include "bunsan/util.hpp"
 
-/*bunsan::tempfile::tempfile(): file(boost::filesystem::unique_path(boost::filesystem::temp_directory_path()/"%%%%-%%%%-%%%%-%%%%")), do_auto_remove(true) {}*/
-
-//bunsan::tempfile::tempfile(const boost::filesystem::path &model): file(boost::filesystem::unique_path(model)), do_auto_remove(true) {}
-
 bunsan::tempfile_ptr bunsan::tempfile::in_dir(const boost::filesystem::path &dir)
 {
 	return bunsan::tempfile::from_model(dir/"%%%%-%%%%-%%%%-%%%%");
@@ -21,7 +17,7 @@ bunsan::tempfile_ptr bunsan::tempfile::unique()
 	return bunsan::tempfile::from_model(boost::filesystem::temp_directory_path()/"%%%%-%%%%-%%%%-%%%%");
 }
 
-bunsan::tempfile::tempfile(const boost::filesystem::path &file_): file(file_), do_auto_remove(true) {}
+bunsan::tempfile::tempfile(const boost::filesystem::path &file_, bool do_auto_remove_): file(file_), do_auto_remove(do_auto_remove_) {}
 
 boost::filesystem::path bunsan::tempfile::path() const
 {
