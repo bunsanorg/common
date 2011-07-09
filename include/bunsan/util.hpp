@@ -12,7 +12,7 @@
 			buf<<"["<<__FILE__<<":"<<__LINE__<<":"<<__func__<<":"<<boost::posix_time::second_clock::local_time()<<"] "<<M<<std::endl;\
 			std::cerr<<buf.str()<<std::flush;\
 		} while (false)
-#define DLOG(M) SLOG(#M)
+#define DLOG(...) SLOG(#__VA_ARGS__)
 
 #include <locale>
 #include <string>
