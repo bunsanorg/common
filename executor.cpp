@@ -52,12 +52,12 @@ bunsan::executor::executor(const boost::property_tree::ptree &command): next_pos
 		string arg;
 		if (arg_value.first=="c" || arg_value.first=="complex")
 		{
-			SLOG("complex type");
+			DLOG(complex type);
 			for (const auto &arg_subvalue: arg_value.second)
 			{
 				process(arg, arg_subvalue);
 			}
-			SLOG("end of complex type");
+			DLOG(end of complex type);
 		}
 		else if (arg_value.first=="d" || arg_value.first=="definition")
 		{
