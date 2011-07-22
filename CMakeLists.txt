@@ -23,7 +23,7 @@ message("We have to check pthread library on win* platform")
 
 add_definitions(-std=c++0x -pthread -g)
 
-aux_source_directory(. srcs)
+aux_source_directory(src srcs)
 
 include_directories(include)
 
