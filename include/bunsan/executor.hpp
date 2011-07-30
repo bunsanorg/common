@@ -25,6 +25,8 @@ namespace bunsan
 	{
 	public:
 		explicit executor(const std::string &command);
+		explicit executor(const boost::filesystem::path &command);
+		explicit executor(const char *command);
 		explicit executor(const boost::property_tree::ptree &command);
 		executor(const executor &)=default;
 		executor(executor &&)=default;
@@ -49,10 +51,26 @@ namespace bunsan
 		 * \return *this
 		 */
 		executor &add_argument(const std::string &arg);
+		inline executor &add_argument(const boost::filesystem::path &arg)
+		{
+			return add_argument(arg.native());
+		}
+		inline executor &add_argument(const char *arg)
+		{
+			return add_argument(std::string(arg));
+		}
 		/*!
 		 * \brief set named argument
 		 */
 		executor &set_argument(const std::string &key, const std::string &arg);
+		inline executor &set_argument(const std::string &key, const boost::filesystem::path &arg)
+		{
+			return set_argument(key, arg.native());
+		}
+		inline executor &set_argument(const std::string &key, const char *arg)
+		{
+			return set_argument(key, std::string(arg));
+		}
 		/*!
 		 * \brief set current work directory for process
 		 */
@@ -61,11 +79,11 @@ namespace bunsan
 		 * \brief set executable file (without 0 argument will be used)
 		 */
 		executor &executable(const boost::filesystem::path &exec_);
-		template <typename ... Args>
-		executor &add_argument(const std::string &arg, const Args &...args)
+		template <typename T1, typename T2, typename ... Args>
+		executor &add_argument(const T1 &arg1, const T2 &arg2, const Args &...args)
 		{
-			add_argument(arg);
-			return add_argument(args...);
+			add_argument(arg1);
+			return add_argument(arg2, args...);
 		}
 		template <typename ... Args>
 		int sync(const Args &...args) const
