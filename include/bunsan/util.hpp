@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef BUNSAN_UTIL_HPP
+#define BUNSAN_UTIL_HPP
 
 #include <iostream>
 #include <sstream>
@@ -43,5 +43,5 @@ namespace bunsan
 	}
 }
 
-#endif //UTIL_HPP
+#endif //BUNSAN_UTIL_HPP
 

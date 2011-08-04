@@ -1,5 +1,5 @@
-#ifndef SERVICE_HPP
-#define SERVICE_HPP
+#ifndef BUNSAN_SERVICE_HPP
+#define BUNSAN_SERVICE_HPP
 
 #include <memory>
 
@@ -35,5 +35,5 @@ namespace bunsan
 	typedef std::shared_ptr<service> service_ptr;
 }
 
-#endif //SERVICE_HPP
+#endif //BUNSAN_SERVICE_HPP
 

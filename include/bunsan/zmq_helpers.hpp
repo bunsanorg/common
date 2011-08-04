@@ -1,5 +1,5 @@
-#ifndef ZMQ_HELPERS_HPP
-#define ZMQ_HELPERS_HPP
+#ifndef BUNSAN_ZMQ_HELPERS_HPP
+#define BUNSAN_ZMQ_HELPERS_HPP
 
 #include <string>
 #include <vector>
@@ -87,5 +87,5 @@ namespace bunsan{namespace zmq_helpers
 	void decode(/*const */zmq::message_t &msg, std::vector<unsigned char> &c);
 }}
 
-#endif //ZMQ_HELPERS_HPP
+#endif //BUNSAN_ZMQ_HELPERS_HPP
 

@@ -1,5 +1,5 @@
-#ifndef XMLRPC_SERVICE_HPP
-#define XMLRPC_SERVICE_HPP
+#ifndef BUNSAN_XMLRPC_SERVICE_HPP
+#define BUNSAN_XMLRPC_SERVICE_HPP
 
 #include <thread>
 #include <mutex>
@@ -33,5 +33,5 @@ namespace bunsan
 	};
 }
 
-#endif //XMLRPC_SERVICE_HPP
+#endif //BUNSAN_XMLRPC_SERVICE_HPP
 
