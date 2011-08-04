@@ -1,5 +1,5 @@
-#ifndef FACTORY_HPP
-#define FACTORY_HPP
+#ifndef BUNSAN_FACTORY_HPP
+#define BUNSAN_FACTORY_HPP
 
 #include <map>
 #include <string>
@@ -35,5 +35,5 @@ namespace bunsan{namespace factory
 	}
 }}
 
-#endif //FACTORY_HPP
+#endif //BUNSAN_FACTORY_HPP
 

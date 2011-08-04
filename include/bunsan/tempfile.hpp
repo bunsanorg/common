@@ -1,5 +1,5 @@
-#ifndef TEMPFILE_HPP
-#define TEMPFILE_HPP
+#ifndef BUNSAN_TEMPFILE_HPP
+#define BUNSAN_TEMPFILE_HPP
 
 #include <string>
 #include <memory>
@@ -39,5 +39,5 @@ namespace bunsan
 	typedef tempfile::tempfile_ptr tempfile_ptr;
 }
 
-#endif //TEMPFILE_HPP
+#endif //BUNSAN_TEMPFILE_HPP
 

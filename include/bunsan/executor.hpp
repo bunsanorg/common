@@ -1,5 +1,5 @@
-#ifndef EXECUTOR_HPP
-#define EXECUTOR_HPP
+#ifndef BUNSAN_EXECUTOR_HPP
+#define BUNSAN_EXECUTOR_HPP
 
 #include <stdexcept>
 #include <string>
@@ -142,5 +142,5 @@ namespace bunsan
 	};
 }
 
-#endif //EXECUTOR_HPP
+#endif //BUNSAN_EXECUTOR_HPP
 

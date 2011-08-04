@@ -1,5 +1,5 @@
-#ifndef PSEUDO_SERVICE_HPP
-#define PSEUDO_SERVICE_HPP
+#ifndef BUNSAN_PSEUDO_SERVICE_HPP
+#define BUNSAN_PSEUDO_SERVICE_HPP
 
 #include <mutex>
 #include <condition_variable>
@@ -25,5 +25,5 @@ namespace bunsan
 	};
 }
 
-#endif //PSEUDO_SERVICE_HPP
+#endif //BUNSAN_PSEUDO_SERVICE_HPP
 

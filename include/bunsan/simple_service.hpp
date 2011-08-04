@@ -1,5 +1,5 @@
-#ifndef SIMPLE_SERVICE_HPP
-#define SIMPLE_SERVICE_HPP
+#ifndef BUNSAN_SIMPLE_SERVICE_HPP
+#define BUNSAN_SIMPLE_SERVICE_HPP
 
 namespace bunsan
 {
@@ -12,5 +12,5 @@ namespace bunsan
 	};
 }
 
-#endif //SIMPLE_SERVICE_HPP
+#endif //BUNSAN_SIMPLE_SERVICE_HPP
 

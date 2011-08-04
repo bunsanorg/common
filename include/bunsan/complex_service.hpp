@@ -1,5 +1,5 @@
-#ifndef COMPLEX_SERVICE_HPP
-#define COMPLEX_SERVICE_HPP
+#ifndef BUNSAN_COMPLEX_SERVICE_HPP
+#define BUNSAN_COMPLEX_SERVICE_HPP
 
 #include <vector>
 
@@ -21,5 +21,5 @@ namespace bunsan
 	};
 }
 
-#endif //COMPLEX_SERVICE_HPP
+#endif //BUNSAN_COMPLEX_SERVICE_HPP
 
