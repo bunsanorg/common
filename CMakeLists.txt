@@ -2,33 +2,25 @@ project(bunsan_common)
 
 cmake_minimum_required(VERSION 2.8)
 
-set(
-	xmlrpc_link_lib
-	xmlrpc++
-	xmlrpc_client++
-	xmlrpc_cpp
-	xmlrpc_server++
-	xmlrpc_server_abyss++
-	xmlrpc_server_cgi++
-	xmlrpc_server_pstream++
-	xmlrpc_util
-)
+find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
 
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-find_package (Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
-message("We have to check pthread library on win* platform")
+
+message(AUTHOR_WARNING "We have to check pthread library on win* platform")
+message(AUTHOR_WARNING "We have to provide support for different compilers")
 
 add_definitions(-std=c++0x -pthread -g)
 
 aux_source_directory(src srcs)
 
-include_directories(include)
+include_directories(include ${XMLRPC_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME} SHARED ${srcs})
-target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${xmlrpc_link_lib})
+target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${XMLRPC_LIBRARIES})
 
 # install
 
