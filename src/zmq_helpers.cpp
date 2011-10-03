@@ -1,5 +1,7 @@
 #include "bunsan/zmq_helpers.hpp"
 
+#include <stdexcept>
+
 #include <cstring>
 
 bunsan::zmq_helpers::socket::socket(zmq::context_t &context, int type): zmq::socket_t(context, type){}
@@ -36,6 +38,8 @@ void bunsan::zmq_helpers::encode(const std::vector<std::string> &c, zmq::message
 	char *buf = static_cast<char *>(msg.data());
 	for (const std::string &i: c)
 	{
+		if (i.find('\0')!=std::string::npos)
+			throw std::invalid_argument("string in std::vector<std::string> may not contain \\0 symbol");
 		memcpy(buf, i.c_str(), i.size());
 		buf += i.size();
 		*buf = '\0';

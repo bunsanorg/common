@@ -18,6 +18,22 @@ int main()
 	encode(msgs1, message);
 	decode(message, ss);
 	assert(msgs1==ss);
+	std::vector<std::string> msgs2;
+	std::string buf;
+	buf.push_back('1');
+	buf.push_back('2');
+	buf.push_back('3');
+	buf.push_back('\0');
+	buf.push_back('5');
+	msgs2.push_back(buf);
+	try
+	{
+		encode(msgs2, message);
+		assert(false);
+	}
+	catch (std::exception &e)
+	{
+	}
 	return 0;
 }
 
