@@ -14,8 +14,10 @@ namespace bunsan{namespace zmq_helpers
 	/// autoclosing socket
 	class socket: public zmq::socket_t
 	{
+		int linger;
 	public:
 		socket(zmq::context_t &context, int type);
+		void set_linger(int linger_);
 		~socket();
 	};
 	// generic
