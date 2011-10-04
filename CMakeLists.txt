@@ -13,13 +13,22 @@ include_directories(${Boost_INCLUDE_DIRS})
 message(AUTHOR_WARNING "We have to check pthread library on win* platform")
 message(AUTHOR_WARNING "We have to provide support for different compilers")
 
-add_definitions(-std=c++0x -pthread -g)
+add_definitions(-std=c++0x -pthread -g -Wall -Wextra)
 
 aux_source_directory(src srcs)
+aux_source_directory(src/process process_srcs)
+
+if (${UNIX})
+	aux_source_directory(src/process/impl/unix process_impl_srcs)
+elseif(${WIN32})
+	aux_source_directory(src/process/impl/win32 process_impl_srcs)
+else()
+	message(SEND_ERROR "Unsupported platform")
+endif()
 
 include_directories(include ${XMLRPC_INCLUDE_DIRS})
 
-add_library(${PROJECT_NAME} SHARED ${srcs})
+add_library(${PROJECT_NAME} SHARED ${srcs} ${process_srcs} ${process_impl_srcs})
 target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${XMLRPC_LIBRARIES})
 
 # install
