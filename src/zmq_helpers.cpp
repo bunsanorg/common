@@ -4,12 +4,16 @@
 
 #include <cstring>
 
-bunsan::zmq_helpers::socket::socket(zmq::context_t &context, int type): zmq::socket_t(context, type){}
+bunsan::zmq_helpers::socket::socket(zmq::context_t &context, int type): zmq::socket_t(context, type), linger(0){}
+
+void bunsan::zmq_helpers::socket::set_linger(int linger_)
+{
+	linger = linger_;
+}
 
 bunsan::zmq_helpers::socket::~socket()
 {
-	int zero = 0;
-	setsockopt(ZMQ_LINGER, &zero, sizeof(zero));
+	setsockopt(ZMQ_LINGER, &linger, sizeof(linger));
 };
 
 // string
