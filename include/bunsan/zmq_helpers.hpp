@@ -18,8 +18,32 @@ namespace bunsan{namespace zmq_helpers
 	public:
 		socket(zmq::context_t &context, int type);
 		void set_linger(int linger_);
+		using zmq::socket_t::setsockopt;
+		using zmq::socket_t::getsockopt;
+		template <typename T>
+		inline void setsockopt(int option, const T *value)
+		{
+			zmq::socket_t::setsockopt(option, value, sizeof(T));
+		}
+		template <typename T>
+		inline void setsockopt(int option, const T &value)
+		{
+			zmq::socket_t::setsockopt(option, &value, sizeof(T));
+		}
+		template <typename T>
+		inline void getsockopt(int option, T &value)
+		{
+			getsockopt(option, &value);
+		}
+		template <typename T>
+		inline void getsockopt(int option, T *value)
+		{
+			size_t len = sizeof(T);
+			zmq::socket_t::getsockopt(option, value, &len);
+		}
 		~socket();
 	};
+	typedef socket socket_t;
 	// generic
 	template <typename T>
 	void encode(const T &c, zmq::message_t &msg);
