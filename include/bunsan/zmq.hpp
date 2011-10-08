@@ -27,14 +27,17 @@ namespace bunsan{namespace zmq
 		bool send(const char *msg, int opt=0);
 		bool send(const std::vector<unsigned char> &msg, int opt=0);
 		//TODO all char overloads
+		bool send(const std::vector<std::string> &msg, int opt=0);
 		template <typename T>
 		bool send_more(const T &msg)
 		{
 			return send(msg, ZMQ_SNDMORE);
 		}
 		// receive overloads
+		bool recv(zmq::message_t &msg, int opt=0);
 		bool recv(std::string &msg, int opt=0);
 		bool recv(std::vector<unsigned char> &msg, int opt=0);
+		bool recv(std::vector<std::string> &msg, int opt=0);
 		template <typename T>
 		bool recv_more(T &msg, int &more, int opt=0)
 		{

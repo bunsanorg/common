@@ -40,8 +40,51 @@ int main()
 #endif
 	test(inp, out, "");
 	test(inp, out, "hello world");
-	std::string s(1000000, '\0');
-	std::generate(s.begin(), s.end(), [](){return static_cast<char>(rand()%256);});
-	test(inp, out, s);
+	{
+		std::string s(1000000, '\0');
+		std::generate(s.begin(), s.end(), [](){return static_cast<char>(rand()%256);});
+		test(inp, out, s);
+	}
+	{
+		std::vector<std::string> msgs0 = {"msg1\n\n", "msg2", "dcjnjvcs\n\n\ndmklc", "o_O", "\n\n\nakmdad", "", "the end!!!111"};
+		test(inp, out, msgs0);
+	}
+	{
+		std::vector<std::string> msgs1 = {"", "", "o_O", ""};
+		test(inp, out, msgs1);
+	}
+	{
+		std::vector<std::string> msgs2;
+		std::string buf;
+		buf.push_back('1');
+		buf.push_back('2');
+		buf.push_back('3');
+		buf.push_back('\0');
+		buf.push_back('5');
+		msgs2.push_back(buf);
+		try
+		{
+			test(inp, out, msgs2);
+			assert(false);
+		}
+		catch (std::exception &e)
+		{
+		}
+	}
+	{
+		std::vector<std::string> vec(1000);
+		std::generate(vec.begin(), vec.end(),
+			[]()
+			{
+				std::string s(10000, '\0');
+				std::generate(s.begin(), s.end(),
+					[]()
+					{
+						return static_cast<char>(rand()%255+1);
+					});
+				return s;
+			});
+		test(inp, out, vec);
+	}
 }
 
