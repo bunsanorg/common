@@ -43,6 +43,15 @@ namespace bunsan{namespace zmq
 		bool recv(std::vector<unsigned char> &msg, int opt=0);
 		bool recv(std::vector<std::string> &msg, int opt=0);
 		template <typename T>
+		bool recv(boost::optional<T> &msg, int opt=0)
+		{
+			T msg_;
+			bool ret = recv(msg_, opt);
+			if (ret)
+				msg = msg_;
+			return ret;
+		}
+		template <typename T>
 		bool recv_more(T &msg, int &more, int opt=0)
 		{
 			bool ret = false;
