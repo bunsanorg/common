@@ -14,6 +14,10 @@ namespace bunsan{namespace zmq
 	using ::zmq::message_t;
 	using ::zmq::context_t;
 	using ::zmq::error_t;
+	using ::zmq::pollitem_t;
+	using ::zmq::free_fn;
+	using ::zmq::poll;
+	using ::zmq::version;
 	class socket_t: public ::zmq::socket_t
 	{
 		boost::optional<int> linger;
