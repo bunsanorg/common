@@ -4,6 +4,7 @@
 
 #include <boost/property_tree/info_parser.hpp>
 
+#include "bunsan/util.hpp"
 #include "bunsan/executor.hpp"
 
 int main()
@@ -27,6 +28,9 @@ int main()
 		ctx = executor(pt).context();
 		assert(false);
 	}
-	catch (std::exception &e){}
+	catch (std::exception &e)
+	{
+		SLOG("caught: "<<e.what());
+	}
 }
 

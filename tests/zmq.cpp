@@ -1,3 +1,4 @@
+#include "bunsan/util.hpp"
 #include "bunsan/zmq.hpp"
 
 #include <algorithm>
@@ -69,6 +70,7 @@ int main()
 		}
 		catch (std::exception &e)
 		{
+			SLOG("caught: "<<e.what());
 		}
 	}
 	{
