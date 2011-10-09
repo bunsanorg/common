@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -17,6 +18,7 @@
 #include <locale>
 #include <string>
 
+#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -24,6 +26,55 @@
 
 namespace bunsan
 {
+	namespace error_message
+	{
+		constexpr const char *invalid_optional = "boost::optional was not initialized";
+	}
+	// exception overload
+	template <typename T, typename E>
+	T &get(boost::optional<T> &o, const E &e)
+	{
+		if (!o)
+			throw e;
+		return o.get();
+	}
+	template <typename T, typename E>
+	const T &get(const boost::optional<T> &o, const E &e)
+	{
+		if (!o)
+			throw e;
+		return o.get();
+	}
+	// std::string overload
+	template <typename T>
+	T &get(boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
+	{
+		if (!o)
+			throw std::invalid_argument(msg);
+		return o.get();
+	}
+	template <typename T>
+	const T &get(const boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
+	{
+		if (!o)
+			throw std::invalid_argument(msg);
+		return o.get();
+	}
+	// const char * overload
+	template <typename T>
+	T &get(boost::optional<T> &o, const char *msg)
+	{
+		if (!o)
+			throw std::invalid_argument(msg);
+		return o.get();
+	}
+	template <typename T>
+	const T &get(const boost::optional<T> &o, const char *msg)
+	{
+		if (!o)
+			throw std::invalid_argument(msg);
+		return o.get();
+	}
 	/*!
 	 * \brief recreate directory
 	 */
