@@ -7,6 +7,8 @@
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include "bunsan/util.hpp"
+
 namespace bunsan
 {
 	namespace process
@@ -45,6 +47,7 @@ namespace bunsan
 				argv_.swap(ctx.argv_);
 				use_path_.swap(ctx.use_path_);
 			}
+			// current path
 			inline context &current_path(const boost::filesystem::path &current_path_)
 			{
 				this->current_path_ = current_path_;
@@ -52,8 +55,9 @@ namespace bunsan
 			}
 			inline const boost::filesystem::path &current_path() const
 			{
-				return current_path_.get();
+				return bunsan::get(current_path_, "current_path member was not initialized");
 			}
+			// executable
 			inline context &executable(const boost::filesystem::path &executable_)
 			{
 				this->executable_ = executable_;
@@ -61,8 +65,9 @@ namespace bunsan
 			}
 			inline const boost::filesystem::path &executable() const
 			{
-				return executable_.get();
+				return bunsan::get(executable_, "executable member was not initialized");
 			}
+			// argv
 			inline context &argv(const std::vector<std::string> &argv_)
 			{
 				this->argv_ = argv_;
@@ -72,6 +77,7 @@ namespace bunsan
 			{
 				return argv_;
 			}
+			// use path
 			inline context &use_path(bool use_path_)
 			{
 				this->use_path_ = use_path_;
@@ -79,8 +85,9 @@ namespace bunsan
 			}
 			inline bool use_path() const
 			{
-				return use_path_.get();
+				return bunsan::get(use_path_, "use_path member was not initialized");
 			}
+			// build functions
 			/*!
 			 * \brief prepare context to execution
 			 *
