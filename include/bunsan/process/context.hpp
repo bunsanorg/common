@@ -77,6 +77,10 @@ namespace bunsan
 			{
 				return argv_;
 			}
+			inline std::vector<std::string> &argv()
+			{
+				return argv_;
+			}
 			// use path
 			inline context &use_path(bool use_path_)
 			{
