@@ -87,6 +87,17 @@ namespace bunsan{namespace zmq
 			size_t len = sizeof(T);
 			::zmq::socket_t::getsockopt(option, value, &len);
 		}
+		// bind and connect overloads
+		using ::zmq::socket_t::bind;
+		using ::zmq::socket_t::connect;
+		inline void bind(const std::string &addr)
+		{
+			bind(addr.c_str());
+		}
+		inline void connect(const std::string &addr)
+		{
+			connect(addr.c_str());
+		}
 		~socket_t();
 	};
 	typedef socket_t socket;
