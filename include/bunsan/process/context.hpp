@@ -6,7 +6,11 @@
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/optional.hpp>
+#include <boost/serialization/vector.hpp>
 
+#include "bunsan/serialization/path.hpp"
 #include "bunsan/util.hpp"
 
 namespace bunsan
@@ -15,6 +19,15 @@ namespace bunsan
 	{
 		class context
 		{
+		friend class boost::serialization::access;
+		template <typename Archive>
+		void serialize(Archive &ar, const unsigned int version)
+		{
+			ar & current_path_;
+			ar & executable_;
+			ar & argv_;
+			ar & use_path_;
+		}
 		public:
 			context()=default;
 			context(const context &)=default;
@@ -42,10 +55,11 @@ namespace bunsan
 			}
 			inline void swap(context &ctx) throw()
 			{
-				current_path_.swap(ctx.current_path_);
-				executable_.swap(ctx.executable_);
-				argv_.swap(ctx.argv_);
-				use_path_.swap(ctx.use_path_);
+				using boost::swap;
+				swap(current_path_, ctx.current_path_);
+				swap(executable_, ctx.executable_);
+				swap(argv_, ctx.argv_);
+				swap(use_path_, ctx.use_path_);
 			}
 			// current path
 			inline context &current_path(const boost::filesystem::path &current_path_)
