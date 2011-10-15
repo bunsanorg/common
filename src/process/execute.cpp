@@ -5,21 +5,7 @@
 
 #include "bunsan/util.hpp"
 
-#include "bunsan/process/detail/launch.hpp"
-#include "bunsan/process/detail/wait.hpp"
-
-int bunsan::process::detail::wait(boost::process::child &&child)
-{
-	DLOG(waiting for a child process);
-	boost::process::status status = child.wait();
-	DLOG(child process has completed);
-	if (status.exited())
-		return status.exit_status();
-	else
-		return -1;
-}
-
-boost::process::child bunsan::process::detail::launch(bunsan::process::context &&ctx_)
+int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 {
 	ctx_.build();
 	SLOG("trying to execute "<<ctx_.executable()<<" in "<<ctx_.current_path()<<(ctx_.use_path()?" using path":" without using path"));
@@ -36,7 +22,15 @@ boost::process::child bunsan::process::detail::launch(bunsan::process::context &
 	SLOG("executing \""<<exec_<<"\" in "<<ctx_.current_path()<<" with args");
 	for (size_t i = 0; i<ctx_.argv().size(); ++i)
 		SLOG("args["<<i<<"] == \""<<ctx_.argv()[i]<<"\"");
-	return boost::process::launch(exec_, ctx_.argv(), ctx);
+	// waiting
+	boost::process::child child = boost::process::launch(exec_, ctx_.argv(), ctx);
+	DLOG(waiting for a child process);
+	boost::process::status status = child.wait();
+	DLOG(child process has completed);
+	if (status.exited())
+		return status.exit_status();
+	else
+		return -1;
 }
 
 void bunsan::process::context::build_()
