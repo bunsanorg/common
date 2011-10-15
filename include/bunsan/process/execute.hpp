@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
@@ -14,8 +13,6 @@ namespace bunsan
 {
 	namespace process
 	{
-		int sync_execute(const context &ctx, const std::chrono::seconds &timeout);
-		int sync_execute(context &&ctx, const std::chrono::seconds &timeout);
 		int sync_execute(const context &ctx);
 		int sync_execute(context &&ctx);
 		inline int sync_execute(const boost::filesystem::path &cwd, const boost::filesystem::path &executable, const std::vector<std::string> &args, bool use_path=true)
