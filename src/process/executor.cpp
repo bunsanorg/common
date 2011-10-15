@@ -205,7 +205,7 @@ int bunsan::executor::sync() const
 	return bunsan::process::sync_execute(context());
 }
 
-bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command was finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
+bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command has finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
 
 bunsan::return_code::operator int() const throw()
 {
