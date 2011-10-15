@@ -20,7 +20,6 @@ namespace bunsan{namespace zmq
 	using ::zmq::version;
 	class socket_t: public ::zmq::socket_t
 	{
-		boost::optional<int> linger;
 	public:
 		socket_t(zmq::context_t &context, int type);
 		void set_linger(int linger_);
