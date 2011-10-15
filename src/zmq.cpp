@@ -6,13 +6,11 @@ bunsan::zmq::socket_t::socket_t(zmq::context_t &context, int type): ::zmq::socke
 
 void bunsan::zmq::socket_t::set_linger(int linger_)
 {
-	linger = linger_;
+	setsockopt(ZMQ_LINGER, linger_);
 }
 
 bunsan::zmq::socket_t::~socket_t()
 {
-	if (linger)
-		setsockopt(ZMQ_LINGER, &linger.get());
 };
 
 bool bunsan::zmq::socket_t::send(const std::string &msg, int opt)
