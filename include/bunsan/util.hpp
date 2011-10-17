@@ -92,6 +92,14 @@ namespace bunsan
 		boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().native(), pt);
 		boost::filesystem::current_path(boost::filesystem::initial_path());
 	}
+	/*!
+	 * \brief if node does not exists, set it to value (empty Ptree by default), return node
+	 */
+	template <typename Ptree>
+	Ptree &ptree_get(Ptree &ptree, const typename Ptree::path_type &path, const Ptree &value=Ptree())
+	{
+		return ptree.put_child(path, ptree.get_child(path, value));
+	}
 }
 
 #endif //BUNSAN_UTIL_HPP
