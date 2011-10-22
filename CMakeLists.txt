@@ -2,7 +2,16 @@ project(bunsan_common)
 
 cmake_minimum_required(VERSION 2.8)
 
-find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
+if (NOT DEFINED network)
+	message(STATUS "Using network library part")
+	set(network ON)
+endif()
+
+if (${network})
+	find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
+	set(network_libraries ${XMLRPC_LIBRARIES} zmq)
+	set(network_includes ${XMLRPC_INCLUDE_DIRS})
+endif()
 
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
@@ -18,10 +27,14 @@ add_definitions(-std=c++0x -pthread -g -Wall -Wextra)
 aux_source_directory(src srcs)
 aux_source_directory(src/process process_srcs)
 
-include_directories(include ${XMLRPC_INCLUDE_DIRS})
+if (${network})
+	aux_source_directory(src/network network_srcs)
+endif()
 
-add_library(${PROJECT_NAME} SHARED ${srcs} ${process_srcs})
-target_link_libraries(${PROJECT_NAME} zmq ${Boost_LIBRARIES} ${XMLRPC_LIBRARIES})
+include_directories(include ${network_includes})
+
+add_library(${PROJECT_NAME} SHARED ${srcs} ${process_srcs} ${network_srcs})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${network_libraries})
 
 # install
 
@@ -32,4 +45,7 @@ install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 
 enable_testing()
 add_subdirectory(tests ${PROJECT_BINARY_DIR}/tests)
+if (${network})
+	add_subdirectory(tests/network ${PROJECT_BINARY_DIR}/tests/network)
+endif()
 
