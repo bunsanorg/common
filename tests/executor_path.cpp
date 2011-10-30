@@ -44,7 +44,7 @@ int main()
 		"}\n");
 	read_info(in_3, pt);
 	ctx = executor(pt).context().built();
-	assert(ctx.executable()=="/bin/exe");
+	assert(ctx.executable()==boost::filesystem::absolute("/bin/exe"));
 	assert(!ctx.use_path());
 }
 
