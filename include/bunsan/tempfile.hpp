@@ -16,7 +16,8 @@ namespace bunsan
 		typedef std::shared_ptr<tempfile> tempfile_ptr;
 		explicit tempfile(const boost::filesystem::path &file_, bool do_auto_remove_=true);
 		boost::filesystem::path path() const;
-		std::string native() const;
+		boost::filesystem::path::string_type native() const;
+		std::string generic_string() const;
 		bool auto_remove() const;
 		void auto_remove(bool do_auto_remove_);
 		~tempfile() throw();

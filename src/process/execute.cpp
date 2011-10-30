@@ -10,15 +10,15 @@ int bunsan::process::sync_execute(bunsan::process::context &&ctx_)
 	ctx_.build();
 	SLOG("trying to execute "<<ctx_.executable()<<" in "<<ctx_.current_path()<<(ctx_.use_path()?" using path":" without using path"));
 	boost::process::context ctx;
-	ctx.work_directory = ctx_.current_path().native();
+	ctx.work_directory = ctx_.current_path().generic_string();
 	ctx.environment = boost::process::self::get_environment();
 	ctx.stdout_behavior = boost::process::inherit_stream();
 	ctx.stderr_behavior = boost::process::inherit_stream();
 	std::string exec_;
 	if (ctx_.use_path())
-		exec_ = boost::process::find_executable_in_path(ctx_.executable().native());
+		exec_ = boost::process::find_executable_in_path(ctx_.executable().generic_string());
 	else
-		exec_ = ctx_.executable().native();
+		exec_ = ctx_.executable().generic_string();
 	SLOG("executing \""<<exec_<<"\" in "<<ctx_.current_path()<<" with args");
 	for (size_t i = 0; i<ctx_.argv().size(); ++i)
 		SLOG("args["<<i<<"] == \""<<ctx_.argv()[i]<<"\"");
@@ -40,7 +40,7 @@ void bunsan::process::context::build_()
 	else //!argv_.empty() || executable_
 	{// we should set missing argv_[0] or executable_
 		if (executable_ && argv_.empty())
-			argv_.push_back(executable_.get().native());
+			argv_.push_back(executable_.get().generic_string());
 		else if (!executable_ && !argv_.empty())
 			executable_ = argv_.at(0);
 	}

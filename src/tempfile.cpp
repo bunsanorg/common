@@ -24,9 +24,14 @@ boost::filesystem::path bunsan::tempfile::path() const
 	return file;
 }
 
-std::string bunsan::tempfile::native() const
+boost::filesystem::path::string_type bunsan::tempfile::native() const
 {
 	return file.native();
+}
+
+std::string bunsan::tempfile::generic_string() const
+{
+	return file.generic_string();
 }
 
 bool bunsan::tempfile::auto_remove() const
