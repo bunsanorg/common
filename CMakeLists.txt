@@ -2,8 +2,6 @@ project(bunsan_common)
 
 cmake_minimum_required(VERSION 2.8)
 
-set(gcc_flags -g -Wall -Wextra)
-
 if (NOT DEFINED network)
 	message(STATUS "Using network library part")
 	set(network ON)
@@ -13,13 +11,6 @@ if (${network})
 	find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
 	set(network_libraries ${XMLRPC_LIBRARIES} zmq)
 	set(network_includes ${XMLRPC_INCLUDE_DIRS})
-	if (${CMAKE_COMPILER_IS_GNUCC})
-		add_definitions(-std=c++0x -pthread ${gcc_flags})
-	endif()
-else()
-	if (${CMAKE_COMPILER_IS_GNUCC})
-		add_definitions(-std=c++0x ${gcc_flags})
-	endif()
 endif()
 
 # BOOST
@@ -27,6 +18,16 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
+
+if (${CMAKE_COMPILER_IS_GNUCC})
+	set(gcc_flags -g -Wall -Wextra)
+	if (${MINGW})
+		# MinGW has no pthread support
+		add_definitions(-std=c++0x ${gcc_flags})
+	else()
+		add_definitions(-std=c++0x -pthread ${gcc_flags})
+	endif()
+endif()
 
 aux_source_directory(src srcs)
 aux_source_directory(src/process process_srcs)
