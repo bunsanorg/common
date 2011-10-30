@@ -2,6 +2,8 @@ project(bunsan_common)
 
 cmake_minimum_required(VERSION 2.8)
 
+include(${CMAKE_SOURCE_DIR}/user-config.cmake OPTIONAL)
+
 if (NOT DEFINED network)
 	message(STATUS "Using network library part")
 	set(network ON)
