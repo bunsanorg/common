@@ -23,7 +23,8 @@ namespace bunsan{namespace factory
 		}
 	}
 	template <typename Factory, typename ... Args>
-	auto instance(std::map<std::string, Factory> *&factories, const std::string &type, Args ... args)->decltype(factories->find(type)->second(args...))
+	auto instance(std::map<std::string, Factory> *&factories, const std::string &type, Args &&...args)
+		->decltype(factories->find(type)->second(std::forward<Args>(args)...))
 	{
 		if (factories)
 		{
@@ -31,7 +32,7 @@ namespace bunsan{namespace factory
 			if (iter!=factories->end())
 				return iter->second(args...);
 		}
-		return decltype(factories->find(type)->second(args...))();
+		return decltype(factories->find(type)->second(std::forward<Args>(args)...))();
 	}
 }}
 
