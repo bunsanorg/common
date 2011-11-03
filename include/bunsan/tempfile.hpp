@@ -34,8 +34,8 @@ namespace bunsan
 		 */
 		static tempfile_ptr from_model(const boost::filesystem::path &model);
 	private:
-		bool do_auto_remove;
 		boost::filesystem::path file;
+		bool do_auto_remove;
 	};
 	typedef tempfile::tempfile_ptr tempfile_ptr;
 }
