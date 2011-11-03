@@ -162,9 +162,9 @@ public:
 		return boost::apply_visitor(rvisitor, ref);
 	}
 private:
-	ref_visitor rvisitor;
 	const std::vector<string_opt> *positional;
 	const dict *named;
+	ref_visitor rvisitor;
 };
 
 void bunsan::executor::prepare(std::vector<std::string> &args, token_visitor &visitor) const
@@ -205,7 +205,10 @@ int bunsan::executor::sync() const
 	return bunsan::process::sync_execute(context());
 }
 
-bunsan::return_code::return_code(int code_): code(code_), std::runtime_error("command has finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"){}
+bunsan::return_code::return_code(int code_):
+	std::runtime_error("command has finished with \""+boost::lexical_cast<std::string>(code_)+"\" return code"),
+	code(code_)
+{}
 
 bunsan::return_code::operator int() const throw()
 {
