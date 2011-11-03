@@ -80,46 +80,46 @@ namespace bunsan
 		 */
 		executor &executable(const boost::filesystem::path &exec_);
 		template <typename T1, typename T2, typename ... Args>
-		executor &add_argument(const T1 &arg1, const T2 &arg2, const Args &...args)
+		executor &add_argument(const T1 &arg1, const T2 &arg2, Args &&...args)
 		{
 			add_argument(arg1);
-			return add_argument(arg2, args...);
+			return add_argument(arg2, std::forward<Args>(args)...);
 		}
 		template <typename ... Args>
-		int sync(const Args &...args) const
+		int sync(Args &&...args) const
 		{
 			executor tmp(*this);
-			return tmp.add_argument(args...).sync();
+			return tmp.add_argument(std::forward<Args>(args)...).sync();
 		}
 		template <typename ... Args>
-		void operator()(const Args &...args) const
+		void operator()(Args &&...args) const
 		{
 			executor tmp(*this);
-			tmp.add_argument(args...)();
+			tmp.add_argument(std::forward<Args>(args)...)();
 		}
 		template <typename T, typename ... Args>
-		static int run_sync_from(const boost::filesystem::path &cwd, const T &command, const Args &...args)
+		static int run_sync_from(const boost::filesystem::path &cwd, const T &command, Args &&...args)
 		{
 			executor exc(command);
-			return exc.current_path(cwd).sync(args...);
+			return exc.current_path(cwd).sync(std::forward<Args>(args)...);
 		}
 		template <typename T, typename ... Args>
-		static int run_sync(const T &command, const Args &...args)
+		static int run_sync(const T &command, Args &&...args)
 		{
 			executor exc(command);
-			return exc.sync(args...);
+			return exc.sync(std::forward<Args>(args)...);
 		}
 		template <typename T, typename ... Args>
-		static void exec_from(const boost::filesystem::path &cwd, const T &command, const Args &...args)
+		static void exec_from(const boost::filesystem::path &cwd, const T &command, Args &&...args)
 		{
 			executor exc(command);
-			exc.current_path(cwd)(args...);
+			exc.current_path(cwd)(std::forward<Args>(args)...);
 		}
 		template <typename T, typename ... Args>
-		static void exec(const T &command, const Args &...args)
+		static void exec(const T &command, Args &&...args)
 		{
 			executor exc(command);
-			exc(args...);
+			exc(std::forward<Args>(args)...);
 		}
 	public:
 		static constexpr const char *current_path_key = "current_path";
