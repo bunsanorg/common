@@ -30,7 +30,7 @@ namespace bunsan{namespace factory
 		{
 			auto iter = factories->find(type);
 			if (iter!=factories->end())
-				return iter->second(args...);
+				return iter->second(std::forward<Args>(args)...);
 		}
 		return decltype(factories->find(type)->second(std::forward<Args>(args)...))();
 	}
