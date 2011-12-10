@@ -16,7 +16,7 @@ bunsan::executor::executor(const std::string &command): positional(0), next_posi
 bunsan::executor::executor(const boost::filesystem::path &command): positional(0), next_positional(0)
 {
 	SLOG("creating executor object from "<<command);
-	arguments.push_back(string(1, token(command.generic_string())));
+	arguments.push_back(string(1, token(command.string())));
 }
 
 bunsan::executor::executor(const char *command): positional(0), next_positional(0)
@@ -118,14 +118,14 @@ bunsan::executor &bunsan::executor::set_argument(const std::string &key, const s
 bunsan::executor &bunsan::executor::current_path(const boost::filesystem::path &cwd)
 {
 	SLOG("setting cwd to "<<cwd);
-	named[current_path_key] = cwd.generic_string();
+	named[current_path_key] = cwd.string();
 	return *this;
 }
 
 bunsan::executor &bunsan::executor::executable(const boost::filesystem::path &exec_)
 {
 	SLOG("setting executable to "<<exec_);
-	named[executable_key] = exec_.generic_string();
+	named[executable_key] = exec_.string();
 	return *this;
 }
 

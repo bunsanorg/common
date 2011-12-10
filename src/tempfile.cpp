@@ -34,6 +34,11 @@ std::string bunsan::tempfile::generic_string() const
 	return file.generic_string();
 }
 
+std::string bunsan::tempfile::string() const
+{
+	return file.string();
+}
+
 bool bunsan::tempfile::auto_remove() const
 {
 	return do_auto_remove;

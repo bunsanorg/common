@@ -89,7 +89,7 @@ namespace bunsan
 	{
 		boost::filesystem::initial_path();
 		boost::filesystem::current_path(boost::filesystem::absolute(boost::filesystem::path(filename)).parent_path());
-		boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().generic_string(), pt, loc);
+		boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().string(), pt, loc);
 		boost::filesystem::current_path(boost::filesystem::initial_path());
 	}
 	/*!
