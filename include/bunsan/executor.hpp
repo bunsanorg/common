@@ -53,7 +53,7 @@ namespace bunsan
 		executor &add_argument(const std::string &arg);
 		inline executor &add_argument(const boost::filesystem::path &arg)
 		{
-			return add_argument(arg.generic_string());
+			return add_argument(arg.string());
 		}
 		inline executor &add_argument(const char *arg)
 		{
@@ -65,7 +65,7 @@ namespace bunsan
 		executor &set_argument(const std::string &key, const std::string &arg);
 		inline executor &set_argument(const std::string &key, const boost::filesystem::path &arg)
 		{
-			return set_argument(key, arg.generic_string());
+			return set_argument(key, arg.string());
 		}
 		inline executor &set_argument(const std::string &key, const char *arg)
 		{

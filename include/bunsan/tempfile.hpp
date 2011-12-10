@@ -18,6 +18,7 @@ namespace bunsan
 		boost::filesystem::path path() const;
 		boost::filesystem::path::string_type native() const;
 		std::string generic_string() const;
+		std::string string() const;
 		bool auto_remove() const;
 		void auto_remove(bool do_auto_remove_);
 		~tempfile() throw();
