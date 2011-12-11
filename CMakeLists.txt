@@ -11,8 +11,8 @@ endif()
 
 if (${network})
 	find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
-	set(network_libraries ${XMLRPC_LIBRARIES} zmq)
-	set(network_includes ${XMLRPC_INCLUDE_DIRS})
+	list(APPEND libraries ${XMLRPC_LIBRARIES} zmq)
+	list(APPEND includes ${XMLRPC_INCLUDE_DIRS})
 endif()
 
 # BOOST
@@ -20,6 +20,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
+list(APPEND libraries ${Boost_LIBRARIES})
 
 if (${CMAKE_COMPILER_IS_GNUCC})
 	set(gcc_flags -g -Wall -Wextra -Wfatal-errors)
@@ -32,16 +33,19 @@ if (${CMAKE_COMPILER_IS_GNUCC})
 endif()
 
 aux_source_directory(src srcs)
+
 aux_source_directory(src/process process_srcs)
+list(APPEND srcs ${process_srcs})
 
 if (${network})
 	aux_source_directory(src/network network_srcs)
+	list(APPEND srcs ${network_srcs})
 endif()
 
-include_directories(include ${network_includes})
+include_directories(include ${includes})
 
-add_library(${PROJECT_NAME} SHARED ${srcs} ${process_srcs} ${network_srcs})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${network_libraries})
+add_library(${PROJECT_NAME} SHARED ${srcs})
+target_link_libraries(${PROJECT_NAME} ${libraries})
 
 # install
 
