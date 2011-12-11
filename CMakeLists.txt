@@ -11,15 +11,15 @@ endif()
 
 if (${network})
 	find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
-	list(APPEND libraries ${XMLRPC_LIBRARIES} zmq)
 	list(APPEND includes ${XMLRPC_INCLUDE_DIRS})
+	list(APPEND libraries ${XMLRPC_LIBRARIES} zmq)
 endif()
 
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
 if (${CMAKE_COMPILER_IS_GNUCC})
