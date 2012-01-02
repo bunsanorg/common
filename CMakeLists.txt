@@ -4,12 +4,12 @@ cmake_minimum_required(VERSION 2.8)
 
 include(${CMAKE_SOURCE_DIR}/user-config.cmake OPTIONAL)
 
-if (NOT DEFINED network)
+if(NOT DEFINED network)
 	message(STATUS "Using network library part")
 	set(network ON)
 endif()
 
-if (${network})
+if(${network})
 	find_package(XMLRPC REQUIRED c++2 libwww-client abyss-server)
 	list(APPEND includes ${XMLRPC_INCLUDE_DIRS})
 	list(APPEND libraries ${XMLRPC_LIBRARIES} zmq)
@@ -22,9 +22,9 @@ find_package(Boost COMPONENTS system filesystem serialization iostreams unit_tes
 list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
-if (${CMAKE_COMPILER_IS_GNUCC})
-	set(gcc_flags -g -Wall -Wextra -Wfatal-errors)
-	if (${MINGW})
+if(${CMAKE_COMPILER_IS_GNUCC})
+	set(gcc_flags -g -Wall -Wextra)
+	if(${MINGW})
 		# MinGW has no pthread support
 		add_definitions(-std=c++0x ${gcc_flags})
 	else()
@@ -37,7 +37,7 @@ aux_source_directory(src srcs)
 aux_source_directory(src/process process_srcs)
 list(APPEND srcs ${process_srcs})
 
-if (${network})
+if(${network})
 	aux_source_directory(src/network network_srcs)
 	list(APPEND srcs ${network_srcs})
 endif()
@@ -50,13 +50,16 @@ target_link_libraries(${PROJECT_NAME} ${libraries})
 # install
 
 install(DIRECTORY include DESTINATION .)
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(TARGETS ${PROJECT_NAME}
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib)
 
 # testing
 
 enable_testing()
 add_subdirectory(tests ${PROJECT_BINARY_DIR}/tests)
-if (${network})
+if(${network})
 	add_subdirectory(tests/network ${PROJECT_BINARY_DIR}/tests/network)
 endif()
 
