@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <map>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/variant.hpp>
