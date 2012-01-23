@@ -25,6 +25,11 @@ namespace bunsan{namespace factory
 		}
 		return false;
 	}
+	/*!
+	 * \note
+	 * we can use Factory::result_type if Factory is instantiation of std::function,
+	 * but in general it is not
+	 */
 	template <typename Factory, typename ... Args>
 	typename std::result_of<Factory(Args &&...)>::type instance(
 		std::map<std::string, Factory> *&factories,
