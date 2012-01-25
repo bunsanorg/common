@@ -5,11 +5,10 @@ bunsan::error::error(const std::string &message_)
 	(*this)<<error_message(message_);
 }
 
-const std::string &bunsan::error::message() const throw()
+const char *bunsan::error::message() const throw()
 {
 	const std::string *message_ = boost::get_error_info<error_message>(*this);
-	BOOST_ASSERT(message_);
-	return *message_;
+	return message_?message_->c_str():"no message";
 }
 
 const char *bunsan::error::what() const throw()
