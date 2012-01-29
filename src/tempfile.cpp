@@ -101,17 +101,17 @@ bunsan::tempfile::~tempfile()
 		{
 			DLOG(error);
 			SLOG(e.what());
-			SLOG("unable to remove "<<m_path);
+			SLOG("unable to remove tempfile "<<m_path);
 		}
 		catch(...)
 		{
 			DLOG(unknown error);
-			SLOG("unable to remove "<<m_path);
+			SLOG("unable to remove tempfile "<<m_path);
 		}
 	}
 	else
 	{
-		SLOG("skipping removing tempfile "<<m_path);
+		SLOG("skipping tempfile remove "<<m_path);
 	}
 }
 
