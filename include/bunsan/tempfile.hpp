@@ -2,43 +2,57 @@
 #define BUNSAN_TEMPFILE_HPP
 
 #include <string>
-#include <memory>
 
-#include <boost/noncopyable.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem.hpp>
 
 namespace bunsan
 {
-	class tempfile: private boost::noncopyable
+	class tempfile
 	{
 	public:
-		typedef std::shared_ptr<tempfile> tempfile_ptr;
-		explicit tempfile(const boost::filesystem::path &file_, bool do_auto_remove_=true);
-		boost::filesystem::path path() const;
+		// constructors
+		tempfile();
+		explicit tempfile(const boost::filesystem::path &path_, bool do_auto_remove_=true);
+		tempfile(const tempfile &tmp)=delete;
+		tempfile(tempfile &&tmp) throw();
+		// operator=
+		tempfile &operator=(const tempfile &tmp)=delete;
+		tempfile &operator=(tempfile &&tmp) throw();
+		// path access
+		const boost::filesystem::path &path() const;
 		boost::filesystem::path::string_type native() const;
 		std::string generic_string() const;
 		std::string string() const;
+		// auto_remove
 		bool auto_remove() const;
 		void auto_remove(bool do_auto_remove_);
-		~tempfile() throw();
+		// destruction
+		~tempfile();
+		// swap
+		void swap(tempfile &tmp) throw();
+
+		// static creators
+		/// create tempfile in specified directory
+		static tempfile in_dir(const boost::filesystem::path &dir);
+		/// create tempfile in system temp dir
+		static tempfile unique();
 		/*!
-		 * \brief create tempfile in specified directory
+		 * \brief create tempfile in system temp dir with name specified by model
+		 *
+		 * \pre model.filename()==model
 		 */
-		static tempfile_ptr in_dir(const boost::filesystem::path &dir);
-		/*!
-		 * \brief create tempfile in system temp dir
-		 */
-		static tempfile_ptr unique();
-		/*!
-		 * \brief create tempfile using model: % symbols will be replaced by random symbol [0-9a-f]
-		 */
-		static tempfile_ptr from_model(const boost::filesystem::path &model);
+		static tempfile unique(const boost::filesystem::path &model);
+		/// create tempfile using model: % symbols will be replaced by random symbols [0-9a-f]
+		static tempfile from_model(const boost::filesystem::path &model);
 	private:
-		boost::filesystem::path file;
+		static const boost::filesystem::path default_model;
+		boost::filesystem::path m_path;
 		bool do_auto_remove;
 	};
-	typedef tempfile::tempfile_ptr tempfile_ptr;
+	inline void swap(tempfile &a, tempfile &b) throw()
+	{
+		a.swap(b);
+	}
 }
 
 #endif //BUNSAN_TEMPFILE_HPP
