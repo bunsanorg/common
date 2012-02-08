@@ -42,7 +42,7 @@ int main()
 	test(inp, out, "");
 	test(inp, out, "hello world");
 	{
-		std::string s(1000000, '\0');
+		std::string s(1000*1000, '\0');
 		std::generate(s.begin(), s.end(), [](){return static_cast<char>(rand()%256);});
 		test(inp, out, s);
 	}
