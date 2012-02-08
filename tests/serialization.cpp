@@ -30,7 +30,7 @@ void test_path(const boost::filesystem::path &p)
 
 int main()
 {
-	for (int i = 0; i<100000; ++i)
+	for (int i = 0; i<1000; ++i)
 	{
 		test(std::chrono::seconds(rand()));
 	}
