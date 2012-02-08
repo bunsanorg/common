@@ -10,11 +10,29 @@ namespace bunsan
 	struct error: virtual std::exception, virtual boost::exception
 	{
 		error()=default;
+		/// \see message
 		error(const std::string &message_);
-		virtual const char *message() const throw();
 		virtual const char *what() const throw();
-	private:
-		typedef boost::error_info<struct error_message_tag, std::string> error_message;
+		/*!
+		 * \tparam ErrorInfo boost::error_info instantiation
+		 * \return pointer to data associated with ErrorInfo
+		 */
+		template <typename ErrorInfo>
+		const typename ErrorInfo::value_type *get() const throw()
+		{
+			return boost::get_error_info<ErrorInfo>(*this);
+		}
+		/*!
+		 * \copydoc get
+		 */
+		template <typename ErrorInfo>
+		typename ErrorInfo::value_type *get() throw()
+		{
+			return boost::get_error_info<ErrorInfo>(*this);
+		}
+		// tags
+		/// Human readable error message
+		typedef boost::error_info<struct tag_message, std::string> message;
 	};
 }
 

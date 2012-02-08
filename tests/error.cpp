@@ -5,33 +5,35 @@
 
 #include <boost/assert.hpp>
 
-template <typename Error>
-struct helper
+template <typename Error, typename Arg, typename Get>
+void test(const Error &err, const Arg &arg, const Get &get)
 {
-	template <typename Arg, typename Get>
-	static void test(const Error &err, const Arg &arg, const Get &get)
+	try
 	{
-		try
-		{
-			BOOST_THROW_EXCEPTION(err);
-			BOOST_ASSERT_MSG(false, "throw failed");
-		}
-		catch (Error &e)
-		{
-			BOOST_ASSERT_MSG(get(e)==arg, "construction failed");
-			std::cerr<<e.what()<<std::endl;
-			return;
-		}
-		catch (std::exception &e)
-		{
-			BOOST_ASSERT_MSG(false, "match failed");
-		}
-		BOOST_ASSERT_MSG(false, "exit failed");
+		BOOST_THROW_EXCEPTION(err);
+		BOOST_ASSERT_MSG(false, "throw failed");
 	}
-};
+	catch (Error &e)
+	{
+		BOOST_ASSERT_MSG(get(e)==arg, "construction failed");
+		std::cerr<<e.what()<<std::endl;
+		return;
+	}
+	catch (std::exception &e)
+	{
+		BOOST_ASSERT_MSG(false, "match failed");
+	}
+	BOOST_ASSERT_MSG(false, "exit failed");
+}
 
 #define TEST(ERROR, ARG, GET) \
-	helper<ERROR>::test(ERROR(ARG), ARG, [](const ERROR &e){return e.GET();})
+	test(ERROR(ARG), ARG, \
+	[](const ERROR &e) \
+	{ \
+		const auto *ret = e.get<ERROR::GET>(); \
+		BOOST_ASSERT_MSG(ret, "boost::get_error_info failed"); \
+		return *ret; \
+	});
 
 int main()
 {
