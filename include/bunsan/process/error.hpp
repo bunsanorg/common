@@ -8,16 +8,17 @@ namespace bunsan{namespace process
 	struct error: virtual bunsan::error
 	{
 		error()=default;
-		explicit error(const std::string &msg);
+		/// \see bunsan::error::message
+		explicit error(const std::string &message_);
 	};
-	class non_zero_exit_status_error: public virtual error
+	struct non_zero_exit_status_error: public virtual error
 	{
-	public:
 		non_zero_exit_status_error()=default;
+		/// \see exit_status
 		explicit non_zero_exit_status_error(int exit_status_);
-		virtual int exit_status() const throw();
-	private:
-		typedef boost::error_info<struct error_exit_status_tag, int> error_exit_status;
+		// tags
+		/// Program exit status
+		typedef boost::error_info<struct tag_exit_status_tag, int> exit_status;
 	};
 }}
 
