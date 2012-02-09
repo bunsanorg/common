@@ -1,4 +1,5 @@
 #include <memory>
+#include <set>
 
 #include <cassert>
 
@@ -6,18 +7,23 @@
 
 int main()
 {
-	using namespace bunsan::factory;
 	typedef std::shared_ptr<int> int_ptr;
+	typedef bunsan::factory<std::function<int_ptr()>> bunsan_factory;
 	std::map<std::string, std::function<int_ptr()>> *map(0);
-	assert(!static_cast<bool>(instance(map, "strange")));
-	assert(  register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(0));} ))  );
+	assert(!static_cast<bool>(bunsan_factory::instance(map, "strange")));
+	assert(  bunsan_factory::register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(0));} ))  );
 	assert(map!=0);
-	assert(!  register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(-1));} ))  );
-	assert(*instance(map, "zero")==0);
-	assert(  register_new(map, "one", std::function<int_ptr()>( [](){return int_ptr(new int(1));} ))  );
-	assert(*instance(map, "zero")==0);
-	assert(*instance(map, "one")==1);
-	assert(!static_cast<bool>(instance(map, "")));
+	assert(!  bunsan_factory::register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(-1));} ))  );
+	assert(*bunsan_factory::instance(map, "zero")==0);
+	assert(  bunsan_factory::register_new(map, "one", std::function<int_ptr()>( [](){return int_ptr(new int(1));} ))  );
+	assert(*bunsan_factory::instance(map, "zero")==0);
+	assert(*bunsan_factory::instance(map, "one")==1);
+	assert(!static_cast<bool>(bunsan_factory::instance(map, "")));
+	{
+		std::set<std::string> set(bunsan_factory::registered_begin(map), bunsan_factory::registered_end(map));
+		std::set<std::string> req = {"zero", "one"};
+		assert(req==set);
+	}
 	return 0;
 }
 
