@@ -1,5 +1,7 @@
 #include "bunsan/factory_helper.hpp"
 
+#include <set>
+
 #include <boost/assert.hpp>
 
 namespace test
@@ -82,6 +84,11 @@ namespace test
 int main()
 {
 	{
+		{
+			std::set<std::string> set(test::fact::registered_begin(), test::fact::registered_end());
+			std::set<std::string> req = {"init"};
+			BOOST_ASSERT(req==set);
+		}
 		test::fact_ptr ptr = test::fact::instance("init", "hello,", " world");
 		BOOST_ASSERT(ptr);
 		BOOST_ASSERT(ptr->f()=="hello, world");
@@ -90,6 +97,11 @@ int main()
 		BOOST_ASSERT(!ptr);
 	}
 	{
+		{
+			std::set<std::string> set(test::fact2::registered_begin(), test::fact2::registered_end());
+			std::set<std::string> req = {"init"};
+			BOOST_ASSERT(req==set);
+		}
 		test::fact2_ptr ptr = test::fact2::instance("init");
 		BOOST_ASSERT(ptr);
 		BOOST_ASSERT(ptr->code()==123);

@@ -35,11 +35,20 @@ namespace bunsan
 {\
 public: \
 	typedef std::shared_ptr<CLASS> CLASS##_ptr; \
-	typedef std::function<CLASS##_ptr(__VA_ARGS__)> factory_type; \
+	typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__)> bunsan_factory; \
+	typedef typename bunsan_factory::factory_type factory_type; \
 	template <typename ... Args> \
-	static inline CLASS##_ptr instance(const std::string &type, Args &&...args) \
+	static inline CLASS##_ptr instance(const typename bunsan_factory::key_type &type, Args &&...args) \
 	{ \
-		return bunsan::factory::instance(factories, type, std::forward<Args>(args)...); \
+		return bunsan_factory::instance(factories, type, std::forward<Args>(args)...); \
+	} \
+	static inline typename bunsan_factory::const_iterator registered_begin() \
+	{ \
+		return bunsan_factory::registered_begin(factories); \
+	} \
+	static inline typename bunsan_factory::const_iterator registered_end() \
+	{ \
+		return bunsan_factory::registered_end(factories); \
 	} \
 private:
 
@@ -57,12 +66,12 @@ private:
 #endif
 #define BUNSAN_FACTORY_END(CLASS) \
 protected: \
-	static inline bool register_new(const std::string &type, const factory_type &f) \
+	static inline bool register_new(const typename bunsan_factory::key_type &type, const factory_type &f) \
 	{ \
-		return bunsan::factory::register_new(factories, type, f); \
+		return bunsan_factory::register_new(factories, type, f); \
 	} \
 private: \
-	static std::map<std::string, factory_type> *factories; \
+	static typename bunsan_factory::map_type *factories; \
 }; \
 typedef CLASS::CLASS##_ptr CLASS##_ptr;
 
@@ -91,7 +100,7 @@ namespace bunsan
 #	error ASSERTION: BUNSAN_FACTORY_DEFINE is in use
 #endif
 #define BUNSAN_FACTORY_DEFINE(CLASS) \
-	std::map<std::string, CLASS::factory_type> *CLASS::factories;
+	typename CLASS::bunsan_factory::map_type *CLASS::factories;
 
 #endif //BUNSAN_FACTORY_HELPER_HPP
 
