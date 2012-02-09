@@ -12,13 +12,16 @@
 
 namespace bunsan
 {
-	template <typename Factory>
-	class factory
+	template <typename Signature>
+	class factory;
+	template <typename Result, typename ... Args>
+	class factory<Result (Args...)>
 	{
 	public:
-		typedef Factory factory_type;
+		typedef Result result_type;
+		typedef std::function<Result (Args...)> factory_type;
 		typedef std::string key_type;
-		typedef std::map<key_type, Factory> map_type;
+		typedef std::map<key_type, factory_type> map_type;
 		typedef typename map_type::value_type value_type;
 		typedef typename map_type::const_iterator map_const_iterator;
 		struct pair_first
@@ -45,15 +48,9 @@ namespace bunsan
 			}
 			return false;
 		}
-		/*!
-		 * \note
-		 * we can use Factory::result_type if Factory is instantiation of std::function,
-		 * but in general it is not
-		 */
-		template <typename ... Args>
-		static typename std::result_of<factory_type(Args &&...)>::type instance(
-			const std::map<std::string, factory_type> *const factories,
-			const std::string &type,
+		static result_type instance(
+			const map_type *const factories,
+			const key_type &type,
 			Args &&...args)
 		{
 			if (factories)
@@ -62,7 +59,7 @@ namespace bunsan
 				if (iter!=factories->end())
 					return iter->second(std::forward<Args>(args)...);
 			}
-			return typename std::result_of<factory_type(Args &&...)>::type();
+			return result_type();
 		}
 		static const_iterator registered_begin(const map_type *const factories)
 		{

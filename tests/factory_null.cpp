@@ -7,7 +7,7 @@
 
 int main()
 {
-	typedef bunsan::factory<std::function<std::shared_ptr<int>()>> bunsan_factory;
+	typedef bunsan::factory<std::shared_ptr<int>()> bunsan_factory;
 	typename bunsan_factory::map_type *map(0);
 	std::set<bunsan_factory::key_type> set(
 		bunsan_factory::registered_begin(map),

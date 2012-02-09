@@ -8,14 +8,14 @@
 int main()
 {
 	typedef std::shared_ptr<int> int_ptr;
-	typedef bunsan::factory<std::function<int_ptr()>> bunsan_factory;
-	std::map<std::string, std::function<int_ptr()>> *map(0);
+	typedef bunsan::factory<int_ptr()> bunsan_factory;
+	typename bunsan_factory::map_type *map(0);
 	assert(!static_cast<bool>(bunsan_factory::instance(map, "strange")));
-	assert(  bunsan_factory::register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(0));} ))  );
+	assert(  bunsan_factory::register_new(map, "zero", [](){return int_ptr(new int(0));} )  );
 	assert(map!=0);
-	assert(!  bunsan_factory::register_new(map, "zero", std::function<int_ptr()>( [](){return int_ptr(new int(-1));} ))  );
+	assert(!  bunsan_factory::register_new(map, "zero", [](){return int_ptr(new int(-1));} )  );
 	assert(*bunsan_factory::instance(map, "zero")==0);
-	assert(  bunsan_factory::register_new(map, "one", std::function<int_ptr()>( [](){return int_ptr(new int(1));} ))  );
+	assert(  bunsan_factory::register_new(map, "one", [](){return int_ptr(new int(1));} )  );
 	assert(*bunsan_factory::instance(map, "zero")==0);
 	assert(*bunsan_factory::instance(map, "one")==1);
 	assert(!static_cast<bool>(bunsan_factory::instance(map, "")));
