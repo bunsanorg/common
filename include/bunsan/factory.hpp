@@ -69,7 +69,7 @@ namespace bunsan
 			if (factories)
 				return const_iterator(factories->begin(), pair_first());
 			else
-				// TODO
+				/// \see factory_null unit test
 				return const_iterator(map_const_iterator(), pair_first());
 		}
 		static const_iterator registered_end(const map_type *const factories)
@@ -77,7 +77,7 @@ namespace bunsan
 			if (factories)
 				return const_iterator(factories->end(), pair_first());
 			else
-				// TODO
+				/// \see factory_null unit test
 				return const_iterator(map_const_iterator(), pair_first());
 		}
 	};
