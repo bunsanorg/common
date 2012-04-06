@@ -11,7 +11,7 @@ void bunsan::pseudo_service::start()
 void bunsan::pseudo_service::join()
 {
 	guard lk(run_lock);
-	joiner.wait(lk, [running](){return !running;});
+	joiner.wait(lk, [this](){return !running;});
 }
 
 void bunsan::pseudo_service::stop()
