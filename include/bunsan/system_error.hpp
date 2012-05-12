@@ -6,10 +6,10 @@
 
 namespace bunsan
 {
-	inline void system_error(const std::string &msg)
-	{
-		throw std::system_error(std::error_code(errno, std::system_category()), msg);
-	}
+    inline void system_error(const std::string &msg)
+    {
+        throw std::system_error(std::error_code(errno, std::system_category()), msg);
+    }
 }
 
 #endif //BUNSAN_SYSTEM_ERROR_HPP

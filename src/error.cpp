@@ -2,11 +2,11 @@
 
 bunsan::error::error(const std::string &message_)
 {
-	(*this)<<message(message_);
+    (*this)<<message(message_);
 }
 
 const char *bunsan::error::what() const throw()
 {
-	return boost::diagnostic_information_what(*this);
+    return boost::diagnostic_information_what(*this);
 }
 
