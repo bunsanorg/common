@@ -7,18 +7,18 @@
 
 namespace bunsan
 {
-	class complex_service: virtual public service
-	{
-	public:
-		virtual void start();
-		virtual void join();
-		virtual void stop();
-		virtual bool is_running();
-		virtual ~complex_service();
-	protected:
-		typedef std::vector<service_ptr> container;
-		container services;
-	};
+    class complex_service: virtual public service
+    {
+    public:
+        virtual void start();
+        virtual void join();
+        virtual void stop();
+        virtual bool is_running();
+        virtual ~complex_service();
+    protected:
+        typedef std::vector<service_ptr> container;
+        container services;
+    };
 }
 
 #endif //BUNSAN_COMPLEX_SERVICE_HPP
