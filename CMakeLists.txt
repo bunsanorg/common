@@ -34,7 +34,7 @@ endif()
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem serialization iostreams unit_test_framework program_options thread REQUIRED)
 list(APPEND includes ${Boost_INCLUDE_DIRS})
 list(APPEND libraries ${Boost_LIBRARIES})
 
@@ -42,6 +42,9 @@ aux_source_directory(src srcs)
 
 aux_source_directory(src/process process_srcs)
 list(APPEND srcs ${process_srcs})
+
+aux_source_directory(src/interprocess/sync interprocess_sync_srcs)
+list(APPEND srcs ${interprocess_sync_srcs})
 
 if(${ENABLE_NETWORK})
     aux_source_directory(src/network network_srcs)
