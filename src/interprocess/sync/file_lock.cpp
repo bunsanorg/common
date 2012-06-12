@@ -131,6 +131,56 @@ void file_lock::swap(file_lock &fl) throw()
 void file_lock::lock()
 {
     BOOST_ASSERT(*this);
-    // TODO
+    boost::lock(m_mutex->mlock, m_mutex->flock);
+}
+
+bool file_lock::try_lock()
+{
+    BOOST_ASSERT(*this);
+    return boost::try_lock(m_mutex->mlock, m_mutex->flock);
+}
+
+bool file_lock::timed_lock(const boost::posix_time::ptime &)
+{
+    BOOST_ASSERT(*this);
+#warning "is not implemented"
+    BOOST_ASSERT_MSG(false, "is not implemented");
+    return false;
+}
+
+void file_lock::unlock()
+{
+    m_mutex->flock.unlock();
+    m_mutex->mlock.unlock();
+}
+
+void file_lock::lock_sharable()
+{
+    BOOST_ASSERT(*this);
+#warning "is not implemented"
+    BOOST_ASSERT_MSG(false, "is not implemented");
+}
+
+bool file_lock::try_lock_sharable()
+{
+    BOOST_ASSERT(*this);
+#warning "is not implemented"
+    BOOST_ASSERT_MSG(false, "is not implemented");
+    return false;
+}
+
+bool file_lock::timed_lock_sharable(const boost::posix_time::ptime &)
+{
+    BOOST_ASSERT(*this);
+#warning "is not implemented"
+    BOOST_ASSERT_MSG(false, "is not implemented");
+    return false;
+}
+
+void file_lock::unlock_sharable()
+{
+    BOOST_ASSERT(*this);
+#warning "is not implemented"
+    BOOST_ASSERT_MSG(false, "is not implemented");
 }
 
