@@ -40,7 +40,7 @@ file_lock file_lock_factory::get(const boost::filesystem::path &path)
         boost::shared_lock<boost::shared_mutex> lk(m_lock);
         mutex_ptr mtx;
         if (try_find_mutex(path, mtx))
-            return file_lock(this, mtx);
+            return file_lock(*this, mtx);
     }
     boost::unique_lock<boost::shared_mutex> lk(m_lock);
     mutex_ptr mtx;
@@ -50,7 +50,7 @@ file_lock file_lock_factory::get(const boost::filesystem::path &path)
         mtx->path = path;
         m_instances.insert(mtx);
     }
-    return file_lock(this, mtx);
+    return file_lock(*this, mtx);
 }
 
 bool file_lock_factory::try_erase(mutex_ptr &mtx)
@@ -73,5 +73,64 @@ bool file_lock_factory::try_erase(mutex_ptr &mtx)
         }
     }
     return false;
+}
+
+file_lock::file_lock():
+    m_factory(0)
+{}
+
+file_lock::file_lock(const boost::filesystem::path &path, file_lock_factory &factory_)
+{
+    *this = factory_.get(path);
+}
+
+file_lock::file_lock(file_lock_factory &factory_, const mutex_ptr &mutex_):
+    m_factory(&factory_),
+    m_mutex(mutex_)
+{}
+
+file_lock::file_lock(file_lock &&fl) throw():
+    m_factory(fl.m_factory),
+    m_mutex(std::move(fl.m_mutex))
+{
+    fl.reset();
+}
+
+file_lock &file_lock::operator=(file_lock &&fl) throw()
+{
+    this->swap(fl);
+    fl.reset();
+    return *this;
+}
+
+file_lock::~file_lock()
+{
+    if (*this)
+        m_factory->try_erase(m_mutex);
+}
+
+void file_lock::reset() throw()
+{
+    m_factory = 0;
+    m_mutex.reset();
+}
+
+file_lock::operator bool() const throw()
+{
+    BOOST_ASSERT(static_cast<bool>(m_factory)==static_cast<bool>(m_mutex));
+    return static_cast<bool>(m_factory);
+}
+
+void file_lock::swap(file_lock &fl) throw()
+{
+    using boost::swap;
+    swap(m_factory, fl.m_factory);
+    swap(m_mutex, fl.m_mutex);
+}
+
+void file_lock::lock()
+{
+    BOOST_ASSERT(*this);
+    // TODO
 }
 

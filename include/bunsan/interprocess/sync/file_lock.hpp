@@ -9,6 +9,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/identity.hpp>
+#include <boost/optional.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -86,12 +87,15 @@ namespace bunsan{namespace interprocess
     public:
         /// create invalid file_lock
         file_lock();
-        file_lock(const boost::filesystem::path &path, file_lock_factory &factory=file_lock_factory::instance());
-        file_lock(file_lock_factory *factory_, const mutex_ptr &mutex_);
+        file_lock(const boost::filesystem::path &path, file_lock_factory &factory_=file_lock_factory::instance());
+        file_lock(file_lock_factory &factory_, const mutex_ptr &mutex_);
         file_lock(file_lock &&lock) throw();
         file_lock(const file_lock &)=delete;
         file_lock& operator=(file_lock &&) throw();
         ~file_lock();
+
+        void reset() throw();
+        operator bool() const throw();
 
         void swap(file_lock &) throw();
         void lock();
