@@ -6,7 +6,9 @@
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
+#include <boost/multi_index/identity.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -33,7 +35,15 @@ namespace bunsan{namespace interprocess
         file_lock_factory &operator=(const file_lock_factory &)=delete;
 
         file_lock get(const boost::filesystem::path &path);
-        bool try_erase(const mutex_ptr &mutex);
+        /*!
+         * \brief Try to erase mutex from factory
+         *
+         * Caller should not store any other pointers
+         * to the mutex. Argument mtx is reset on success.
+         *
+         * \return true on success
+         */
+        bool try_erase(mutex_ptr &mtx);
         /*!
          * \brief per-process instance
          *
@@ -57,10 +67,16 @@ namespace bunsan{namespace interprocess
                         const boost::filesystem::path &,
                         get_path_from_pointer
                     >
+                >,
+                boost::multi_index::ordered_unique
+                <
+                    boost::multi_index::tag<struct tag_pointer>,
+                    boost::multi_index::identity<mutex_ptr>
                 >
             >
         > mutex_set;
         typedef mutex_set::index<tag_path>::type index_path_type;
+        typedef mutex_set::index<tag_pointer>::type index_pointer_type;
         mutex_set m_instances;
     };
     class file_lock

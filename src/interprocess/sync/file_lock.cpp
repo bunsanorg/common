@@ -53,3 +53,25 @@ file_lock file_lock_factory::get(const boost::filesystem::path &path)
     return file_lock(this, mtx);
 }
 
+bool file_lock_factory::try_erase(mutex_ptr &mtx)
+{
+    if (mtx.use_count()==2) // mtx and m_instances
+    {
+        boost::unique_lock<boost::shared_mutex> lk(m_lock);
+        index_pointer_type &by_pointer = m_instances.get<tag_pointer>();
+        index_pointer_type::iterator it = by_pointer.find(mtx);
+        if (it!=by_pointer.end())
+        {
+            BOOST_ASSERT(mtx==*it);
+            mtx.reset();
+            if (it->unique())
+            {
+                by_pointer.erase(it);
+                return true;
+            }
+            mtx = *it;
+        }
+    }
+    return false;
+}
+
