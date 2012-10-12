@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <type_traits>
 
 #include "bunsan/factory.hpp"
 
@@ -38,7 +39,8 @@ public: \
     typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__)> bunsan_factory; \
     typedef typename bunsan_factory::factory_type factory_type; \
     template <typename ... Args> \
-    static inline CLASS##_ptr instance(const typename bunsan_factory::key_type &type, Args &&...args) \
+    static inline typename std::enable_if<bunsan_factory::arguments_size::value == sizeof...(Args), \
+    CLASS##_ptr>::type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
     { \
         return bunsan_factory::instance(factories, type, std::forward<Args>(args)...); \
     } \

@@ -21,6 +21,7 @@ namespace bunsan
         typedef Result result_type;
         typedef std::function<Result (Args...)> factory_type;
         typedef std::string key_type;
+        typedef std::integral_constant<std::size_t, sizeof...(Args)> arguments_size;
         typedef std::map<key_type, factory_type> map_type;
         typedef typename map_type::value_type value_type;
         typedef typename map_type::const_iterator map_const_iterator;
