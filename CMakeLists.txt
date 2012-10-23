@@ -40,6 +40,9 @@ list(APPEND libraries ${Boost_LIBRARIES})
 
 aux_source_directory(src srcs)
 
+aux_source_directory(src/filesystem filesystem_srcs)
+list(APPEND srcs ${filesystem_srcs})
+
 aux_source_directory(src/process process_srcs)
 list(APPEND srcs ${process_srcs})
 
