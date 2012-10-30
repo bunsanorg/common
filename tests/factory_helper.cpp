@@ -51,9 +51,9 @@ namespace test
             }
         private:
             std::string m_data, m_data2;
-            static bool factory_reg_hook;
+            static const bool factory_reg_hook;
         };
-        bool init::factory_reg_hook = test::fact::register_new("init", []
+        const bool init::factory_reg_hook = test::fact::register_new("init", []
             (const std::string &data_, const std::string data2_)
             {
                 fact_ptr ptr(new init(data_, data2_));
@@ -71,9 +71,9 @@ namespace test
                 return 123;
             }
         private:
-            static bool factory_reg_hook;
+            static const bool factory_reg_hook;
         };
-        bool init::factory_reg_hook = test::fact2::register_new("init", []()
+        const bool init::factory_reg_hook = test::fact2::register_new("init", []()
             {
                 fact2_ptr ptr(new init);
                 return ptr;
