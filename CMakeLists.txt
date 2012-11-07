@@ -12,11 +12,7 @@ include(${CMAKE_SOURCE_DIR}/BunsanCommon.cmake)
 include_directories(include)
 
 # BOOST
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem serialization unit_test_framework thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND libraries ${Boost_LIBRARIES})
+bunsan_use_boost(system filesystem serialization unit_test_framework thread)
 
 add_library(${PROJECT_NAME} SHARED
     src/tempfile.cpp
