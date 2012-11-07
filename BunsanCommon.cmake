@@ -27,6 +27,15 @@ if(NOT DEFINED ENABLE_TESTS)
     set(ENABLE_TESTS ON CACHE BOOL "Do you want to enable testing?" FORCE)
 endif()
 
+# libraries
+macro(bunsan_use_boost)
+    set(Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_MULTITHREADED ON)
+    find_package(Boost COMPONENTS ${ARGN} REQUIRED)
+    include_directories(${Boost_INCLUDE_DIRS})
+    list(APPEND libraries ${Boost_LIBRARIES})
+endmacro()
+
 # binary targets
 function(add_binary_targets bin_targets_)
     set(bin_targets)
