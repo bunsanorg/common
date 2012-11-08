@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME} SHARED
 )
 target_link_libraries(${PROJECT_NAME} ${libraries})
 
+install(DIRECTORY include DESTINATION .)
 bunsan_install_targets(${PROJECT_NAME})
 install(FILES BunsanCommon.cmake DESTINATION ${CMAKE_ROOT}/Modules)
 
