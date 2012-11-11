@@ -27,34 +27,52 @@ if(NOT DEFINED ENABLE_TESTS)
     set(ENABLE_TESTS ON CACHE BOOL "Do you want to enable testing?" FORCE)
 endif()
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/include)
+    include_directories(include)
+endif()
+
 # libraries
+macro(bunsan_use)
+    list(APPEND libraries ${ARGN})
+endmacro()
+
 macro(bunsan_use_boost)
     set(Boost_USE_STATIC_LIBS OFF)
     set(Boost_USE_MULTITHREADED ON)
     find_package(Boost COMPONENTS ${ARGN} REQUIRED)
     include_directories(${Boost_INCLUDE_DIRS})
-    list(APPEND libraries ${Boost_LIBRARIES})
+    bunsan_use(${Boost_LIBRARIES})
+endmacro()
+
+macro(bunsan_use_bunsan)
+    foreach(lib ${ARGN})
+        bunsan_use(bunsan_${lib})
+    endforeach()
 endmacro()
 
 # binary targets
-function(add_binary_targets bin_targets_)
-    set(bin_targets)
+function(bunsan_add_executable target)
+    add_executable(${target} ${ARGN})
+    target_link_libraries(${target} ${libraries})
+endfunction()
 
-    foreach(bin ${ARGN})
-        set(trgt ${PROJECT_NAME}_${bin})
-        list(APPEND bin_targets ${trgt})
-        set(binprefix src/bin/${bin})
-        if(EXISTS ${CMAKE_SOURCE_DIR}/${binprefix}.cpp)
-            add_executable(${trgt} ${binprefix}.cpp)
-        elseif(EXISTS ${CMAKE_SOURCE_DIR}/${binprefix}.c)
-            add_executable(${trgt} ${binprefix}.c)
-        else()
-            message(SEND_ERROR "Source does not exist for target ${trgt}")
-        endif()
-        target_link_libraries(${trgt} ${PROJECT_NAME} ${libraries})
+function(bunsan_add_shared_library target)
+    add_library(${target} SHARED ${ARGN})
+    target_link_libraries(${target} ${libraries})
+endfunction()
+
+function(bunsan_add_cli_targets targets_)
+    set(cli_targets)
+
+    foreach(cli ${ARGN})
+        set(trgt ${PROJECT_NAME}_${cli})
+        list(APPEND cli_targets ${trgt})
+        set(cliprefix src/bin/${cli})
+        file(GLOB srcs src/bin/${cli}.cpp)
+        bunsan_add_executable(${trgt} ${srcs})
     endforeach()
 
-    set(${bin_targets_} ${bin_targets} PARENT_SCOPE)
+    set(${cli_targets_} ${cli_targets} PARENT_SCOPE)
 endfunction()
 
 # testing
@@ -100,4 +118,8 @@ macro(bunsan_install_targets)
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
+endmacro()
+
+macro(bunsan_install_headers)
+    install(DIRECTORY include DESTINATION .)
 endmacro()
