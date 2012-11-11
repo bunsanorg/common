@@ -9,12 +9,10 @@ cmake_minimum_required(VERSION 2.8)
 # this module is installed system-wide.
 include(${CMAKE_SOURCE_DIR}/BunsanCommon.cmake)
 
-include_directories(include)
-
 # BOOST
 bunsan_use_boost(system filesystem serialization unit_test_framework thread)
 
-add_library(${PROJECT_NAME} SHARED
+bunsan_add_shared_library(${PROJECT_NAME}
     src/tempfile.cpp
     src/error.cpp
     src/system_error.cpp
@@ -28,9 +26,8 @@ add_library(${PROJECT_NAME} SHARED
 
     src/filesystem/operations.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${libraries})
 
-install(DIRECTORY include DESTINATION .)
+bunsan_install_headers()
 bunsan_install_targets(${PROJECT_NAME})
 install(FILES BunsanCommon.cmake DESTINATION ${CMAKE_ROOT}/Modules)
 
