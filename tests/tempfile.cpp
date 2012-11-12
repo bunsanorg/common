@@ -60,4 +60,3 @@ int main()
         BOOST_ASSERT(tmp.path().extension()==".tgz");
     }
 }
-

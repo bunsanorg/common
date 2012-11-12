@@ -10,4 +10,3 @@ void bunsan::reset_dir(const boost::filesystem::path &dir)
     boost::filesystem::create_directory(dir);
     SLOG("directory "<<dir<<" was reset");
 }
-

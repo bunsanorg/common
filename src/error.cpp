@@ -9,4 +9,3 @@ const char *bunsan::error::what() const noexcept
 {
     return boost::diagnostic_information_what(*this);
 }
-
