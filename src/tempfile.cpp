@@ -114,4 +114,3 @@ bunsan::tempfile::~tempfile()
         SLOG("skipping tempfile remove "<<m_path);
     }
 }
-

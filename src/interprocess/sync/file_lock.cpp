@@ -184,4 +184,3 @@ void file_lock::unlock_sharable()
 #warning "is not implemented"
     BOOST_ASSERT_MSG(false, "is not implemented");
 }
-

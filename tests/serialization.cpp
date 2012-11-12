@@ -41,4 +41,3 @@ int main()
     test_path("//");
     test_path("/sas//sa");
 }
-

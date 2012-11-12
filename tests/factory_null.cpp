@@ -14,4 +14,3 @@ int main()
         bunsan_factory::registered_end(map));
     BOOST_ASSERT(set.empty());
 }
-

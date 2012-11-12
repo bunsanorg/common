@@ -16,4 +16,3 @@ int main()
     assert(pt.get<std::string>("some.path.name0")=="value0");
     assert(pt.get<std::string>("some.path.name1")=="value1");
 }
-

@@ -16,4 +16,3 @@ int main()
     static_assert(!meta::is_equality_comparable<stub>::value, "is_equality_comparable");
     static_assert(meta::is_greater_than_comparable<std::string>::value, "is_greater_than_comparable");
 }
-

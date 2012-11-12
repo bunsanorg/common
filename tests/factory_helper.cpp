@@ -109,4 +109,3 @@ int main()
         BOOST_ASSERT(!ptr);
     }
 }
-

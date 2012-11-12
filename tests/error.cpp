@@ -41,4 +41,3 @@ int main()
     TEST(bunsan::process::error, std::string("message"), message);
     TEST(bunsan::process::non_zero_exit_status_error, 10, exit_status);
 }
-

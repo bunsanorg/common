@@ -89,4 +89,3 @@ int main()
     test_except(o, 100500);
     test_sexcept(o, std::logic_error("jdknasjkdnc amk mkamnaklm"));
 }
-
