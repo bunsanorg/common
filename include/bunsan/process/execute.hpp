@@ -1,5 +1,4 @@
-#ifndef EXECUTE_HPP
-#define EXECUTE_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -16,7 +15,9 @@ namespace bunsan
     namespace process
     {
         int sync_execute(const context &ctx);
+
         int sync_execute(context &&ctx);
+
         inline int sync_execute(
             const boost::filesystem::path &cwd,
             const boost::filesystem::path &executable,
@@ -25,6 +26,7 @@ namespace bunsan
         {
             return sync_execute(context().current_path(cwd).executable(executable).argv(args).use_path(use_path));
         }
+
         inline int sync_execute(
             const boost::filesystem::path &cwd,
             const std::vector<std::string> &args,
@@ -32,6 +34,7 @@ namespace bunsan
         {
             return sync_execute(context().current_path(cwd).argv(args).use_path(use_path));
         }
+
         template <typename ... Args>
         void check_sync_execute(Args &&...args)
         {
@@ -41,6 +44,3 @@ namespace bunsan
         }
     }
 }
-
-#endif //EXECUTE_HPP
-

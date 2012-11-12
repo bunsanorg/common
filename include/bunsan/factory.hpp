@@ -1,5 +1,4 @@
-#ifndef BUNSAN_FACTORY_HPP
-#define BUNSAN_FACTORY_HPP
+#pragma once
 
 #include <map>
 #include <string>
@@ -14,6 +13,7 @@ namespace bunsan
 {
     template <typename Signature>
     class factory;
+
     template <typename Result, typename ... Args>
     class factory<Result (Args...)>
     {
@@ -25,6 +25,7 @@ namespace bunsan
         typedef std::map<key_type, factory_type> map_type;
         typedef typename map_type::value_type value_type;
         typedef typename map_type::const_iterator map_const_iterator;
+
         struct pair_first
         {
             const key_type &operator()(const value_type &pair) const
@@ -32,9 +33,10 @@ namespace bunsan
                 return pair.first;
             }
         };
+
         typedef std::function<const key_type &(const value_type &)> iterator_converter;
         typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
-        //
+
         static bool register_new(
             map_type *&factories,
             const key_type &type,
@@ -49,6 +51,7 @@ namespace bunsan
             }
             return false;
         }
+
         static result_type instance(
             const map_type *const factories,
             const key_type &type,
@@ -62,6 +65,7 @@ namespace bunsan
             }
             return result_type();
         }
+
         static const_iterator registered_begin(const map_type *const factories)
         {
             if (factories)
@@ -70,6 +74,7 @@ namespace bunsan
                 /// \see factory_null unit test
                 return const_iterator(map_const_iterator(), pair_first());
         }
+
         static const_iterator registered_end(const map_type *const factories)
         {
             if (factories)
@@ -80,6 +85,3 @@ namespace bunsan
         }
     };
 }
-
-#endif //BUNSAN_FACTORY_HPP
-

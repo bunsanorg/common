@@ -1,5 +1,4 @@
-#ifndef BUNSAN_META_COMPARABLE_HPP
-#define BUNSAN_META_COMPARABLE_HPP
+#pragma once
 
 #include <type_traits>
 
@@ -8,29 +7,30 @@ namespace bunsan{namespace meta
     namespace detail
     {
         template <typename T>
-        struct remove_cv_ref
-        {
-            typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type type;
-        };
-    }
-    namespace detail
-    {
+        struct remove_cv_ref: std::remove_cv<typename std::remove_reference<T>::type> {};
+
         struct tag {};
+
         struct any
         {
             template <typename T>
             any(const T &);
         };
+
         tag operator==(const any &, const any &);
         tag operator<=(const any &, const any &);
         tag operator>=(const any &, const any &);
         tag operator<(const any &, const any &);
         tag operator>(const any &, const any &);
+
         typedef char yes;
         typedef char (&no)[2];
+
         no check(tag);
+
         template <typename T>
         yes check(T);
+
 #define BUNSAN_META_OPERATOR(NAME, OPERATOR) \
         template <typename T> \
         class NAME \
@@ -46,12 +46,10 @@ namespace bunsan{namespace meta
     BUNSAN_META_OPERATOR(is_greater_than_comparable, >=);
 #undef BUNSAN_META_OPERATOR
     }
+
     using detail::is_equality_comparable;
     using detail::is_less_equal_comparable;
     using detail::is_greater_equal_comparable;
     using detail::is_less_than_comparable;
     using detail::is_greater_than_comparable;
 }}
-
-#endif //BUNSAN_META_COMPARABLE_HPP
-

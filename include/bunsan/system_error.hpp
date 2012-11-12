@@ -1,5 +1,4 @@
-#ifndef BUNSAN_SYSTEM_ERROR_HPP
-#define BUNSAN_SYSTEM_ERROR_HPP
+#pragma once
 
 #include "bunsan/error.hpp"
 
@@ -21,6 +20,3 @@ namespace bunsan
         typedef boost::error_info<struct tag_what_message, std::string> what_message;
     };
 }
-
-#endif //BUNSAN_SYSTEM_ERROR_HPP
-

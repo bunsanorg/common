@@ -1,5 +1,4 @@
-#ifndef BUNSAN_FACTORY_HELPER_HPP
-#define BUNSAN_FACTORY_HELPER_HPP
+#pragma once
 
 #include <map>
 #include <string>
@@ -103,6 +102,3 @@ namespace bunsan
 #endif
 #define BUNSAN_FACTORY_DEFINE(CLASS) \
     typename CLASS::bunsan_factory::map_type *CLASS::factories;
-
-#endif //BUNSAN_FACTORY_HELPER_HPP
-
