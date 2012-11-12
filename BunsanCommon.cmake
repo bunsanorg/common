@@ -44,6 +44,12 @@ macro(bunsan_use_boost)
     bunsan_use(${Boost_LIBRARIES})
 endmacro()
 
+macro(bunsan_use_xmlrpc)
+    find_package(XMLRPC REQUIRED ${ARGN})
+    include_directories(${XMLRPC_INCLUDE_DIRS})
+    bunsan_use(${XMLRPC_LIBRARIES})
+endmacro()
+
 macro(bunsan_use_bunsan)
     foreach(lib ${ARGN})
         bunsan_use(bunsan_${lib})
