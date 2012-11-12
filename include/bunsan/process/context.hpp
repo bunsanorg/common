@@ -1,5 +1,4 @@
-#ifndef CONTEXT_HPP
-#define CONTEXT_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -20,6 +19,7 @@ namespace bunsan
         class context
         {
         friend class boost::serialization::access;
+
         template <typename Archive>
         void serialize(Archive &ar, const unsigned int /*version*/)
         {
@@ -28,31 +28,37 @@ namespace bunsan
             ar & argv_;
             ar & use_path_;
         }
+
         public:
             context()=default;
             context(const context &)=default;
+
             inline context(context &&ctx):  current_path_(std::move(ctx.current_path_)),
                             executable_(std::move(ctx.executable_)),
                             argv_(std::move(ctx.argv_)),
                             use_path_(std::move(ctx.use_path_)){}
+
             context &operator=(const context &ctx)
             {
                 context ctx_(ctx);
                 this->swap(ctx_);
                 return *this;
             }
+
             inline context &operator=(context &&ctx) noexcept
             {
                 this->swap(ctx);
                 return *this;
             }
+
             inline bool operator==(const context &ctx) const
             {
                 return  current_path_==ctx.current_path_ &&
-                    executable_==ctx.executable_ &&
-                    argv_==ctx.argv_ &&
-                    use_path_==ctx.use_path_;
+                        executable_==ctx.executable_ &&
+                        argv_==ctx.argv_ &&
+                        use_path_==ctx.use_path_;
             }
+
             inline void swap(context &ctx) noexcept
             {
                 using boost::swap;
@@ -61,6 +67,7 @@ namespace bunsan
                 swap(argv_, ctx.argv_);
                 swap(use_path_, ctx.use_path_);
             }
+
             // current path
             inline context &current_path(const boost::filesystem::path &current_path_)
             {
@@ -71,6 +78,7 @@ namespace bunsan
             {
                 return bunsan::get(current_path_, "current_path member was not initialized");
             }
+
             // executable
             inline context &executable(const boost::filesystem::path &executable_)
             {
@@ -81,6 +89,7 @@ namespace bunsan
             {
                 return bunsan::get(executable_, "executable member was not initialized");
             }
+
             // argv
             inline context &argv(const std::vector<std::string> &argv_)
             {
@@ -95,6 +104,7 @@ namespace bunsan
             {
                 return argv_;
             }
+
             // use path
             inline context &use_path(bool use_path_)
             {
@@ -105,6 +115,7 @@ namespace bunsan
             {
                 return bunsan::get(use_path_, "use_path member was not initialized");
             }
+
             // build functions
             /*!
              * \brief prepare context to execution
@@ -117,14 +128,17 @@ namespace bunsan
                 ctx.build_();
                 this->swap(ctx);
             }
+
             inline context built() const
             {
                 context ctx(*this);
                 ctx.build_();
                 return ctx;
             }
+
         private:
             void build_();
+
             boost::optional<boost::filesystem::path> current_path_;
             boost::optional<boost::filesystem::path> executable_;
             std::vector<std::string> argv_;
@@ -136,6 +150,3 @@ namespace bunsan
         }
     }
 }
-
-#endif //CONTEXT_HPP
-

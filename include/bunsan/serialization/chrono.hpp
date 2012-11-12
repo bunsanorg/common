@@ -1,5 +1,4 @@
-#ifndef BUNSAN_SERIALIZATION_CHRONO_HPP
-#define BUNSAN_SERIALIZATION_CHRONO_HPP
+#pragma once
 
 #include <boost/serialization/split_free.hpp>
 
@@ -12,12 +11,14 @@ namespace boost{namespace serialization
     {
         split_free(ar, dur, file_version);
     }
+
     template <typename Archive, typename Rep, typename Period>
     void save(Archive &ar, const typename std::chrono::duration<Rep, Period> &dur, const unsigned int /*version*/)
     {
         Rep rp = dur.count();
         ar & rp;
     }
+
     template <typename Archive, typename Rep, typename Period>
     void load(Archive &ar, typename std::chrono::duration<Rep, Period> &dur, const unsigned int /*version*/)
     {
@@ -26,6 +27,3 @@ namespace boost{namespace serialization
         dur = typename std::chrono::duration<Rep, Period>(rp);
     }
 }}
-
-#endif //BUNSAN_SERIALIZATION_CHRONO_HPP
-

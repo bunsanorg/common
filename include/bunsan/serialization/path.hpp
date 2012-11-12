@@ -1,5 +1,4 @@
-#ifndef BUNSAN_SERIALIZATION_PATH_HPP
-#define BUNSAN_SERIALIZATION_PATH_HPP
+#pragma once
 
 #include <boost/serialization/split_free.hpp>
 
@@ -9,11 +8,13 @@ BOOST_SERIALIZATION_SPLIT_FREE(boost::filesystem::path)
 
 namespace boost{namespace serialization
 {
+    // FIXME nvp
     template <typename Archive>
     void save(Archive &ar, const boost::filesystem::path &path, const unsigned int /*version*/)
     {
         ar & path.generic_string();
     }
+
     template <typename Archive>
     void load(Archive &ar, boost::filesystem::path &path, const unsigned int /*version*/)
     {
@@ -22,6 +23,3 @@ namespace boost{namespace serialization
         path = str;
     }
 }}
-
-#endif //BUNSAN_SERIALIZATION_PATH_HPP
-

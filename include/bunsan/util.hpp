@@ -1,5 +1,4 @@
-#ifndef BUNSAN_UTIL_HPP
-#define BUNSAN_UTIL_HPP
+#pragma once
 
 #include <iostream>
 #include <sstream>
@@ -30,6 +29,7 @@ namespace bunsan
     {
         constexpr const char *invalid_optional = "boost::optional was not initialized";
     }
+
     // exception overload
     template <typename T, typename E>
     T &get(boost::optional<T> &o, const E &e)
@@ -38,6 +38,7 @@ namespace bunsan
             throw e;
         return o.get();
     }
+
     template <typename T, typename E>
     const T &get(const boost::optional<T> &o, const E &e)
     {
@@ -45,6 +46,7 @@ namespace bunsan
             throw e;
         return o.get();
     }
+
     // std::string overload
     template <typename T>
     T &get(boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
@@ -53,6 +55,7 @@ namespace bunsan
             throw std::invalid_argument(msg);
         return o.get();
     }
+
     template <typename T>
     const T &get(const boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
     {
@@ -60,6 +63,7 @@ namespace bunsan
             throw std::invalid_argument(msg);
         return o.get();
     }
+
     // const char * overload
     template <typename T>
     T &get(boost::optional<T> &o, const char *msg)
@@ -68,6 +72,7 @@ namespace bunsan
             throw std::invalid_argument(msg);
         return o.get();
     }
+
     template <typename T>
     const T &get(const boost::optional<T> &o, const char *msg)
     {
@@ -75,13 +80,15 @@ namespace bunsan
             throw std::invalid_argument(msg);
         return o.get();
     }
+
     /*!
      * \brief recreate directory
      */
     void reset_dir(const boost::filesystem::path &dir);
+
     /*!
      * \brief read info from filename with relative path bug fix
-     * 
+     *
      * it is not safe function, it should be used only from single thread
      */
     template <typename Ptree>
@@ -92,6 +99,7 @@ namespace bunsan
         boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().string(), pt, loc);
         boost::filesystem::current_path(boost::filesystem::initial_path());
     }
+
     /*!
      * \brief if node does not exists, set it to value (empty Ptree by default), return node
      */
@@ -101,6 +109,3 @@ namespace bunsan
         return ptree.put_child(path, ptree.get_child(path, value));
     }
 }
-
-#endif //BUNSAN_UTIL_HPP
-
