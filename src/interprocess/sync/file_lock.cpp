@@ -90,14 +90,14 @@ file_lock::file_lock(file_lock_factory &factory_, const mutex_ptr &mutex_):
     m_mutex(mutex_)
 {}
 
-file_lock::file_lock(file_lock &&fl) throw():
+file_lock::file_lock(file_lock &&fl) noexcept:
     m_factory(fl.m_factory),
     m_mutex(std::move(fl.m_mutex))
 {
     fl.reset();
 }
 
-file_lock &file_lock::operator=(file_lock &&fl) throw()
+file_lock &file_lock::operator=(file_lock &&fl) noexcept
 {
     this->swap(fl);
     fl.reset();
@@ -110,19 +110,19 @@ file_lock::~file_lock()
         m_factory->try_erase(m_mutex);
 }
 
-void file_lock::reset() throw()
+void file_lock::reset() noexcept
 {
     m_factory = 0;
     m_mutex.reset();
 }
 
-file_lock::operator bool() const throw()
+file_lock::operator bool() const noexcept
 {
     BOOST_ASSERT(static_cast<bool>(m_factory)==static_cast<bool>(m_mutex));
     return static_cast<bool>(m_factory);
 }
 
-void file_lock::swap(file_lock &fl) throw()
+void file_lock::swap(file_lock &fl) noexcept
 {
     using boost::swap;
     swap(m_factory, fl.m_factory);

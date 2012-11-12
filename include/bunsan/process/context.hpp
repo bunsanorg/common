@@ -41,7 +41,7 @@ namespace bunsan
                 this->swap(ctx_);
                 return *this;
             }
-            inline context &operator=(context &&ctx) throw()
+            inline context &operator=(context &&ctx) noexcept
             {
                 this->swap(ctx);
                 return *this;
@@ -53,7 +53,7 @@ namespace bunsan
                     argv_==ctx.argv_ &&
                     use_path_==ctx.use_path_;
             }
-            inline void swap(context &ctx) throw()
+            inline void swap(context &ctx) noexcept
             {
                 using boost::swap;
                 swap(current_path_, ctx.current_path_);
@@ -130,7 +130,7 @@ namespace bunsan
             std::vector<std::string> argv_;
             boost::optional<bool> use_path_;
         };
-        inline void swap(context &a, context &b) throw()
+        inline void swap(context &a, context &b) noexcept
         {
             a.swap(b);
         }

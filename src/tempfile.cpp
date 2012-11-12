@@ -35,12 +35,12 @@ bunsan::tempfile::tempfile(): do_auto_remove(false) {}
 bunsan::tempfile::tempfile(const boost::filesystem::path &path_, bool do_auto_remove_):
     m_path(path_), do_auto_remove(do_auto_remove_) {}
 
-bunsan::tempfile::tempfile(tempfile &&tmp) throw()
+bunsan::tempfile::tempfile(tempfile &&tmp) noexcept
 {
     swap(tmp);
 }
 
-bunsan::tempfile &bunsan::tempfile::operator=(tempfile &&tmp) throw()
+bunsan::tempfile &bunsan::tempfile::operator=(tempfile &&tmp) noexcept
 {
     swap(tmp);
     return *this;
@@ -48,7 +48,7 @@ bunsan::tempfile &bunsan::tempfile::operator=(tempfile &&tmp) throw()
 
 // swap
 
-void bunsan::tempfile::swap(tempfile &tmp) throw()
+void bunsan::tempfile::swap(tempfile &tmp) noexcept
 {
     using boost::swap;
     swap(m_path, tmp.m_path);
