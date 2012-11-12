@@ -12,13 +12,13 @@ namespace bunsan
         error()=default;
         /// \see message
         error(const std::string &message_);
-        virtual const char *what() const throw();
+        virtual const char *what() const noexcept;
         /*!
          * \tparam ErrorInfo boost::error_info instantiation
          * \return pointer to data associated with ErrorInfo
          */
         template <typename ErrorInfo>
-        const typename ErrorInfo::value_type *get() const throw()
+        const typename ErrorInfo::value_type *get() const noexcept
         {
             return boost::get_error_info<ErrorInfo>(*this);
         }
@@ -26,7 +26,7 @@ namespace bunsan
          * \copydoc get
          */
         template <typename ErrorInfo>
-        typename ErrorInfo::value_type *get() throw()
+        typename ErrorInfo::value_type *get() noexcept
         {
             return boost::get_error_info<ErrorInfo>(*this);
         }

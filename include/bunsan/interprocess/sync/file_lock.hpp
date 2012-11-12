@@ -89,15 +89,15 @@ namespace bunsan{namespace interprocess
         file_lock();
         file_lock(const boost::filesystem::path &path, file_lock_factory &factory_=file_lock_factory::instance());
         file_lock(file_lock_factory &factory_, const mutex_ptr &mutex_);
-        file_lock(file_lock &&lock) throw();
+        file_lock(file_lock &&lock) noexcept;
         file_lock(const file_lock &)=delete;
-        file_lock& operator=(file_lock &&) throw();
+        file_lock& operator=(file_lock &&) noexcept;
         ~file_lock();
 
-        void reset() throw();
-        operator bool() const throw();
+        void reset() noexcept;
+        operator bool() const noexcept;
 
-        void swap(file_lock &) throw();
+        void swap(file_lock &) noexcept;
         void lock();
         bool try_lock();
         bool timed_lock(const boost::posix_time::ptime &);
@@ -110,7 +110,7 @@ namespace bunsan{namespace interprocess
         file_lock_factory *m_factory;
         mutex_ptr m_mutex;
     };
-    inline void swap(file_lock &a, file_lock &b) throw()
+    inline void swap(file_lock &a, file_lock &b) noexcept
     {
         a.swap(b);
     }

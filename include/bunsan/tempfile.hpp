@@ -14,10 +14,10 @@ namespace bunsan
         tempfile();
         explicit tempfile(const boost::filesystem::path &path_, bool do_auto_remove_=true);
         tempfile(const tempfile &tmp)=delete;
-        tempfile(tempfile &&tmp) throw();
+        tempfile(tempfile &&tmp) noexcept;
         // operator=
         tempfile &operator=(const tempfile &tmp)=delete;
-        tempfile &operator=(tempfile &&tmp) throw();
+        tempfile &operator=(tempfile &&tmp) noexcept;
         // path access
         const boost::filesystem::path &path() const;
         boost::filesystem::path::string_type native() const;
@@ -29,7 +29,7 @@ namespace bunsan
         // destruction
         ~tempfile();
         // swap
-        void swap(tempfile &tmp) throw();
+        void swap(tempfile &tmp) noexcept;
 
         // static creators
         /// create tempfile in specified directory
@@ -49,7 +49,7 @@ namespace bunsan
         boost::filesystem::path m_path;
         bool do_auto_remove;
     };
-    inline void swap(tempfile &a, tempfile &b) throw()
+    inline void swap(tempfile &a, tempfile &b) noexcept
     {
         a.swap(b);
     }
