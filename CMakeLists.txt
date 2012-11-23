@@ -18,6 +18,8 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/system_error.cpp
     src/util.cpp
 
+    src/runtime/demangle.cpp
+
     src/process/error.cpp
     src/process/execute.cpp
     src/process/aliases.cpp
