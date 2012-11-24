@@ -12,6 +12,9 @@ include(${CMAKE_SOURCE_DIR}/BunsanCommon.cmake)
 # BOOST
 bunsan_use_boost(system filesystem serialization unit_test_framework thread)
 
+# FIXME OS-specified (*nix)
+bunsan_use(dl)
+
 bunsan_add_shared_library(${PROJECT_NAME}
     src/tempfile.cpp
     src/error.cpp
@@ -19,6 +22,7 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/util.cpp
 
     src/runtime/demangle.cpp
+    src/runtime/stacktrace.cpp
 
     src/process/error.cpp
     src/process/execute.cpp
