@@ -1,43 +1,26 @@
+#define BOOST_TEST_MODULE error
+#include <boost/test/unit_test.hpp>
+
 #include "bunsan/error.hpp"
 #include "bunsan/process/error.hpp"
 
-#include <iostream>
+BOOST_AUTO_TEST_SUITE(error)
 
-#include <boost/assert.hpp>
-
-template <typename Error, typename Arg, typename Get>
-void test(const Error &err, const Arg &arg, const Get &get)
+template <typename Error>
+bool check(const Error &e)
 {
-    try
-    {
-        BOOST_THROW_EXCEPTION(err);
-        BOOST_ASSERT_MSG(false, "throw failed");
-    }
-    catch (Error &e)
-    {
-        BOOST_ASSERT_MSG(get(e)==arg, "construction failed");
-        std::cerr<<e.what()<<std::endl;
-        return;
-    }
-    catch (std::exception &e)
-    {
-        BOOST_ASSERT_MSG(false, "match failed");
-    }
-    BOOST_ASSERT_MSG(false, "exit failed");
+    BOOST_CHECK(e.template get<bunsan::error::stacktrace>());
+    BOOST_TEST_MESSAGE(e.what());
+    return true;
 }
 
-#define TEST(ERROR, ARG, GET) \
-    test(ERROR(ARG), ARG, \
-    [](const ERROR &e) \
-    { \
-        const auto *ret = e.get<ERROR::GET>(); \
-        BOOST_ASSERT_MSG(ret, "boost::get_error_info failed"); \
-        return *ret; \
-    });
+#define BUNSAN_CHECK_EXCEPTION(ERROR, ...) BOOST_CHECK_EXCEPTION(BOOST_THROW_EXCEPTION(ERROR(__VA_ARGS__)), ERROR, check<ERROR>)
 
-int main()
+BOOST_AUTO_TEST_CASE(throw_)
 {
-    TEST(bunsan::error, std::string("message"), message);
-    TEST(bunsan::process::error, std::string("message"), message);
-    TEST(bunsan::process::non_zero_exit_status_error, 10, exit_status);
+    BUNSAN_CHECK_EXCEPTION(bunsan::error, "message");
+    BUNSAN_CHECK_EXCEPTION(bunsan::process::error, "message");
+    BUNSAN_CHECK_EXCEPTION(bunsan::process::non_zero_exit_status_error, 10);
 }
+
+BOOST_AUTO_TEST_SUITE_END() // error
