@@ -1,7 +1,9 @@
 #define BOOST_TEST_MODULE ptree_get
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/util.hpp"
+#include "bunsan/get.hpp"
+
+#include <boost/property_tree/info_parser.hpp>
 
 BOOST_AUTO_TEST_SUITE(ptree_get)
 
@@ -15,7 +17,7 @@ BOOST_AUTO_TEST_CASE(ptree_get)
     BOOST_CHECK(bunsan::ptree_get(pt, "some.path", vl2) == vl);
     bunsan::ptree_get(pt, "some.path").put("name0", "value0");
     bunsan::ptree_get(pt, "some.path").put("name1", "value1");
-    boost::property_tree::write_info(std::cout, pt);
+    boost::property_tree::write_info(std::cerr, pt);
     BOOST_CHECK_EQUAL(pt.get<std::string>("some.path.name0"), "value0");
     BOOST_CHECK_EQUAL(pt.get<std::string>("some.path.name1"), "value1");
 }
