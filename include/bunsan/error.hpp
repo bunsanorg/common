@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bunsan/runtime/stacktrace.hpp"
+
 #include <exception>
 
 #include <boost/exception/all.hpp>
@@ -8,12 +10,22 @@ namespace bunsan
 {
     struct error: virtual std::exception, virtual boost::exception
     {
-        error()=default;
+        /*!
+         * \brief Create error object with stacktrace tag.
+         *
+         * \see stacktrace
+         */
+        error();
 
-        /// \see message
+        /*!
+         * \brief Create error object with message and stacktrace tags.
+         *
+         * \see message
+         * \see stacktrace
+         */
         error(const std::string &message_);
 
-        virtual const char *what() const noexcept;
+        const char *what() const noexcept override;
 
         /*!
          * \tparam ErrorInfo boost::error_info instantiation
@@ -34,7 +46,16 @@ namespace bunsan
             return boost::get_error_info<ErrorInfo>(*this);
         }
 
+        /*!
+         * \brief Enable stack trace if not provided.
+         *
+         * \param skip number of nested function to omit in stack trace
+         */
+        void enable_stacktrace(const std::size_t skip=1);
+
         /// Human readable error message
         typedef boost::error_info<struct tag_message, std::string> message;
+
+        typedef boost::error_info<struct tag_stacktrace, runtime::stacktrace> stacktrace;
     };
 }
