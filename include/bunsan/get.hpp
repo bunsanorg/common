@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bunsan/error.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -11,59 +13,22 @@
 
 namespace bunsan
 {
-    namespace error_message
-    {
-        constexpr const char *invalid_optional = "boost::optional was not initialized";
-    }
-
-    // exception overload
-    template <typename T, typename E>
-    T &get(boost::optional<T> &o, const E &e)
-    {
-        if (!o)
-            throw e;
-        return o.get();
-    }
-
-    template <typename T, typename E>
-    const T &get(const boost::optional<T> &o, const E &e)
-    {
-        if (!o)
-            throw e;
-        return o.get();
-    }
+    struct uninitialized_optional_error: virtual error {};
 
     // std::string overload
-    template <typename T>
-    T &get(boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
+    template <typename T, typename Error=uninitialized_optional_error>
+    T &get(boost::optional<T> &o, const std::string &msg)
     {
         if (!o)
-            throw std::invalid_argument(msg);
+            BOOST_THROW_EXCEPTION(Error() << error::message(msg));
         return o.get();
     }
 
-    template <typename T>
-    const T &get(const boost::optional<T> &o, const std::string &msg=error_message::invalid_optional)
+    template <typename T, typename Error=uninitialized_optional_error>
+    T &get(boost::optional<T> &o)
     {
         if (!o)
-            throw std::invalid_argument(msg);
-        return o.get();
-    }
-
-    // const char * overload
-    template <typename T>
-    T &get(boost::optional<T> &o, const char *msg)
-    {
-        if (!o)
-            throw std::invalid_argument(msg);
-        return o.get();
-    }
-
-    template <typename T>
-    const T &get(const boost::optional<T> &o, const char *msg)
-    {
-        if (!o)
-            throw std::invalid_argument(msg);
+            BOOST_THROW_EXCEPTION(Error());
         return o.get();
     }
 
