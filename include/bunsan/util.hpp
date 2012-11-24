@@ -6,12 +6,14 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#define SLOG(M) do\
-        {\
-            std::stringstream buf;\
-            buf<<"["<<__FILE__<<":"<<__LINE__<<":"<<__func__<<":"<<boost::posix_time::second_clock::local_time()<<"] "<<M<<std::endl;\
-            std::cerr<<buf.str()<<std::flush;\
-        } while (false)
+#define SLOG(M) do \
+        { \
+            std::stringstream buf; \
+            buf << "[" << __FILE__ << ":" << __LINE__ << ":" << __func__ << ":" << \
+                boost::posix_time::second_clock::local_time() << "] " << M << std::endl; \
+            std::cerr << buf.str() << std::flush; \
+        } \
+        while (false)
 #define DLOG(...) SLOG(#__VA_ARGS__)
 
 #include <locale>
@@ -24,11 +26,6 @@
 
 namespace bunsan
 {
-    /*!
-     * \brief recreate directory
-     */
-    void reset_dir(const boost::filesystem::path &dir);
-
     /*!
      * \brief Read info from filename with relative path bug fix
      *

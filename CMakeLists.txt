@@ -19,7 +19,6 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/tempfile.cpp
     src/error.cpp
     src/system_error.cpp
-    src/util.cpp
 
     src/runtime/demangle.cpp
     src/runtime/stacktrace.cpp
