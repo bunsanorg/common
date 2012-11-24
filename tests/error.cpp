@@ -2,7 +2,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "bunsan/error.hpp"
-#include "bunsan/process/error.hpp"
 
 BOOST_AUTO_TEST_SUITE(error)
 
@@ -19,8 +18,6 @@ bool check(const Error &e)
 BOOST_AUTO_TEST_CASE(throw_)
 {
     BUNSAN_CHECK_EXCEPTION(bunsan::error, "message");
-    BUNSAN_CHECK_EXCEPTION(bunsan::process::error, "message");
-    BUNSAN_CHECK_EXCEPTION(bunsan::process::non_zero_exit_status_error, 10);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // error
