@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE(demangle)
 BOOST_AUTO_TEST_CASE(stacktrace)
 {
     BOOST_TEST_MESSAGE(::X::f());
-    BOOST_CHECK_EQUAL(X::f(1).size(), 1);
-    BOOST_CHECK_EQUAL(X::f(1, 2).size(), 1);
+    BOOST_CHECK_EQUAL(X::f(1, 1).size(), 1);
+    BOOST_CHECK_EQUAL(X::f(1, 2).size(), 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // runtime
