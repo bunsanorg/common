@@ -24,12 +24,6 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/runtime/demangle.cpp
     src/runtime/stacktrace.cpp
 
-    src/process/error.cpp
-    src/process/execute.cpp
-    src/process/aliases.cpp
-
-    src/interprocess/sync/file_lock.cpp
-
     src/filesystem/operations.cpp
 )
 
