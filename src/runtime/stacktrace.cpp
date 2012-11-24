@@ -16,14 +16,17 @@
 namespace bunsan{namespace runtime
 {
 // FIXME windows version is not implemented
-    stacktrace stacktrace::get(const std::size_t max_size, const std::size_t skip)
+    stacktrace stacktrace::get(const std::size_t skip, const std::size_t max_size)
     {
         stacktrace trace;
         trace.resize(max_size + skip);
         const std::size_t real_size = ::backtrace(trace.data(), max_size + skip);
         BOOST_ASSERT(real_size <= max_size + skip);
         trace.resize(real_size);
-        trace.erase(trace.begin(), trace.begin() + skip);
+        if (skip <= real_size)
+            trace.erase(trace.begin(), trace.begin() + skip);
+        else
+            trace.clear();
         return trace;
     }
 
