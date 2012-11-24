@@ -44,13 +44,13 @@ namespace bunsan{namespace runtime
                 else
                     out << "???";
                 if (offset)
-                    out << "+0x" << std::hex << offset;
+                    out << "+" << std::showbase << std::hex << offset;
                 out << ") [";
                 if (info.dli_saddr)
                     out << info.dli_saddr;
                 else
                     out << "???";
-                out << "] {addr = 0x" << std::hex << function << "}\n";
+                out << "] {addr = " << std::showbase << std::hex << function << "}\n";
             }
             else
             {
