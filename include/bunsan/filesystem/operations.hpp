@@ -8,6 +8,11 @@
 
 namespace bunsan{namespace filesystem
 {
+    /*!
+     * \brief recreate directory
+     */
+    void reset_dir(const boost::filesystem::path &dir);
+
     using boost::filesystem::copy_option;
 
     void copy_tree(const boost::filesystem::path &from,

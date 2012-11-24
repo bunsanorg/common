@@ -2,6 +2,13 @@
 
 namespace bunsan{namespace filesystem
 {
+    void reset_dir(const boost::filesystem::path &dir)
+    {
+        if (boost::filesystem::exists(dir))
+            boost::filesystem::remove_all(dir);
+        boost::filesystem::create_directory(dir);
+    }
+
     void copy_tree(const boost::filesystem::path &from,
                    const boost::filesystem::path &to)
     {
