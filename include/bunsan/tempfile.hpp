@@ -50,6 +50,8 @@ namespace bunsan
 
     private:
         static const boost::filesystem::path default_model;
+
+    private:
         boost::filesystem::path m_path;
         bool do_auto_remove;
     };
