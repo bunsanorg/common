@@ -1,21 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-#define SLOG(M) do \
-        { \
-            std::stringstream buf; \
-            buf << "[" << __FILE__ << ":" << __LINE__ << ":" << __func__ << ":" << \
-                boost::posix_time::second_clock::local_time() << "] " << M << std::endl; \
-            std::cerr << buf.str() << std::flush; \
-        } \
-        while (false)
-#define DLOG(...) SLOG(#__VA_ARGS__)
-
 #include <locale>
 #include <string>
 
@@ -24,7 +8,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 
-namespace bunsan
+namespace bunsan{namespace property_tree
 {
     /*!
      * \brief Read info from filename with relative path bug fix
@@ -39,4 +23,4 @@ namespace bunsan
         boost::property_tree::info_parser::read_info(boost::filesystem::path(filename).filename().string(), pt, loc);
         boost::filesystem::current_path(boost::filesystem::initial_path());
     }
-}
+}}
