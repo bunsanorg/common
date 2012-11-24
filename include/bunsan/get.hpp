@@ -15,7 +15,22 @@ namespace bunsan
 {
     struct uninitialized_optional_error: virtual error {};
 
-    // std::string overload
+    template <typename T, typename Error=uninitialized_optional_error>
+    const T &get(const boost::optional<T> &o, const std::string &msg)
+    {
+        if (!o)
+            BOOST_THROW_EXCEPTION(Error() << error::message(msg));
+        return o.get();
+    }
+
+    template <typename T, typename Error=uninitialized_optional_error>
+    const T &get(const boost::optional<T> &o)
+    {
+        if (!o)
+            BOOST_THROW_EXCEPTION(Error());
+        return o.get();
+    }
+
     template <typename T, typename Error=uninitialized_optional_error>
     T &get(boost::optional<T> &o, const std::string &msg)
     {
