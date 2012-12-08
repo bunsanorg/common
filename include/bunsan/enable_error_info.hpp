@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 #include <system_error>
-#include <iostream>
+#include <ios>
 #include <type_traits>
 
 #include <boost/system/system_error.hpp>
@@ -20,6 +20,7 @@ namespace bunsan
         typedef boost::error_info<struct tag_original_what, std::string> original_what;
         typedef boost::error_info<struct tag_original_type_name, std::string> original_type_name;
 
+        /// \todo use std::exception_ptr
         template <typename T>
         struct error_info_injector: T, boost::exception
         {
@@ -94,6 +95,11 @@ namespace bunsan
         BOOST_THROW_EXCEPTION(::bunsan::system_error(e.what()) << \
             ::bunsan::exception_detail::original_type_name(::bunsan::runtime::type_name(e)) \
             ERROR_INFO); \
+    } \
+    catch (::std::bad_alloc &) \
+    /* should not be caught, there are no enough memory */ \
+    { \
+        throw; \
     } \
     BOOST_PP_SEQ_FOR_EACH(BUNSAN_EXCEPTIONS_WRAP_WRAPPER, ERROR_INFO, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
