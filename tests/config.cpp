@@ -3,6 +3,7 @@
 
 #include "bunsan/config/traits.hpp"
 #include "bunsan/config/input_archive.hpp"
+#include "bunsan/config/output_archive.hpp"
 
 #include "bunsan/stream_enum.hpp"
 
@@ -95,6 +96,20 @@ BOOST_AUTO_TEST_CASE(input)
     BOOST_CHECK(boost::get<std::string>(&cfg_str.d));
     if (boost::get<std::string>(&cfg_str.d))
         BOOST_CHECK_EQUAL(*boost::get<std::string>(&cfg_str.d), "string");
+}
+
+BOOST_AUTO_TEST_CASE(output)
+{
+    cfg_type cfg_int, cfg_str;
+    bunsan::config::input_archive<boost::property_tree::ptree> in_int(tree_int), in_str(tree_str);
+    in_int >> cfg_int;
+    in_str >> cfg_str;
+    boost::property_tree::ptree otree_int, otree_str;
+    bunsan::config::output_archive<boost::property_tree::ptree> out_int(otree_int), out_str(otree_str);
+    out_int << cfg_int;
+    out_str << cfg_str;
+    BOOST_CHECK(otree_int == tree_int);
+    BOOST_CHECK(otree_str == tree_str);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // archive
