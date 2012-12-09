@@ -47,6 +47,7 @@ struct fixture
         std::string b;
         my_enum c;
         variant d;
+        boost::property_tree::ptree e;
 
         template <typename Archive>
         void serialize(Archive &ar, const unsigned int)
@@ -55,6 +56,7 @@ struct fixture
             ar & BOOST_SERIALIZATION_NVP(b);
             ar & BOOST_SERIALIZATION_NVP(c);
             ar & BOOST_SERIALIZATION_NVP(d);
+            ar & BOOST_SERIALIZATION_NVP(e);
         }
     };
 
@@ -63,6 +65,9 @@ struct fixture
         tree_int.put("a", 10);
         tree_int.put("b", "hello");
         tree_int.put("c", "second");
+        tree_int.put("e.x", "x text");
+        tree_int.put("e.y", "y text");
+        tree_int.get_child("e").sort();
         tree_multiple = tree_no = tree_other = tree_str = tree_int;
         tree_int.put("d.int", "20");
         tree_str.put("d.string", "string");
@@ -96,6 +101,8 @@ BOOST_AUTO_TEST_CASE(input)
     BOOST_CHECK(boost::get<std::string>(&cfg_str.d));
     if (boost::get<std::string>(&cfg_str.d))
         BOOST_CHECK_EQUAL(*boost::get<std::string>(&cfg_str.d), "string");
+    BOOST_CHECK_EQUAL(cfg_int.e.get<std::string>("x"), "x text");
+    BOOST_CHECK_EQUAL(cfg_int.e.get<std::string>("y"), "y text");
 }
 
 BOOST_AUTO_TEST_CASE(output)
@@ -108,7 +115,11 @@ BOOST_AUTO_TEST_CASE(output)
     bunsan::config::output_archive<boost::property_tree::ptree> out_int(otree_int), out_str(otree_str);
     out_int << cfg_int;
     out_str << cfg_str;
+    otree_int.sort();
+    tree_int.sort();
     BOOST_CHECK(otree_int == tree_int);
+    otree_str.sort();
+    tree_str.sort();
     BOOST_CHECK(otree_str == tree_str);
 }
 

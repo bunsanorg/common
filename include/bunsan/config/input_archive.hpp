@@ -144,6 +144,12 @@ namespace bunsan{namespace config
             obj = value;
         }
 
+        /// For Ptree.
+        void load(Ptree &obj)
+        {
+            obj = *ptree_;
+        }
+
         /// For boost::filesystem::path.
         void load(boost::filesystem::path &obj)
         {

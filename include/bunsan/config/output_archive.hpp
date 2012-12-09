@@ -89,6 +89,12 @@ namespace bunsan{namespace config
             ptree_->put_value(obj);
         }
 
+        /// For Ptree.
+        void save(const Ptree &obj)
+        {
+            *ptree_ = obj;
+        }
+
         /// For boost::filesystem::path.
         void save(const boost::filesystem::path &obj)
         {
