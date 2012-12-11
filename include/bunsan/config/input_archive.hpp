@@ -210,7 +210,8 @@ namespace bunsan{namespace config
                 const typename T::key_type key = boost::lexical_cast<typename T::key_type>(key_value.first);
                 typename T::mapped_type value;
                 load_from_ptree(value, key_value.second);
-                obj.emplace(key, value);
+                // FIXME should be replaced by emplace in the future
+                obj.insert(typename T::value_type(key, value));
             }
         }
 
