@@ -4,11 +4,7 @@
 #include "bunsan/config/traits.hpp"
 
 #include <memory>
-#include <vector>
-#include <string>
 #include <chrono>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
@@ -74,7 +70,7 @@ namespace bunsan{namespace config
     private:
         /// For complex types.
         template <typename T>
-        typename std::enable_if<!traits::direct_assign<T>::value, void>::type
+        typename std::enable_if<traits::is_recursive<T>::value, void>::type
         save(const T &obj)
         {
             const_cast<T &>(obj).serialize(*this, boost::serialization::version<T>::value);
@@ -83,7 +79,7 @@ namespace bunsan{namespace config
 
         /// For primitive types.
         template <typename T>
-        typename std::enable_if<traits::direct_assign<T>::value, void>::type
+        typename std::enable_if<traits::is_direct_assignable<T>::value, void>::type
         save(const T &obj)
         {
             ptree_->put_value(obj);
@@ -108,57 +104,37 @@ namespace bunsan{namespace config
             save(obj.count());
         }
 
-        /// For general object.
+        /// For sequences except maps.
         template <typename T>
-        static typename Ptree::value_type to_value_type(const T &obj)
-        {
-            typename Ptree::value_type value;
-            save_to_ptree(obj, value.second);
-            return value;
-        }
-
-        /// For key-value pair.
-        template <typename K, typename V>
-        static typename Ptree::value_type to_value_type(const std::pair<K, V> &obj)
-        {
-            typename Ptree::value_type value = {
-                boost::lexical_cast<std::string>(obj.first),
-                Ptree()
-            };
-            save_to_ptree(obj.second, value.second);
-            return value;
-        }
-
-        /// For iterable.
-        template <typename T>
-        void save_sequence(const T &seq)
+        typename std::enable_if<traits::is_random_access_sequence<T>::value ||
+                                traits::is_sequence<T>::value ||
+                                traits::is_set<T>::value, void>::type
+        save(const T &obj)
         {
             ptree_->clear();
-            for (const auto &value: seq)
+            for (const auto &value: obj)
             {
-                ptree_->push_back(to_value_type(value));
+                typename Ptree::value_type ptree_value;
+                save_to_ptree(value, ptree_value.second);
+                ptree_->push_back(ptree_value);
             }
         }
 
-        /// For std::unordered_map.
-        template <typename Key, typename Tp, typename Hash, typename Pred, typename Alloc>
-        void save(const std::unordered_map<Key, Tp, Hash, Pred, Alloc> &obj)
+        /// For maps.
+        template <typename T>
+        typename std::enable_if<traits::is_map<T>::value, void>::type
+        save(const T &obj)
         {
-            save_sequence(obj);
-        }
-
-        /// For std::unordered_set.
-        template <typename Value, typename Hash, typename Pred, typename Alloc>
-        void save(const std::unordered_set<Value, Hash, Pred, Alloc> &obj)
-        {
-            save_sequence(obj);
-        }
-
-        /// For std::vector.
-        template <typename Tp, typename Alloc>
-        void save(const std::vector<Tp, Alloc> &obj)
-        {
-            save_sequence(obj);
+            ptree_->clear();
+            for (const auto &value: obj)
+            {
+                typename Ptree::value_type ptree_value = {
+                    boost::lexical_cast<std::string>(value.first),
+                    Ptree()
+                };
+                save_to_ptree(obj, ptree_value.second);
+                ptree_->push_back(ptree_value);
+            }
         }
 
         /// For boost::variant.

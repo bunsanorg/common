@@ -4,11 +4,7 @@
 #include "bunsan/config/traits.hpp"
 
 #include <memory>
-#include <vector>
-#include <string>
 #include <chrono>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
@@ -77,7 +73,7 @@ namespace bunsan{namespace config
 
         /// For complex types.
         template <typename T>
-        typename std::enable_if<!traits::direct_assign<T>::value, void>::type
+        typename std::enable_if<traits::is_recursive<T>::value, void>::type
         load(T &obj)
         {
             obj.serialize(*this, boost::serialization::version<T>::value);
@@ -129,7 +125,7 @@ namespace bunsan{namespace config
 
         /// For primitive types.
         template <typename T>
-        typename std::enable_if<traits::direct_assign<T>::value, void>::type
+        typename std::enable_if<traits::is_direct_assignable<T>::value, void>::type
         load(T &obj)
         {
             load_primitive(obj);
@@ -163,42 +159,59 @@ namespace bunsan{namespace config
             obj = std::chrono::duration<Rep, Period>(ptree_->template get_value<Rep>());
         }
 
-        /// For std::unordered_map.
-        template <typename Key, typename Tp, typename Hash, typename Pred, typename Alloc>
-        void load(std::unordered_map<Key, Tp, Hash, Pred, Alloc> &obj)
-        {
-            obj.clear();
-            for (const typename Ptree::value_type &key_value: *ptree_)
-            {
-                const Key key = boost::lexical_cast<Key>(key_value.first);
-                Tp value;
-                load_from_ptree(value, key_value.second);
-                obj.emplace(key, value);
-            }
-        }
-
-        /// For std::unordered_set.
-        template <typename Value, typename Hash, typename Pred, typename Alloc>
-        void load(std::unordered_set<Value, Hash, Pred, Alloc> &obj)
-        {
-            obj.clear();
-            for (const typename Ptree::value_type &key_value: *ptree_)
-            {
-                Value value;
-                load_from_ptree(value, key_value.second);
-                obj.insert(value);
-            }
-        }
-
-        /// For std::vector.
-        template <typename Tp, typename Alloc>
-        void load(std::vector<Tp, Alloc> &obj)
+        /// For random access sequences.
+        template <typename T>
+        typename std::enable_if<traits::is_random_access_sequence<T>::value, void>::type
+        load(T &obj)
         {
             obj.resize(ptree_->size());
             auto obj_iter = obj.begin();
             auto ptree_iter = ptree_->begin();
             for (; obj_iter != obj.end(); ++obj_iter, ++ptree_iter)
                 load_from_ptree(*obj_iter, ptree_iter->second);
+        }
+
+        /// For sequences.
+        template <typename T>
+        typename std::enable_if<traits::is_sequence<T>::value, void>::type
+        load(T &obj)
+        {
+            obj.clear();
+            for (const typename Ptree::value_type &key_value: *ptree_)
+            {
+                typename T::value_type value;
+                load_from_ptree(value, key_value.second);
+                obj.insert(value);
+            }
+        }
+
+        /// For sets.
+        template <typename T>
+        typename std::enable_if<traits::is_set<T>::value, void>::type
+        load(T &obj)
+        {
+            obj.clear();
+            for (const typename Ptree::value_type &key_value: *ptree_)
+            {
+                typename T::value_type value;
+                load_from_ptree(value, key_value.second);
+                obj.insert(value);
+            }
+        }
+
+        /// For maps.
+        template <typename T>
+        typename std::enable_if<traits::is_map<T>::value, void>::type
+        load(T &obj)
+        {
+            obj.clear();
+            for (const typename Ptree::value_type &key_value: *ptree_)
+            {
+                const typename T::key_type key = boost::lexical_cast<typename T::key_type>(key_value.first);
+                typename T::mapped_type value;
+                load_from_ptree(value, key_value.second);
+                obj.emplace(key, value);
+            }
         }
 
         /// For boost::variant.
