@@ -97,8 +97,8 @@ namespace bunsan{namespace config
             constexpr operator T() const { return value_; }
 
         public:
-            // FIXME: do we need basic_istream here?
-            friend std::istream &operator>>(std::istream &in, integral_wrapper &integral)
+            template <typename CharT, typename Traits>
+            friend std::basic_istream<CharT, Traits> &operator>>(std::basic_istream<CharT, Traits> &in, integral_wrapper &integral)
             {
                 std::ios_base::fmtflags flags = in.flags();
                 in.unsetf(std::ios_base::basefield);
