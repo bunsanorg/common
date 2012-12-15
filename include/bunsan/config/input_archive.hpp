@@ -27,7 +27,7 @@ namespace bunsan{namespace config
         inline unsigned int get_library_version() { return 0; }
 
     public:
-        explicit input_archive(const Ptree &ptree): ptree_(&ptree) {}
+        explicit input_archive(const Ptree &ptree): m_ptree(&ptree) {}
 
         template <typename T>
         input_archive &operator&(T &obj)
@@ -45,7 +45,7 @@ namespace bunsan{namespace config
         template <typename T>
         input_archive &operator>>(const boost::serialization::nvp<T> &nvp)
         {
-            boost::optional<const Ptree &> ptree = ptree_->get_child_optional(nvp.name());
+            boost::optional<const Ptree &> ptree = m_ptree->get_child_optional(nvp.name());
             if (ptree)
             {
                 load_from_ptree(nvp.value(), ptree.get());
@@ -112,7 +112,7 @@ namespace bunsan{namespace config
         typename std::enable_if<std::is_integral<T>::value, void>::type
         load_primitive(T &obj)
         {
-            obj = ptree_->template get_value<integral_wrapper<T>>();
+            obj = m_ptree->template get_value<integral_wrapper<T>>();
         }
 
         /// For non-integral primitive types.
@@ -120,7 +120,7 @@ namespace bunsan{namespace config
         typename std::enable_if<!std::is_integral<T>::value, void>::type
         load_primitive(T &obj)
         {
-            obj = ptree_->template get_value<T>();
+            obj = m_ptree->template get_value<T>();
         }
 
         /// For primitive types.
@@ -143,20 +143,20 @@ namespace bunsan{namespace config
         /// For Ptree.
         void load(Ptree &obj)
         {
-            obj = *ptree_;
+            obj = *m_ptree;
         }
 
         /// For boost::filesystem::path.
         void load(boost::filesystem::path &obj)
         {
-            obj = ptree_->template get_value<std::string>();
+            obj = m_ptree->template get_value<std::string>();
         }
 
         /// For std::chrono::duration.
         template <typename Rep, typename Period>
         void load(std::chrono::duration<Rep, Period> &obj)
         {
-            obj = std::chrono::duration<Rep, Period>(ptree_->template get_value<Rep>());
+            obj = std::chrono::duration<Rep, Period>(m_ptree->template get_value<Rep>());
         }
 
         /// For random access sequences.
@@ -164,9 +164,9 @@ namespace bunsan{namespace config
         typename std::enable_if<traits::is_random_access_sequence<T>::value, void>::type
         load(T &obj)
         {
-            obj.resize(ptree_->size());
+            obj.resize(m_ptree->size());
             auto obj_iter = obj.begin();
-            auto ptree_iter = ptree_->begin();
+            auto ptree_iter = m_ptree->begin();
             for (; obj_iter != obj.end(); ++obj_iter, ++ptree_iter)
                 load_from_ptree(*obj_iter, ptree_iter->second);
         }
@@ -177,7 +177,7 @@ namespace bunsan{namespace config
         load(T &obj)
         {
             obj.clear();
-            for (const typename Ptree::value_type &key_value: *ptree_)
+            for (const typename Ptree::value_type &key_value: *m_ptree)
             {
                 typename T::value_type value;
                 load_from_ptree(value, key_value.second);
@@ -191,7 +191,7 @@ namespace bunsan{namespace config
         load(T &obj)
         {
             obj.clear();
-            for (const typename Ptree::value_type &key_value: *ptree_)
+            for (const typename Ptree::value_type &key_value: *m_ptree)
             {
                 typename T::value_type value;
                 load_from_ptree(value, key_value.second);
@@ -205,7 +205,7 @@ namespace bunsan{namespace config
         load(T &obj)
         {
             obj.clear();
-            for (const typename Ptree::value_type &key_value: *ptree_)
+            for (const typename Ptree::value_type &key_value: *m_ptree)
             {
                 const typename T::key_type key = boost::lexical_cast<typename T::key_type>(key_value.first);
                 typename T::mapped_type value;
@@ -220,7 +220,7 @@ namespace bunsan{namespace config
         void load(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &obj);
 
     private:
-        const Ptree *const ptree_;
+        const Ptree *const m_ptree;
     };
 
     namespace input_archive_detail
@@ -287,12 +287,12 @@ namespace bunsan{namespace config
     template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
     void input_archive<Ptree>::load(boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &obj)
     {
-        if (ptree_->empty())
+        if (m_ptree->empty())
             BOOST_THROW_EXCEPTION(variant_load_no_key_error());
-        if (ptree_->size() > 1)
+        if (m_ptree->size() > 1)
             BOOST_THROW_EXCEPTION(variant_load_multiple_keys_error());
-        const std::string type_name = ptree_->front().first;
-        input_archive<Ptree> ar(ptree_->front().second);
+        const std::string type_name = m_ptree->front().first;
+        input_archive<Ptree> ar(m_ptree->front().second);
         input_archive_detail::load_variant<BOOST_VARIANT_ENUM_PARAMS(T)>::load(type_name, ar, obj);
     }
 }}
