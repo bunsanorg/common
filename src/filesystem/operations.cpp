@@ -82,8 +82,7 @@ namespace bunsan{namespace filesystem
                 return;
             if (is_directory(from, ec) && !ec)
             {
-                const boost::filesystem::directory_iterator end;
-                for (boost::filesystem::directory_iterator i(from); !ec && i != end; ++i)
+                for (boost::filesystem::directory_iterator i(from), end; !ec && i != end; ++i)
                     copy_tree(i->path(), to / i->path().filename(), ec);
             }
         }
