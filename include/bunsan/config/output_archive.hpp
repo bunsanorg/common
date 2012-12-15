@@ -28,7 +28,7 @@ namespace bunsan{namespace config
         inline unsigned int get_library_version() { return 0; }
 
     public:
-        explicit output_archive(Ptree &ptree): ptree_(&ptree) {}
+        explicit output_archive(Ptree &ptree): m_ptree(&ptree) {}
 
         template <typename T>
         output_archive &operator&(const T &obj)
@@ -48,7 +48,7 @@ namespace bunsan{namespace config
         {
             Ptree ptree;
             save_to_ptree(nvp.value(), ptree);
-            ptree_->put_child(nvp.name(), ptree);
+            m_ptree->put_child(nvp.name(), ptree);
             return *this;
         }
 
@@ -82,13 +82,13 @@ namespace bunsan{namespace config
         typename std::enable_if<traits::is_direct_assignable<T>::value, void>::type
         save(const T &obj)
         {
-            ptree_->put_value(obj);
+            m_ptree->put_value(obj);
         }
 
         /// For Ptree.
         void save(const Ptree &obj)
         {
-            *ptree_ = obj;
+            *m_ptree = obj;
         }
 
         /// For boost::filesystem::path.
@@ -111,12 +111,12 @@ namespace bunsan{namespace config
                                 traits::is_set<T>::value, void>::type
         save(const T &obj)
         {
-            ptree_->clear();
+            m_ptree->clear();
             for (const auto &value: obj)
             {
                 typename Ptree::value_type ptree_value;
                 save_to_ptree(value, ptree_value.second);
-                ptree_->push_back(ptree_value);
+                m_ptree->push_back(ptree_value);
             }
         }
 
@@ -125,7 +125,7 @@ namespace bunsan{namespace config
         typename std::enable_if<traits::is_map<T>::value, void>::type
         save(const T &obj)
         {
-            ptree_->clear();
+            m_ptree->clear();
             for (const auto &value: obj)
             {
                 typename Ptree::value_type ptree_value = {
@@ -133,7 +133,7 @@ namespace bunsan{namespace config
                     Ptree()
                 };
                 save_to_ptree(obj, ptree_value.second);
-                ptree_->push_back(ptree_value);
+                m_ptree->push_back(ptree_value);
             }
         }
 
@@ -142,7 +142,7 @@ namespace bunsan{namespace config
         void save(const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &obj);
 
     private:
-        Ptree *const ptree_;
+        Ptree *const m_ptree;
     };
 
     namespace output_archive_detail
@@ -151,7 +151,7 @@ namespace bunsan{namespace config
         class save_visitor: public boost::static_visitor<void>
         {
         public:
-            explicit save_visitor(Archive &archive): archive_(&archive) {}
+            explicit save_visitor(Archive &archive): m_archive(&archive) {}
             save_visitor(const save_visitor<Archive, Variant> &)=default;
             save_visitor &operator=(const save_visitor<Archive, Variant> &)=default;
 
@@ -159,11 +159,11 @@ namespace bunsan{namespace config
             void operator()(const T &obj) const
             {
                 static_assert(traits::type_key<Variant, T>::call(), "Undefined type key.");
-                *archive_ & boost::serialization::make_nvp(traits::type_key<Variant, T>::call(), obj);
+                *m_archive & boost::serialization::make_nvp(traits::type_key<Variant, T>::call(), obj);
             }
 
         private:
-            Archive *archive_;
+            Archive *m_archive;
         };
     }
 
