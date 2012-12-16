@@ -132,7 +132,7 @@ namespace bunsan{namespace config
                     boost::lexical_cast<std::string>(value.first),
                     Ptree()
                 };
-                save_to_ptree(obj, ptree_value.second);
+                save_to_ptree(value.second, ptree_value.second);
                 m_ptree->push_back(ptree_value);
             }
         }
