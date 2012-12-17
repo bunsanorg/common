@@ -10,6 +10,9 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
+
 namespace bunsan{namespace config{namespace traits
 {
     /*!
@@ -91,6 +94,18 @@ namespace bunsan{namespace config{namespace traits
 
     template <typename Key, typename Tp, typename Hash, typename Pred, typename Alloc>
     struct is_map<std::unordered_multimap<Key, Tp, Hash, Pred, Alloc>>: std::integral_constant<bool, true> {};
+
+    template <typename Value, typename Hash, typename Pred, typename Alloc>
+    struct is_set<boost::unordered_set<Value, Hash, Pred, Alloc>>: std::integral_constant<bool, true> {};
+
+    template <typename Value, typename Hash, typename Pred, typename Alloc>
+    struct is_set<boost::unordered_multiset<Value, Hash, Pred, Alloc>>: std::integral_constant<bool, true> {};
+
+    template <typename Key, typename Tp, typename Hash, typename Pred, typename Alloc>
+    struct is_map<boost::unordered_map<Key, Tp, Hash, Pred, Alloc>>: std::integral_constant<bool, true> {};
+
+    template <typename Key, typename Tp, typename Hash, typename Pred, typename Alloc>
+    struct is_map<boost::unordered_multimap<Key, Tp, Hash, Pred, Alloc>>: std::integral_constant<bool, true> {};
 }}}
 
 #define BUNSAN_CONFIG_EXPORT(PARENT, DERIVED, FIELD) \
