@@ -1,12 +1,12 @@
 #pragma once
 
+#include "bunsan/factory.hpp"
+
 #include <map>
 #include <string>
 #include <memory>
 #include <functional>
 #include <type_traits>
-
-#include "bunsan/factory.hpp"
 
 /*!
  * \def BUNSAN_FACTORY_BEGIN(CLASS, ...)
