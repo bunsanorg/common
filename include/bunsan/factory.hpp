@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <functional>
 #include <algorithm>
@@ -22,7 +22,7 @@ namespace bunsan
         typedef std::function<Result (Args...)> factory_type;
         typedef std::string key_type;
         typedef std::integral_constant<std::size_t, sizeof...(Args)> arguments_size;
-        typedef std::map<key_type, factory_type> map_type;
+        typedef std::unordered_map<key_type, factory_type> map_type;
         typedef typename map_type::value_type value_type;
         typedef typename map_type::const_iterator map_const_iterator;
 
@@ -44,7 +44,7 @@ namespace bunsan
         {
             if (!factories)
                 factories = new map_type;
-            if (factories->find(type)==factories->end())
+            if (factories->find(type) == factories->end())
             {
                 factories->insert(value_type(type, f));
                 return true;
@@ -60,7 +60,7 @@ namespace bunsan
             if (factories)
             {
                 auto iter = factories->find(type);
-                if (iter!=factories->end())
+                if (iter != factories->end())
                     return iter->second(std::forward<Args>(args)...);
             }
             return result_type();
