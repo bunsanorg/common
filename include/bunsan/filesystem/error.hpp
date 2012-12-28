@@ -2,9 +2,9 @@
 
 #include "bunsan/error.hpp"
 #include "bunsan/system_error.hpp"
+#include "bunsan/forward_constructor.hpp"
 
 #include <iostream>
-#include <utility>
 
 #include <boost/filesystem/path.hpp>
 
@@ -21,8 +21,6 @@ namespace bunsan{namespace filesystem
 
     struct system_error: virtual error, virtual bunsan::system_error
     {
-        template <typename ... Args>
-        explicit system_error(Args &&...args):
-            bunsan::system_error(std::forward<Args>(args)...) {}
+        BUNSAN_INHERIT_EXPLICIT_CONSTRUCTOR(system_error, bunsan::system_error)
     };
 }}
