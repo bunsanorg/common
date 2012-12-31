@@ -32,4 +32,18 @@ BOOST_AUTO_TEST_CASE(append)
     BOOST_CHECK_EQUAL(cat::c_str, "123456");
 }
 
+BOOST_AUTO_TEST_CASE(at)
+{
+    typedef bunsan::mpl::string<'0', '1', '2', '3'> str;
+    static_assert(str::at(-1) == '\0', "");
+    static_assert(str::at(0) == '0', "");
+    static_assert(str::at(1) == '1', "");
+    static_assert(str::at(2) == '2', "");
+    static_assert(str::at(3) == '3', "");
+    static_assert(str::at(4) == '\0', "");
+    BOOST_CHECK_EQUAL(str::at(-1), '\0');
+    BOOST_CHECK_EQUAL(str::at(2), '2');
+    BOOST_CHECK_EQUAL(str::at(1000), '\0');
+}
+
 BOOST_AUTO_TEST_SUITE_END() // mpl_string

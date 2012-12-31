@@ -11,6 +11,27 @@ namespace bunsan{namespace mpl
 
     namespace detail
     {
+        template <char ... Args>
+        struct at;
+
+        template <char Head, char ... Args>
+        struct at<Head, Args...>
+        {
+            static constexpr char call(const std::size_t i)
+            {
+                return i ? at<Args...>::call(i - 1) : Head;
+            }
+        };
+
+        template <>
+        struct at<>
+        {
+            static constexpr char call(const std::size_t)
+            {
+                return '\0';
+            }
+        };
+
         template <typename First, typename Second>
         struct append;
 
@@ -26,6 +47,11 @@ namespace bunsan{namespace mpl
     {
     public:
         static constexpr std::size_t size = sizeof...(Args);
+
+        static constexpr char at(const std::size_t i)
+        {
+            return detail::at<Args...>::call(i);
+        }
 
         static const std::string std_string;
         static const char c_str[size + 1];
