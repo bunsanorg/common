@@ -47,6 +47,7 @@ namespace bunsan{namespace mpl
     {
     public:
         static constexpr std::size_t size = sizeof...(Args);
+        static constexpr bool empty = !size;
 
         static constexpr char at(const std::size_t i)
         {

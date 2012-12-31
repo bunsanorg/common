@@ -18,6 +18,7 @@ BOOST_AUTO_TEST_CASE(boost_mpl_string)
 BOOST_AUTO_TEST_CASE(string)
 {
     typedef bunsan::mpl::string<'1', '2', '3'> str;
+    static_assert(bunsan::mpl::string<>::size == 0, "");
     static_assert(str::size == 3, "");
     BOOST_CHECK_EQUAL(str::c_str, "123");
     BOOST_CHECK_EQUAL(str::std_string, "123");
@@ -44,6 +45,12 @@ BOOST_AUTO_TEST_CASE(at)
     BOOST_CHECK_EQUAL(str::at(-1), '\0');
     BOOST_CHECK_EQUAL(str::at(2), '2');
     BOOST_CHECK_EQUAL(str::at(1000), '\0');
+}
+
+BOOST_AUTO_TEST_CASE(empty)
+{
+    static_assert(bunsan::mpl::string<>::empty, "");
+    static_assert(!bunsan::mpl::string<'1'>::empty, "");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // mpl_string
