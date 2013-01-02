@@ -41,39 +41,48 @@ namespace test
         public:
             explicit init(const std::string data_, const std::string &data2_):
                 m_data(data_), m_data2(data2_) {}
+
             virtual std::string f()
             {
-                return m_data+m_data2;
+                return m_data + m_data2;
             }
+
             virtual std::string g()
             {
-                return m_data2+m_data;
+                return m_data2 + m_data;
             }
+
         private:
             std::string m_data, m_data2;
             static const bool factory_reg_hook;
         };
-        const bool init::factory_reg_hook = test::fact::register_new("init", []
-            (const std::string &data_, const std::string data2_)
+
+        const bool init::factory_reg_hook = test::fact::register_new("init",
+            [](const std::string &data_, const std::string data2_)
             {
                 fact_ptr ptr(new init(data_, data2_));
                 return ptr;
             });
     }
+
     namespace facts2
     {
         class init: public test::fact2
         {
         public:
             init() {}
+
             virtual int code()
             {
                 return 123;
             }
+
         private:
             static const bool factory_reg_hook;
         };
-        const bool init::factory_reg_hook = test::fact2::register_new("init", []()
+
+        const bool init::factory_reg_hook = test::fact2::register_new("init",
+            []()
             {
                 fact2_ptr ptr(new init);
                 return ptr;
@@ -87,12 +96,12 @@ int main()
         {
             std::set<std::string> set(test::fact::registered_begin(), test::fact::registered_end());
             std::set<std::string> req = {"init"};
-            BOOST_ASSERT(req==set);
+            BOOST_ASSERT(req == set);
         }
         test::fact_ptr ptr = test::fact::instance("init", "hello,", " world");
         BOOST_ASSERT(ptr);
-        BOOST_ASSERT(ptr->f()=="hello, world");
-        BOOST_ASSERT(ptr->g()==" worldhello,");
+        BOOST_ASSERT(ptr->f() == "hello, world");
+        BOOST_ASSERT(ptr->g() == " worldhello,");
         ptr = test::fact::instance("noinit", "hello,", " linux");
         BOOST_ASSERT(!ptr);
     }
@@ -100,11 +109,11 @@ int main()
         {
             std::set<std::string> set(test::fact2::registered_begin(), test::fact2::registered_end());
             std::set<std::string> req = {"init"};
-            BOOST_ASSERT(req==set);
+            BOOST_ASSERT(req == set);
         }
         test::fact2_ptr ptr = test::fact2::instance("init");
         BOOST_ASSERT(ptr);
-        BOOST_ASSERT(ptr->code()==123);
+        BOOST_ASSERT(ptr->code() == 123);
         ptr = test::fact2::instance("noinit");
         BOOST_ASSERT(!ptr);
     }
