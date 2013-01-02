@@ -13,15 +13,19 @@ BOOST_AUTO_TEST_CASE(basic)
     typedef std::shared_ptr<int> int_ptr;
     typedef bunsan::factory<int_ptr()> bunsan_factory;
     typename bunsan_factory::map_type *map(0);
-    BOOST_CHECK(!static_cast<bool>(bunsan_factory::instance(map, "strange")));
+    BOOST_CHECK(!bunsan_factory::instance(map, "strange"));
     BOOST_CHECK(  bunsan_factory::register_new(map, "zero", [](){return int_ptr(new int(0));} )  );
     BOOST_CHECK_NE(map, static_cast<typename bunsan_factory::map_type *>(nullptr));
     BOOST_CHECK(!  bunsan_factory::register_new(map, "zero", [](){return int_ptr(new int(-1));} )  );
+    BOOST_CHECK(!bunsan_factory::factory(map, "strange"));
+    const boost::optional<typename bunsan_factory::factory_type> zero_fact = bunsan_factory::factory(map, "zero");
+    BOOST_CHECK(zero_fact);
+    BOOST_CHECK_EQUAL(*zero_fact.get()(), 0);
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "zero"), 0);
     BOOST_CHECK(  bunsan_factory::register_new(map, "one", [](){return int_ptr(new int(1));} )  );
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "zero"), 0);
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "one"), 1);
-    BOOST_CHECK(!static_cast<bool>(bunsan_factory::instance(map, "")));
+    BOOST_CHECK(!bunsan_factory::instance(map, ""));
     {
         std::set<std::string> set(bunsan_factory::registered_begin(map), bunsan_factory::registered_end(map));
         std::set<std::string> req = {"zero", "one"};

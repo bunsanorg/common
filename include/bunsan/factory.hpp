@@ -7,15 +7,17 @@
 #include <iterator>
 #include <type_traits>
 
+#include <boost/optional.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
-namespace bunsan
+namespace bunsan{namespace detail
 {
+    /// \note We need class name different than "factory" to use it as member function's.
     template <typename Signature>
-    class factory;
+    class factory_base;
 
     template <typename Result, typename ... Args>
-    class factory<Result (Args...)>
+    class factory_base<Result (Args...)>
     {
     public:
         typedef Result result_type;
@@ -37,10 +39,9 @@ namespace bunsan
         typedef std::function<const key_type &(const value_type &)> iterator_converter;
         typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
 
-        static bool register_new(
-            map_type *&factories,
-            const key_type &type,
-            const factory_type &f)
+        static bool register_new(map_type *&factories,
+                                 const key_type &type,
+                                 const factory_type &f)
         {
             if (!factories)
                 factories = new map_type;
@@ -52,10 +53,21 @@ namespace bunsan
             return false;
         }
 
-        static result_type instance(
-            const map_type *const factories,
-            const key_type &type,
-            Args &&...args)
+        static boost::optional<factory_type> factory(const map_type *const factories,
+                                                     const key_type &type)
+        {
+            if (factories)
+            {
+                auto iter = factories->find(type);
+                if (iter != factories->end())
+                    return iter->second;
+            }
+            return boost::optional<factory_type>();
+        }
+
+        static result_type instance(const map_type *const factories,
+                                    const key_type &type,
+                                    Args &&...args)
         {
             if (factories)
             {
@@ -71,7 +83,7 @@ namespace bunsan
             if (factories)
                 return const_iterator(factories->begin(), pair_first());
             else
-                /// \see factory_null unit test
+                /// \see factory::null unit test
                 return const_iterator(map_const_iterator(), pair_first());
         }
 
@@ -80,8 +92,14 @@ namespace bunsan
             if (factories)
                 return const_iterator(factories->end(), pair_first());
             else
-                /// \see factory_null unit test
+                /// \see factory::null unit test
                 return const_iterator(map_const_iterator(), pair_first());
         }
     };
+}}
+
+namespace bunsan
+{
+    template <typename Signature>
+    using factory = detail::factory_base<Signature>;
 }

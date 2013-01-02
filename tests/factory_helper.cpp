@@ -98,6 +98,14 @@ int main()
             std::set<std::string> req = {"init"};
             BOOST_ASSERT(req == set);
         }
+        BOOST_ASSERT(!test::fact::factory("not_existing_name"));
+        {
+            const boost::optional<test::fact::factory_type> fact = test::fact::factory("init");
+            BOOST_ASSERT(fact);
+            const test::fact_ptr ptr = fact.get()("1", "2");
+            BOOST_ASSERT(ptr->f() == "12");
+            BOOST_ASSERT(ptr->g() == "21");
+        }
         test::fact_ptr ptr = test::fact::instance("init", "hello,", " world");
         BOOST_ASSERT(ptr);
         BOOST_ASSERT(ptr->f() == "hello, world");
