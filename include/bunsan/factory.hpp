@@ -12,7 +12,16 @@
 
 namespace bunsan{namespace detail
 {
-    /// \note We need class name different than "factory" to use it as member function's.
+    /*!
+     * \brief This class is implementation of bunsan::factory concept.
+     *
+     * bunsan::factory is abstract factory implementation, where each derived
+     * class is registered in abstract factory by std::string identifier
+     * on library load using bunsan::factory::register_new().
+     * Later instance of this type may be created using bunsan::factory::instance().
+     *
+     * \note We need class name different than "factory" to use it as member function's.
+     */
     template <typename Signature>
     class factory_base;
 
@@ -39,6 +48,13 @@ namespace bunsan{namespace detail
         typedef std::function<const key_type &(const value_type &)> iterator_converter;
         typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
 
+        /*!
+         * \brief Registeres new factory with unique identifier.
+         *
+         * \warning factory should not return null pointer
+         *
+         * \return false if identifier is already used
+         */
         static bool register_new(map_type *&factories,
                                  const key_type &type,
                                  const factory_type &f)
@@ -53,6 +69,11 @@ namespace bunsan{namespace detail
             return false;
         }
 
+        /*!
+         * \brief Returns factory registered with specified identifier.
+         *
+         * \return null if factory is not registered
+         */
         static boost::optional<factory_type> factory(const map_type *const factories,
                                                      const key_type &type)
         {
@@ -65,6 +86,11 @@ namespace bunsan{namespace detail
             return boost::optional<factory_type>();
         }
 
+        /*!
+         * \brief Returns new instance of specified type.
+         *
+         * \return null if factory is not registered
+         */
         static result_type instance(const map_type *const factories,
                                     const key_type &type,
                                     Args &&...args)
@@ -78,6 +104,7 @@ namespace bunsan{namespace detail
             return result_type();
         }
 
+        /// Iterate over registered factory identifiers: begin iterator.
         static const_iterator registered_begin(const map_type *const factories)
         {
             if (factories)
@@ -87,6 +114,7 @@ namespace bunsan{namespace detail
                 return const_iterator(map_const_iterator(), pair_first());
         }
 
+        /// Iterate over registered factory identifiers: end iterator.
         static const_iterator registered_end(const map_type *const factories)
         {
             if (factories)
