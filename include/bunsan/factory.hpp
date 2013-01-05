@@ -79,7 +79,7 @@ namespace bunsan{namespace detail
         {
             if (factories)
             {
-                auto iter = factories->find(type);
+                const map_const_iterator iter = factories->find(type);
                 if (iter != factories->end())
                     return iter->second;
             }
@@ -97,8 +97,9 @@ namespace bunsan{namespace detail
         {
             if (factories)
             {
-                auto iter = factories->find(type);
+                const map_const_iterator iter = factories->find(type);
                 if (iter != factories->end())
+                    // TODO should we assert that it is not nullptr?
                     return iter->second(std::forward<Args>(args)...);
             }
             return result_type();
