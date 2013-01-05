@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bunsan/error.hpp"
+
 #include <unordered_map>
 #include <string>
 #include <functional>
@@ -9,6 +11,14 @@
 
 #include <boost/optional.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+
+namespace bunsan
+{
+    struct unknown_factory_error: virtual error
+    {
+        typedef boost::error_info<struct tag_factory_type, std::string> factory_type;
+    };
+}
 
 namespace bunsan{namespace detail
 {
@@ -22,15 +32,16 @@ namespace bunsan{namespace detail
      *
      * \note We need class name different than "factory" to use it as member function's.
      */
-    template <typename Signature>
+    template <typename Signature, typename UnknownError>
     class factory_base;
 
-    template <typename Result, typename ... Args>
-    class factory_base<Result (Args...)>
+    template <typename Result, typename ... Args, typename UnknownError>
+    class factory_base<Result (Args...), UnknownError>
     {
     public:
         typedef Result result_type;
         typedef std::function<Result (Args...)> factory_type;
+        typedef UnknownError unknown_error;
         typedef std::string key_type;
         typedef std::integral_constant<std::size_t, sizeof...(Args)> arguments_size;
         typedef std::unordered_map<key_type, factory_type> map_type;
@@ -72,10 +83,28 @@ namespace bunsan{namespace detail
         /*!
          * \brief Returns factory registered with specified identifier.
          *
+         * \throws unknown_factory if factory is not registered
+         */
+        static factory_type factory(const map_type *const factories,
+                                    const key_type &type)
+        {
+            if (factories)
+            {
+                const map_const_iterator iter = factories->find(type);
+                if (iter != factories->end())
+                    return iter->second;
+            }
+            BOOST_THROW_EXCEPTION(unknown_error() <<
+                                  unknown_factory_error::factory_type(type));
+        }
+
+        /*!
+         * \brief Returns factory registered with specified identifier.
+         *
          * \return null if factory is not registered
          */
-        static boost::optional<factory_type> factory(const map_type *const factories,
-                                                     const key_type &type)
+        static boost::optional<factory_type> factory_optional(const map_type *const factories,
+                                                              const key_type &type)
         {
             if (factories)
             {
@@ -89,11 +118,31 @@ namespace bunsan{namespace detail
         /*!
          * \brief Returns new instance of specified type.
          *
-         * \return null if factory is not registered
+         * \throws unknown_factory if factory is not registered
          */
         static result_type instance(const map_type *const factories,
                                     const key_type &type,
                                     Args &&...args)
+        {
+            if (factories)
+            {
+                const map_const_iterator iter = factories->find(type);
+                if (iter != factories->end())
+                    // TODO should we assert that it is not nullptr?
+                    return iter->second(std::forward<Args>(args)...);
+            }
+            BOOST_THROW_EXCEPTION(unknown_error() <<
+                                  unknown_factory_error::factory_type(type));
+        }
+
+        /*!
+         * \brief Returns new instance of specified type.
+         *
+         * \return nullptr if factory is not registered
+         */
+        static result_type instance_optional(const map_type *const factories,
+                                             const key_type &type,
+                                             Args &&...args)
         {
             if (factories)
             {
@@ -129,6 +178,6 @@ namespace bunsan{namespace detail
 
 namespace bunsan
 {
-    template <typename Signature>
-    using factory = detail::factory_base<Signature>;
+    template <typename Signature, typename UnknownError=bunsan::unknown_factory_error>
+    using factory = detail::factory_base<Signature, UnknownError>;
 }

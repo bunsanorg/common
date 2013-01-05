@@ -34,18 +34,29 @@ namespace bunsan
 #define BUNSAN_FACTORY_BEGIN(CLASS, ...) \
 {\
 public: \
+    struct unknown_##CLASS##_error: virtual ::bunsan::unknown_factory_error {}; \
     typedef std::shared_ptr<CLASS> CLASS##_ptr; \
-    typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__)> bunsan_factory; \
+    typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error> bunsan_factory; \
     typedef typename bunsan_factory::factory_type factory_type; \
-    static inline boost::optional<factory_type> factory(const typename bunsan_factory::key_type &type) \
+    static inline factory_type factory(const typename bunsan_factory::key_type &type) \
     { \
         return bunsan_factory::factory(factories, type); \
+    } \
+    static inline boost::optional<factory_type> factory_optional(const typename bunsan_factory::key_type &type) \
+    { \
+        return bunsan_factory::factory_optional(factories, type); \
     } \
     template <typename ... Args> \
     static inline typename std::enable_if<bunsan_factory::arguments_size::value == sizeof...(Args), \
     CLASS##_ptr>::type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
     { \
         return bunsan_factory::instance(factories, type, std::forward<Args>(args)...); \
+    } \
+    template <typename ... Args> \
+    static inline typename std::enable_if<bunsan_factory::arguments_size::value == sizeof...(Args), \
+    CLASS##_ptr>::type instance_optional(const typename bunsan_factory::key_type &type, Args &&...args) \
+    { \
+        return bunsan_factory::instance_optional(factories, type, std::forward<Args>(args)...); \
     } \
     static inline typename bunsan_factory::const_iterator registered_begin() \
     { \
@@ -78,7 +89,8 @@ protected: \
 private: \
     static typename bunsan_factory::map_type *factories; \
 }; \
-typedef CLASS::CLASS##_ptr CLASS##_ptr;
+typedef CLASS::CLASS##_ptr CLASS##_ptr; \
+typedef CLASS::unknown_##CLASS##_error unknown_##CLASS##_error;
 
 /*!
  * \def BUNSAN_FACTORY_DEFINE(CLASS)
