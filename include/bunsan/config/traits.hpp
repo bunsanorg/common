@@ -55,6 +55,24 @@ namespace bunsan{namespace config{namespace traits
             return nullptr;
         }
     };
+
+    template <typename T>
+    struct serializer
+    {
+        template <typename Archive>
+        static void load(T &obj, Archive &ar, const unsigned int version)
+        {
+            //FIXME boost::serialization::serialize_adl(*this, obj, boost::serialization::version<T>::value);
+            obj.serialize(ar, version);
+        }
+
+        template <typename Archive>
+        static void save(const T &obj, Archive &ar, const unsigned int version)
+        {
+            //FIXME boost::serialization::serialize_adl(*this, obj, boost::serialization::version<T>::value);
+            const_cast<T &>(obj).serialize(ar, version);
+        }
+    };
 }}}
 
 namespace bunsan{namespace config{namespace traits

@@ -76,8 +76,7 @@ namespace bunsan{namespace config
         typename std::enable_if<traits::is_recursive<T>::value, void>::type
         load(T &obj)
         {
-            obj.serialize(*this, boost::serialization::version<T>::value);
-            //FIXME boost::serialization::serialize_adl(*this, obj, boost::serialization::version<T>::value);
+            traits::serializer<T>::load(obj, *this, boost::serialization::version<T>::value);
         }
 
         /*!
