@@ -118,6 +118,40 @@ macro(bunsan_tests_project)
     endif()
 endmacro()
 
+# TODO refactoring needed
+function(bunsan_protobuf_generate_cpp)
+    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+    set(options)
+    set(one_value_args HEADERS SOURCES INSTALL)
+    set(multi_value_args PROTOS)
+    cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+    set(protoc_cmd ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/include)
+    set(srcs_)
+    set(hdrs_)
+    set(protos_)
+    foreach(proto ${ARG_PROTOS})
+        get_filename_component(filename_we ${proto} NAME_WE)
+        get_filename_component(dirname ${proto} PATH)
+        set(path_we ${dirname}/${filename_we})
+        set(hdr ${CMAKE_CURRENT_BINARY_DIR}/${path_we}.pb.h)
+        set(src ${CMAKE_CURRENT_BINARY_DIR}/${path_we}.pb.cc)
+        set(prt ${CMAKE_CURRENT_SOURCE_DIR}/include/${proto})
+        list(APPEND hdrs_ ${hdr})
+        list(APPEND srcs_ ${src})
+        list(APPEND protos_ ${prt})
+        if(ARG_INSTALL)
+            install(FILES ${hdr} DESTINATION ${ARG_INSTALL}/${dirname})
+        endif()
+    endforeach()
+    add_custom_command(
+        OUTPUT ${hdrs_} ${srcs_}
+        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/include ${protos_}
+        DEPENDS ${protos_}
+    )
+    set(${ARG_SOURCES} ${srcs_} PARENT_SCOPE)
+    set(${ARG_HEADERS} ${hdrs_} PARENT_SCOPE)
+endfunction()
+
 # installation
 macro(bunsan_install_targets)
     install(TARGETS ${ARGN}
