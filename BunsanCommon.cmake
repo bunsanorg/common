@@ -50,6 +50,12 @@ macro(bunsan_use_xmlrpc)
     bunsan_use(${XMLRPC_LIBRARIES})
 endmacro()
 
+macro(bunsan_use_curl)
+    find_package(CURL REQUIRED)
+    include_directories(${CURL_INCLUDE_DIRS})
+    bunsan_use(${CURL_LIBRARIES})
+endmacro()
+
 macro(bunsan_use_bunsan)
     foreach(lib ${ARGN})
         bunsan_use(bunsan_${lib})
