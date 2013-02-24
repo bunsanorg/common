@@ -18,6 +18,7 @@ bunsan_use(dl)
 bunsan_add_shared_library(${PROJECT_NAME}
     src/tempfile.cpp
     src/error.cpp
+    src/categorized_error.cpp
     src/system_error.cpp
 
     src/runtime/demangle.cpp
