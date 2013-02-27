@@ -29,6 +29,9 @@ BOOST_AUTO_TEST_CASE(vector)
     // clear
     static_assert(std::is_same<typename bunsan::meta::clear<a>::type, e>::value, "clear");
 
+    // at
+    static_assert(std::is_same<typename bunsan::meta::at<a, 1>::type, float>::value, "at");
+
     // front
     static_assert(std::is_same<typename bunsan::meta::front<a>::type, int>::value, "front");
 
