@@ -48,7 +48,7 @@ namespace bunsan{namespace detail
         typedef typename map_type::value_type value_type;
         typedef typename map_type::const_iterator map_const_iterator;
 
-        struct pair_first
+        struct iterator_converter: std::unary_function<const value_type &, const key_type &>
         {
             const key_type &operator()(const value_type &pair) const
             {
@@ -56,7 +56,6 @@ namespace bunsan{namespace detail
             }
         };
 
-        typedef std::function<const key_type &(const value_type &)> iterator_converter;
         typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
 
         /*!
@@ -158,20 +157,20 @@ namespace bunsan{namespace detail
         static const_iterator registered_begin(const map_type *const factories)
         {
             if (factories)
-                return const_iterator(factories->begin(), pair_first());
+                return const_iterator(factories->begin());
             else
                 /// \see factory::null unit test
-                return const_iterator(map_const_iterator(), pair_first());
+                return const_iterator(map_const_iterator());
         }
 
         /// Iterate over registered factory identifiers: end iterator.
         static const_iterator registered_end(const map_type *const factories)
         {
             if (factories)
-                return const_iterator(factories->end(), pair_first());
+                return const_iterator(factories->end());
             else
                 /// \see factory::null unit test
-                return const_iterator(map_const_iterator(), pair_first());
+                return const_iterator(map_const_iterator());
         }
     };
 }}
