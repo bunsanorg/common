@@ -3,8 +3,11 @@
 
 #include "bunsan/error.hpp"
 #include "bunsan/enable_error_info.hpp"
+#include "bunsan/system_error.hpp"
 
 #include "bunsan/filesystem/fstream.hpp"
+
+#include <cerrno>
 
 BOOST_AUTO_TEST_SUITE(error)
 
@@ -96,6 +99,28 @@ BOOST_AUTO_TEST_CASE(wrap)
     BOOST_CHECK_EXCEPTION(throw2(), boost::exception, check);
     BOOST_CHECK_EXCEPTION(throw_error_info(), std::exception, print);
     BOOST_CHECK_EXCEPTION(throw_error_info(), boost::exception, check_info);
+}
+
+BOOST_AUTO_TEST_CASE(system_error)
+{
+    const auto throw_ =
+        []()
+        {
+            errno = EEXIST;
+            BOOST_THROW_EXCEPTION(bunsan::system_error("action"));
+        };
+    const auto check =
+        [](const bunsan::error &e)
+        {
+            BOOST_REQUIRE(e.get<bunsan::system_error::error_code>());
+            BOOST_CHECK_EQUAL(e.get<bunsan::system_error::error_code>()->value(), EEXIST);
+            BOOST_REQUIRE(e.get<bunsan::system_error::error_code_message>());
+            BOOST_CHECK(!e.get<bunsan::system_error::error_code_message>()->empty());
+            BOOST_REQUIRE(e.get<bunsan::system_error::what_message>());
+            BOOST_CHECK_EQUAL(*e.get<bunsan::system_error::what_message>(), "action");
+            return true;
+        };
+    BOOST_CHECK_EXCEPTION(throw_(), bunsan::error, check);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // error
