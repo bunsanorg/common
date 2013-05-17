@@ -12,8 +12,15 @@ include(${CMAKE_SOURCE_DIR}/BunsanCommon.cmake)
 # BOOST
 bunsan_use_boost(system filesystem serialization unit_test_framework thread)
 
-# FIXME OS-specified (*nix)
-bunsan_use(dl)
+if(${UNIX})
+    bunsan_use(dl)
+elseif(${WIN32})
+    if(${MSVC})
+        bunsan_use(dbghelp)
+    else()
+        bunsan_use(psapi)
+    endif()
+endif()
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/tempfile.cpp
