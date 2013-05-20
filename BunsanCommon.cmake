@@ -62,6 +62,12 @@ macro(bunsan_use_bunsan)
     endforeach()
 endmacro()
 
+macro(bunsan_use_protobuf)
+    find_package(Protobuf REQUIRED)
+    include_directories(${PROTOBUF_INCLUDE_DIRS})
+    bunsan_use(${PROTOBUF_LIBRARIES})
+endmacro()
+
 # binary targets
 function(bunsan_add_executable target)
     add_executable(${target} ${ARGN})
