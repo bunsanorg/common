@@ -155,9 +155,15 @@ function(bunsan_protobuf_generate_cpp)
             install(FILES ${hdr} DESTINATION ${ARG_INSTALL}/${dirname})
         endif()
     endforeach()
+    set(proto_paths)
+    get_property(includes DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+    # TODO we probably need to append global include dir such as /usr/include
+    foreach(proto_path ${includes})
+        list(APPEND proto_paths --proto_path=${proto_path})
+    endforeach()
     add_custom_command(
         OUTPUT ${hdrs_} ${srcs_}
-        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/include ${protos_}
+        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} ${proto_paths} ${protos_}
         DEPENDS ${protos_}
     )
     set(${ARG_SOURCES} ${srcs_} PARENT_SCOPE)
