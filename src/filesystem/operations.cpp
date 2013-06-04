@@ -2,6 +2,8 @@
 #include "bunsan/filesystem/error.hpp"
 #include "bunsan/enable_error_info.hpp"
 
+#include <deque>
+
 namespace bunsan{namespace filesystem
 {
     void reset_dir(const boost::filesystem::path &dir)
@@ -13,6 +15,28 @@ namespace bunsan{namespace filesystem
             boost::filesystem::create_directory(dir);
         }
         BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT(error::path(dir), boost::filesystem::filesystem_error)
+    }
+
+    boost::filesystem::path keep_in_root(const boost::filesystem::path &path,
+                                         const boost::filesystem::path &root)
+    {
+        std::deque<boost::filesystem::path> stack;
+        for (const boost::filesystem::path &i: path)
+        {
+            if (i == "..")
+            {
+                if (!stack.empty())
+                    stack.pop_back();
+            }
+            else if (i != ".")
+            {
+                stack.push_back(i);
+            }
+        }
+        boost::filesystem::path stripped;
+        for (const boost::filesystem::path &i: stack)
+            stripped /= i;
+        return root / stripped;
     }
 
 #define BUNSAN_EXCEPTIONS_WRAP_END_COPY_TREE() \

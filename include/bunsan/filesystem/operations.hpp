@@ -13,6 +13,18 @@ namespace bunsan{namespace filesystem
      */
     void reset_dir(const boost::filesystem::path &dir);
 
+    /*!
+     * This function makes path relative to root,
+     * but keeps it inside root.
+     *
+     * \code{.cpp}
+     * assert(keep_in_root("../../etc/passwd", "/home/user") == "/home/user/etc/passwd");
+     * assert(keep_in_root("../../etc/../passwd", "/home/user") == "/home/user/passwd");
+     * \endcode
+     */
+    boost::filesystem::path keep_in_root(const boost::filesystem::path &path,
+                                         const boost::filesystem::path &root);
+
     using boost::filesystem::copy_option;
 
     void copy_tree(const boost::filesystem::path &from,
