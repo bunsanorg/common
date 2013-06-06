@@ -17,6 +17,13 @@ if(${CMAKE_COMPILER_IS_GNUCC})
     set(CMAKE_C_FLAGS_RELEASE "-O2 ${gcc_flags}")
 endif()
 
+if(${CMAKE_COMPILER_IS_GNUCXX} OR ${CMAKE_COMPILER_IS_GNUCC})
+    set(linker_flags "-Wl,--no-as-needed") # for bunsan::factory plugins
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${linker_flags}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${linker_flags}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${linker_flags}")
+endif()
+
 include(${CMAKE_SOURCE_DIR}/user-config.cmake OPTIONAL)
 
 if(NOT CMAKE_BUILD_TYPE)
