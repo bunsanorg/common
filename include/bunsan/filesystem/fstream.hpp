@@ -9,58 +9,61 @@ namespace bunsan{namespace filesystem
     template <typename ... Args>
     using basic_filebuf = boost::filesystem::basic_filebuf<Args...>;
 
-/// File stream with exceptions enabled.
-#define BUNSAN_FILESYSTEM_BASIC_FSTREAM(FSTREAM) \
-    template <typename CharT, typename Traits=std::char_traits<CharT>> \
-    class basic_##FSTREAM: public boost::filesystem::basic_##FSTREAM<CharT, Traits> \
-    { \
-    public: \
-        basic_##FSTREAM() \
-        { \
-            this->exceptions(std::ios_base::badbit); \
-        } \
-         \
-        explicit basic_##FSTREAM(const boost::filesystem::path &path): \
-            boost::filesystem::basic_##FSTREAM<CharT, Traits>(path) \
-        { \
-            if (!this->is_open()) \
-                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path)); \
-            this->exceptions(std::ios_base::badbit); \
-        } \
-         \
-        basic_##FSTREAM(const boost::filesystem::path &path, const std::ios_base::openmode mode): \
-            boost::filesystem::basic_##FSTREAM<CharT, Traits>(path, mode) \
-        { \
-            if (!this->is_open()) \
-                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path) << error::openmode(mode)); \
-            this->exceptions(std::ios_base::badbit); \
-        } \
-         \
-        void open(const boost::filesystem::path &path) \
-        { \
-            boost::filesystem::basic_##FSTREAM<CharT, Traits>::open(path); \
-            if (!this->is_open()) \
-                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path)); \
-        } \
-         \
-        void open(const boost::filesystem::path &path, const std::ios_base::openmode mode) \
-        { \
-            boost::filesystem::basic_##FSTREAM<CharT, Traits>::open(path, mode); \
-            if (!this->is_open()) \
-                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path) << error::openmode(mode)); \
-        } \
-         \
-        using boost::filesystem::basic_##FSTREAM<CharT, Traits>::exceptions; \
-         \
-        void exceptions(const std::ios_base::iostate except) \
-        { \
-            boost::filesystem::basic_##FSTREAM<CharT, Traits>::exceptions(except | std::ios_base::badbit); \
-        } \
+    template <typename Fstream>
+    class basic_stream: public Fstream
+    {
+    public:
+        basic_stream()
+        {
+            this->exceptions(std::ios_base::badbit);
+        }
+
+        explicit basic_stream(const boost::filesystem::path &path):
+            Fstream(path)
+        {
+            if (!this->is_open())
+                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path));
+            this->exceptions(std::ios_base::badbit);
+        }
+
+        basic_stream(const boost::filesystem::path &path, const std::ios_base::openmode mode):
+            Fstream(path, mode)
+        {
+            if (!this->is_open())
+                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path) << error::openmode(mode));
+            this->exceptions(std::ios_base::badbit);
+        }
+
+        void open(const boost::filesystem::path &path)
+        {
+            Fstream::open(path);
+            if (!this->is_open())
+                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path));
+        }
+
+        void open(const boost::filesystem::path &path, const std::ios_base::openmode mode)
+        {
+            Fstream::open(path, mode);
+            if (!this->is_open())
+                BOOST_THROW_EXCEPTION(system_error("open") << error::path(path) << error::openmode(mode));
+        }
+
+        using Fstream::exceptions;
+
+        void exceptions(const std::ios_base::iostate except)
+        {
+            Fstream::exceptions(except | std::ios_base::badbit);
+        }
     };
 
-    BUNSAN_FILESYSTEM_BASIC_FSTREAM(ifstream)
-    BUNSAN_FILESYSTEM_BASIC_FSTREAM(ofstream)
-    BUNSAN_FILESYSTEM_BASIC_FSTREAM(fstream)
+    template <typename CharT, typename Traits=std::char_traits<CharT>>
+    using basic_ifstream = basic_stream<boost::filesystem::basic_ifstream<CharT, Traits>>;
+
+    template <typename CharT, typename Traits=std::char_traits<CharT>>
+    using basic_ofstream = basic_stream<boost::filesystem::basic_ofstream<CharT, Traits>>;
+
+    template <typename CharT, typename Traits=std::char_traits<CharT>>
+    using basic_fstream = basic_stream<boost::filesystem::basic_fstream<CharT, Traits>>;
 
     typedef basic_filebuf<char> filebuf;
     typedef basic_ifstream<char> ifstream;
