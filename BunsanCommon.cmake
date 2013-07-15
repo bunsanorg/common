@@ -115,6 +115,8 @@ macro(bunsan_tests_project)
 
     message("tests were included")
 
+    bunsan_use_boost(unit_test_framework)
+
     aux_source_directory(. test_srcs)
 
     add_definitions(-DBOOST_TEST_DYN_LINK)
