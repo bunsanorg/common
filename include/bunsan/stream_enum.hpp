@@ -2,17 +2,17 @@
 
 #include <bunsan/error.hpp>
 
-#include <iostream>
-#include <string>
-
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/if.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/cat.hpp>
 
+#include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/to_seq.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/seq/for_each.hpp>
+
+#include <iostream>
+#include <string>
 
 namespace bunsan{namespace stream_enum
 {

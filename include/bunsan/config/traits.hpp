@@ -1,17 +1,17 @@
 #pragma once
 
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
+
+#include <deque>
+#include <list>
+#include <map>
+#include <set>
 #include <string>
 #include <type_traits>
-#include <vector>
-#include <list>
-#include <deque>
-#include <set>
-#include <map>
-#include <unordered_set>
 #include <unordered_map>
-
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
+#include <unordered_set>
+#include <vector>
 
 namespace bunsan{namespace config{namespace traits
 {

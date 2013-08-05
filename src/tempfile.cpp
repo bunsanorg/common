@@ -1,8 +1,9 @@
 #include <bunsan/tempfile.hpp>
+
 #include <bunsan/logging/legacy.hpp>
 
-#include <boost/utility/swap.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/utility/swap.hpp>
 
 const boost::filesystem::path bunsan::tempfile::default_model = "%%%%-%%%%-%%%%-%%%%";
 

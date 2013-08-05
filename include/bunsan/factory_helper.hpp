@@ -2,10 +2,10 @@
 
 #include <bunsan/factory.hpp>
 
-#include <map>
-#include <string>
-#include <memory>
 #include <functional>
+#include <map>
+#include <memory>
+#include <string>
 #include <type_traits>
 
 /*!

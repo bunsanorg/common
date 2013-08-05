@@ -1,11 +1,11 @@
 #define BOOST_TEST_MODULE meta
 #include <boost/test/unit_test.hpp>
 
-#include <type_traits>
-#include <string>
-
-#include <bunsan/meta/vector.hpp>
 #include <bunsan/meta/comparable.hpp>
+#include <bunsan/meta/vector.hpp>
+
+#include <string>
+#include <type_traits>
 
 BOOST_AUTO_TEST_SUITE(meta)
 

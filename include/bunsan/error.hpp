@@ -2,9 +2,9 @@
 
 #include <bunsan/runtime/stacktrace.hpp>
 
-#include <exception>
-
 #include <boost/exception/all.hpp>
+
+#include <exception>
 
 namespace bunsan
 {

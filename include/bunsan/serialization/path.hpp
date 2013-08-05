@@ -1,9 +1,8 @@
 #pragma once
 
-#include <boost/serialization/split_free.hpp>
-#include <boost/serialization/nvp.hpp>
-
 #include <boost/filesystem/path.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/split_free.hpp>
 
 BOOST_SERIALIZATION_SPLIT_FREE(boost::filesystem::path)
 

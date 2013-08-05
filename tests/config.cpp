@@ -1,11 +1,10 @@
 #define BOOST_TEST_MODULE config
 #include <boost/test/unit_test.hpp>
 
-#include <bunsan/config/traits.hpp>
+#include <bunsan/config/cast.hpp>
 #include <bunsan/config/input_archive.hpp>
 #include <bunsan/config/output_archive.hpp>
-#include <bunsan/config/cast.hpp>
-
+#include <bunsan/config/traits.hpp>
 #include <bunsan/stream_enum.hpp>
 
 #include <boost/property_tree/ptree.hpp>

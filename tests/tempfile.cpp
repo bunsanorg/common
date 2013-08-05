@@ -3,9 +3,9 @@
 
 #include <bunsan/tempfile.hpp>
 
+#include <boost/assert.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/assert.hpp>
 
 BOOST_AUTO_TEST_SUITE(tempfile)
 

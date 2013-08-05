@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE error
 #include <boost/test/unit_test.hpp>
 
-#include <bunsan/error.hpp>
 #include <bunsan/enable_error_info.hpp>
+#include <bunsan/error.hpp>
 #include <bunsan/system_error.hpp>
 
 #include <bunsan/filesystem/fstream.hpp>

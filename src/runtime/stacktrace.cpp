@@ -8,17 +8,17 @@
 #   define BOOST_HAVE_DLADDR
 #endif
 
-#include <bunsan/runtime/stacktrace.hpp>
 #include <bunsan/runtime/demangle.hpp>
+#include <bunsan/runtime/stacktrace.hpp>
+
+#include <boost/assert.hpp>
+#include <boost/optional.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <iomanip>
 
 #include <cstdlib>
 #include <cstring>
-
-#include <boost/assert.hpp>
-#include <boost/optional.hpp>
-#include <boost/scope_exit.hpp>
 
 #ifdef BOOST_HAVE_EXECINFO
 #   include <execinfo.h>

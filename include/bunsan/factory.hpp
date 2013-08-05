@@ -2,15 +2,15 @@
 
 #include <bunsan/error.hpp>
 
-#include <unordered_map>
-#include <string>
-#include <functional>
-#include <algorithm>
-#include <iterator>
-#include <type_traits>
-
-#include <boost/optional.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/optional.hpp>
+
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
 
 namespace bunsan
 {

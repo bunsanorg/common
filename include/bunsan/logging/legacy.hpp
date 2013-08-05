@@ -2,11 +2,11 @@
 
 #warning "This logging implementation is deprecated!"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 #define SLOG(M) do \
         { \
