@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE get
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/get.hpp"
+#include <bunsan/get.hpp>
 
 #define BUNSAN_CHECK_EXCEPTION(OPT, MSG) BOOST_CHECK_EXCEPTION(bunsan::get(OPT, MSG), bunsan::uninitialized_optional_error, \
     [](const bunsan::uninitialized_optional_error &e) \

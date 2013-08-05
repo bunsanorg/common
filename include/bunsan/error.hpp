@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bunsan/runtime/stacktrace.hpp"
+#include <bunsan/runtime/stacktrace.hpp>
 
 #include <exception>
 

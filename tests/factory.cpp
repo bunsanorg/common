@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE factory
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/factory.hpp"
-#include "bunsan/factory_helper.hpp"
+#include <bunsan/factory.hpp>
+#include <bunsan/factory_helper.hpp>
 
 #include <memory>
 #include <set>

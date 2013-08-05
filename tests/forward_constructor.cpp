@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE forward_constructor
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/forward_constructor.hpp"
+#include <bunsan/forward_constructor.hpp>
 
 BOOST_AUTO_TEST_SUITE(forward_constructor)
 

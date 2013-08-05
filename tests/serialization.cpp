@@ -4,8 +4,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
-#include "bunsan/serialization/chrono.hpp"
-#include "bunsan/serialization/path.hpp"
+#include <bunsan/serialization/chrono.hpp>
+#include <bunsan/serialization/path.hpp>
 
 template <typename T>
 void test(const T &d)

@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE stream_enum
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/stream_enum.hpp"
+#include <bunsan/stream_enum.hpp>
 
 #include <boost/lexical_cast.hpp>
 

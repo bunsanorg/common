@@ -8,8 +8,8 @@
 #   define BOOST_HAVE_DLADDR
 #endif
 
-#include "bunsan/runtime/stacktrace.hpp"
-#include "bunsan/runtime/demangle.hpp"
+#include <bunsan/runtime/stacktrace.hpp>
+#include <bunsan/runtime/demangle.hpp>
 
 #include <iomanip>
 

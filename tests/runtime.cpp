@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE runtime
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/runtime/demangle.hpp"
-#include "bunsan/runtime/stacktrace.hpp"
+#include <bunsan/runtime/demangle.hpp>
+#include <bunsan/runtime/stacktrace.hpp>
 
 #include <utility>
 

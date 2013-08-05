@@ -4,8 +4,8 @@
 #include <type_traits>
 #include <string>
 
-#include "bunsan/meta/vector.hpp"
-#include "bunsan/meta/comparable.hpp"
+#include <bunsan/meta/vector.hpp>
+#include <bunsan/meta/comparable.hpp>
 
 BOOST_AUTO_TEST_SUITE(meta)
 

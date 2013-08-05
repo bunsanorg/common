@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bunsan/factory.hpp"
+#include <bunsan/factory.hpp>
 
 #include <map>
 #include <string>

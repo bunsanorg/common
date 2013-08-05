@@ -1,5 +1,5 @@
-#include "bunsan/tempfile.hpp"
-#include "bunsan/logging/legacy.hpp"
+#include <bunsan/tempfile.hpp>
+#include <bunsan/logging/legacy.hpp>
 
 #include <boost/utility/swap.hpp>
 #include <boost/filesystem/operations.hpp>

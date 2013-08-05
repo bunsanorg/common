@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE tempfile
 #include <boost/test/unit_test.hpp>
 
-#include "bunsan/tempfile.hpp"
+#include <bunsan/tempfile.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

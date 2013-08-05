@@ -1,7 +1,7 @@
 #pragma once
 
-#include "bunsan/config/error.hpp"
-#include "bunsan/config/traits.hpp"
+#include <bunsan/config/error.hpp>
+#include <bunsan/config/traits.hpp>
 
 #include <memory>
 #include <chrono>
