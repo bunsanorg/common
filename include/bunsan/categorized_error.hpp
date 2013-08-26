@@ -6,6 +6,7 @@
 
 namespace bunsan
 {
+    /// \warning Should not be inherited virtually.
     struct categorized_error: virtual error
     {
         categorized_error()=default;
