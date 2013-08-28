@@ -2,6 +2,7 @@
 
 #include <bunsan/error.hpp>
 
+#include <boost/range/iterator_range.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/optional.hpp>
 
@@ -57,6 +58,7 @@ namespace bunsan{namespace detail
         };
 
         typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
+        typedef boost::iterator_range<const_iterator> const_range;
 
         /*!
          * \brief Registeres new factory with unique identifier.
@@ -153,24 +155,21 @@ namespace bunsan{namespace detail
             return result_type();
         }
 
-        /// Iterate over registered factory identifiers: begin iterator.
-        static const_iterator registered_begin(const map_type *const factories)
+        /// Iterate over registered factory identifiers.
+        static const_range registered(const map_type *const factories)
         {
             if (factories)
-                return const_iterator(factories->begin());
+            {
+                return const_range{
+                    factories->begin(),
+                    factories->end()
+                };
+            }
             else
+            {
                 /// \see factory::null unit test
-                return const_iterator(map_const_iterator());
-        }
-
-        /// Iterate over registered factory identifiers: end iterator.
-        static const_iterator registered_end(const map_type *const factories)
-        {
-            if (factories)
-                return const_iterator(factories->end());
-            else
-                /// \see factory::null unit test
-                return const_iterator(map_const_iterator());
+                return const_range();
+            }
         }
     };
 }}

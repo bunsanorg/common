@@ -3,6 +3,7 @@
 
 #include <bunsan/factory.hpp>
 #include <bunsan/factory_helper.hpp>
+#include <bunsan/range/construct_from_range.hpp>
 
 #include <memory>
 #include <set>
@@ -44,20 +45,18 @@ BOOST_AUTO_TEST_CASE(basic)
     BOOST_CHECK_EXCEPTION(bunsan_factory::instance(map, ""), bunsan::unknown_factory_error, check_unknown_factory_error(""));
     BOOST_CHECK(!bunsan_factory::instance_optional(map, ""));
     {
-        std::set<std::string> set(bunsan_factory::registered_begin(map), bunsan_factory::registered_end(map));
-        std::set<std::string> req = {"zero", "one"};
+        const auto set = bunsan::range::construct_from_range<std::set<std::string>>(
+            bunsan_factory::registered(map));
+        const std::set<std::string> req = {"zero", "one"};
         BOOST_CHECK(req == set);
     }
 }
-
+// construct_from_range
 BOOST_AUTO_TEST_CASE(null)
 {
     typedef bunsan::factory<std::shared_ptr<int>()> bunsan_factory;
     typename bunsan_factory::map_type *map(0);
-    std::set<bunsan_factory::key_type> set(
-        bunsan_factory::registered_begin(map),
-        bunsan_factory::registered_end(map));
-    BOOST_CHECK(set.empty());
+    BOOST_CHECK(bunsan_factory::registered(map).empty());
 }
 
 BOOST_AUTO_TEST_SUITE(helper)
@@ -152,7 +151,7 @@ BOOST_AUTO_TEST_CASE(all)
 {
     {
         {
-            const std::set<std::string> set(test::fact::registered_begin(), test::fact::registered_end());
+            const auto set = bunsan::range::construct_from_range<std::set<std::string>>(test::fact::registered());
             const std::set<std::string> req = {"init"};
             BOOST_CHECK(req == set);
         }
@@ -173,7 +172,7 @@ BOOST_AUTO_TEST_CASE(all)
     }
     {
         {
-            const std::set<std::string> set(test::fact2::registered_begin(), test::fact2::registered_end());
+            const auto set = bunsan::range::construct_from_range<std::set<std::string>>(test::fact2::registered());
             const std::set<std::string> req = {"init"};
             BOOST_CHECK(req == set);
         }

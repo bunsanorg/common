@@ -58,13 +58,9 @@ public: \
     { \
         return bunsan_factory::instance_optional(factories, type, std::forward<Args>(args)...); \
     } \
-    static inline typename bunsan_factory::const_iterator registered_begin() \
+    static inline typename bunsan_factory::const_range registered() \
     { \
-        return bunsan_factory::registered_begin(factories); \
-    } \
-    static inline typename bunsan_factory::const_iterator registered_end() \
-    { \
-        return bunsan_factory::registered_end(factories); \
+        return bunsan_factory::registered(factories); \
     } \
 private:
 
