@@ -70,8 +70,7 @@ namespace bunsan
 #define BUNSAN_EXCEPTIONS_WRAP_WRAPPER(r, ERROR_INFO, ERROR) \
     catch (ERROR &e) \
     { \
-        BOOST_THROW_EXCEPTION(::bunsan::enable_error_info(e) << \
-            ::bunsan::error::stacktrace(::bunsan::runtime::stacktrace::get()) \
+        BOOST_THROW_EXCEPTION(::bunsan::enable_error_info(e) \
             ERROR_INFO); \
     }
 
