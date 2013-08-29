@@ -24,9 +24,9 @@ namespace bunsan
         template <typename T>
         struct error_info_injector: T, boost::exception
         {
-            explicit error_info_injector(const T &e): T(e)
+            explicit error_info_injector(const T &e, const std::size_t skip=0): T(e)
             {
-                (*this) << error::stacktrace(runtime::stacktrace::get(2));
+                (*this) << error::stacktrace(runtime::stacktrace::get(2 + skip));
                 // note: we use original value from e
                 (*this) << original_what(e.what()) << original_type_name(runtime::type_name(e));
             }
@@ -42,7 +42,7 @@ namespace bunsan
     typename std::enable_if<!std::is_base_of<boost::exception, T>::value,
     exception_detail::error_info_injector<T>>::type enable_error_info(const T &obj)
     {
-        return exception_detail::error_info_injector<T>(obj);
+        return exception_detail::error_info_injector<T>(obj, 1);
     }
 
 /*!
