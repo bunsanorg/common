@@ -16,10 +16,11 @@ const char *bunsan::error::what() const noexcept
     return boost::diagnostic_information_what(*this);
 }
 
-void bunsan::error::enable_stacktrace(const std::size_t skip)
+bunsan::error &bunsan::error::enable_stacktrace(const std::size_t skip)
 {
     if (!get<stacktrace>())
         // +1 for enable_stackrace()
         // +1 for stacktrace::get()
         (*this) << stacktrace(runtime::stacktrace::get(skip + 2));
+    return *this;
 }

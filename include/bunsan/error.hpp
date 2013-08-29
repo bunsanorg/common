@@ -51,7 +51,7 @@ namespace bunsan
          *
          * \param skip number of nested function to omit in stack trace
          */
-        void enable_stacktrace(const std::size_t skip=1);
+        error &enable_stacktrace(const std::size_t skip=1);
 
         /// Human readable error message
         typedef boost::error_info<struct tag_message, std::string> message;
