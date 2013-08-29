@@ -18,10 +18,11 @@ namespace bunsan{namespace runtime
         /*!
          * \brief Get stack trace.
          *
-         * \param skip skip first entries (1 means stacktrace::get() will not be included into trace)
+         * \param skip skip first entries,
+         * e.g. 1 means caller will not be included into trace
          * \param max_size maximum stack trace size
          */
-        static stacktrace get(const std::size_t skip=1, const std::size_t max_size=1024);
+        static stacktrace get(const std::size_t skip=0, const std::size_t max_size=1024);
 
     private:
         friend std::ostream &operator<<(std::ostream &out, const stacktrace &trace);

@@ -39,8 +39,9 @@
 
 namespace bunsan{namespace runtime
 {
-    stacktrace stacktrace::get(const std::size_t skip, const std::size_t max_size)
+    stacktrace stacktrace::get(const std::size_t skip_, const std::size_t max_size)
     {
+        const std::size_t skip = skip_ + 1; // we should skip stacktrace::get()
         stacktrace trace;
 #if defined(BOOST_HAVE_EXECINFO)
         trace.resize(max_size + skip);

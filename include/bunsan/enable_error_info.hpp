@@ -26,7 +26,8 @@ namespace bunsan
         {
             explicit error_info_injector(const T &e, const std::size_t skip=0): T(e)
             {
-                (*this) << error::stacktrace(runtime::stacktrace::get(2 + skip));
+                // +1 for current function
+                (*this) << error::stacktrace(runtime::stacktrace::get(skip + 1));
                 // note: we use original value from e
                 (*this) << original_what(e.what()) << original_type_name(runtime::type_name(e));
             }

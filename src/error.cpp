@@ -20,7 +20,6 @@ bunsan::error &bunsan::error::enable_stacktrace(const std::size_t skip)
 {
     if (!get<stacktrace>())
         // +1 for enable_stackrace()
-        // +1 for stacktrace::get()
-        (*this) << stacktrace(runtime::stacktrace::get(skip + 2));
+        (*this) << stacktrace(runtime::stacktrace::get(skip + 1));
     return *this;
 }
