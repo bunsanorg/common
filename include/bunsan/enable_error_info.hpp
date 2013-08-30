@@ -107,11 +107,11 @@ namespace bunsan
 
 /// Predefined list of exceptions.
 #define BUNSAN_EXCEPTIONS_WRAP_LIST \
-        ::std::domain_error, ::std::invalid_argument, ::std::length_error, \
-            ::std::out_of_range, ::std::logic_error, \
-        ::std::range_error, ::std::overflow_error, ::std::underflow_error, \
-            ::std::system_error, ::boost::system::system_error, ::std::runtime_error, \
-        ::std::exception
+    ::std::domain_error, ::std::invalid_argument, ::std::length_error, \
+        ::std::out_of_range, ::std::logic_error, \
+    ::std::range_error, ::std::overflow_error, ::std::underflow_error, \
+        ::std::system_error, ::boost::system::system_error, ::std::runtime_error, \
+    ::std::exception
 
 /// Default footer.
 #define BUNSAN_EXCEPTIONS_WRAP_END() \
