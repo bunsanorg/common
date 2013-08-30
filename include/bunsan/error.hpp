@@ -53,9 +53,14 @@ namespace bunsan
          */
         error &enable_stacktrace(const std::size_t skip=0);
 
+        error &enable_nested(const boost::exception_ptr &ptr);
+        error &enable_nested_current();
+
         /// Human readable error message
         typedef boost::error_info<struct tag_message, std::string> message;
 
         typedef boost::error_info<struct tag_stacktrace, runtime::stacktrace> stacktrace;
+
+        typedef boost::errinfo_nested_exception nested_exception;
     };
 }

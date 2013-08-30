@@ -23,3 +23,14 @@ bunsan::error &bunsan::error::enable_stacktrace(const std::size_t skip)
         (*this) << stacktrace(runtime::stacktrace::get(skip + 1));
     return *this;
 }
+
+bunsan::error &bunsan::error::enable_nested(const boost::exception_ptr &ptr)
+{
+    (*this) << nested_exception(ptr);
+    return *this;
+}
+
+bunsan::error &bunsan::error::enable_nested_current()
+{
+    return enable_nested(boost::current_exception());
+}

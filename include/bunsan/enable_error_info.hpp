@@ -17,8 +17,7 @@ namespace bunsan
 {
     namespace exception_detail
     {
-        typedef boost::error_info<struct tag_original_what, std::string> original_what;
-        typedef boost::error_info<struct tag_original_type_name, std::string> original_type_name;
+        typedef boost::error_info<struct tag_original_exception, boost::exception_ptr> original_exception;
 
         /// \todo use std::exception_ptr
         template <typename T>
@@ -28,8 +27,7 @@ namespace bunsan
             {
                 // +1 for current function
                 (*this) << error::stacktrace(runtime::stacktrace::get(skip + 1));
-                // note: we use original value from e
-                (*this) << original_what(e.what()) << original_type_name(runtime::type_name(e));
+                (*this) << original_exception(boost::current_exception());
             }
 
             const char *what() const noexcept override
@@ -51,11 +49,15 @@ namespace bunsan
  *
  * These macros add stack trace and other useful info
  * to thrown exception. If exception is derived from boost::exception
- * it's type is preserved. Otherwise predefined list of exceptions from <stdexcept>,
- * <system_error> and <boost/system/system_error.hpp> is used to catch and wrap.
- * Note, that if exception is derived from one of that types and not explicitly
- * specified (via BUNSAN_EXCEPTIONS_WRAP_END_EXCEPT or BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT),
- * some information may be lost.
+ * it's type is preserved. Otherwise it's type is unspecified derived from
+ * boost::exception and caught exception type.
+ *
+ * Predefined list of exceptions to be caught
+ * consists of exceptions from <stdexcept>,
+ * <system_error> and <boost/system/system_error.hpp>.
+ * Additional exceptions may be specified by user via
+ * BUNSAN_EXCEPTIONS_WRAP_END_EXCEPT and
+ * BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT.
  *
  * \code{.cpp}
  * BUNSAN_EXCEPTIONS_WRAP_BEGIN()
@@ -92,8 +94,8 @@ namespace bunsan
     catch (::std::ios_base::failure &e) \
     /* TODO: should be removed when std::ios_base::failure is derived from std::system_error */ \
     { \
-        BOOST_THROW_EXCEPTION(::bunsan::system_error(e.what()) << \
-            ::bunsan::exception_detail::original_type_name(::bunsan::runtime::type_name(e)) \
+        BOOST_THROW_EXCEPTION(::bunsan::system_error(e.what()) \
+            .enable_nested_current() \
             ERROR_INFO); \
     } \
     catch (::std::bad_alloc &) \
