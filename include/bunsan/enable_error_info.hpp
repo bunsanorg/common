@@ -52,7 +52,7 @@ namespace bunsan
  * it's type is preserved. Otherwise it's type is unspecified derived from
  * boost::exception and caught exception type.
  *
- * Predefined list of exceptions to be caught
+ * Predefined list of exceptions to catch
  * consists of exceptions from <stdexcept>,
  * <system_error> and <boost/system/system_error.hpp>.
  * Additional exceptions may be specified by user via
@@ -99,7 +99,7 @@ namespace bunsan
             ERROR_INFO); \
     } \
     catch (::std::bad_alloc &) \
-    /* should not be caught, there are no enough memory */ \
+    /* should not be wrapped, there are no enough memory */ \
     { \
         throw; \
     } \
@@ -127,14 +127,28 @@ namespace bunsan
  * \param ERROR_INFO boost::error_info instance (streaming expression)
  *
  * \code{.cpp}
- * BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT(bunsan::filesystem::error::source_path(path1) <<
+ * BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO(
+ *     bunsan::filesystem::error::source_path(path1) <<
  *     bunsan::filesystem::error::destination_path(path2))
  * \endcode
  */
 #define BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO(ERROR_INFO) \
     BUNSAN_EXCEPTIONS_WRAP_END_(<< ERROR_INFO, BUNSAN_EXCEPTIONS_WRAP_LIST)
 
-/// Add error info to wrapped exception + catch additional exceptions.
+/*!
+ * \brief Add error info to wrapped exception + catch additional exceptions.
+ *
+ * \param ERROR_INFO boost::error_info instance (streaming expression)
+ * \param __VA_ARGS__ additional exceptions to catch
+ *
+ * \code{.cpp}
+ * BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT(
+ *     bunsan::filesystem::error::source_path(path1) <<
+ *     bunsan::filesystem::error::destination_path(path2),
+ *     boost::filesystem::filesystem_error,
+ *     another::exception::type)
+ * \endcode
+ */
 #define BUNSAN_EXCEPTIONS_WRAP_END_ERROR_INFO_EXCEPT(ERROR_INFO, ...) \
     BUNSAN_EXCEPTIONS_WRAP_END_(<< ERROR_INFO, __VA_ARGS__, BUNSAN_EXCEPTIONS_WRAP_LIST)
 }
