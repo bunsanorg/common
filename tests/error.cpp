@@ -114,8 +114,6 @@ BOOST_AUTO_TEST_CASE(system_error)
         {
             BOOST_REQUIRE(e.get<bunsan::system_error::error_code>());
             BOOST_CHECK_EQUAL(e.get<bunsan::system_error::error_code>()->value(), EEXIST);
-            BOOST_REQUIRE(e.get<bunsan::system_error::error_code_message>());
-            BOOST_CHECK(!e.get<bunsan::system_error::error_code_message>()->empty());
             BOOST_REQUIRE(e.get<bunsan::system_error::what_message>());
             BOOST_CHECK_EQUAL(*e.get<bunsan::system_error::what_message>(), "action");
             return true;

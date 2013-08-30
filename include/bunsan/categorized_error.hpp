@@ -15,7 +15,11 @@ namespace bunsan
         categorized_error(const std::error_code &ec, const std::string &what);
 
         typedef boost::error_info<struct tag_error_code, std::error_code> error_code;
-        typedef boost::error_info<struct tag_error_code_message, std::string> error_code_message;
         typedef boost::error_info<struct tag_what_message, std::string> what_message;
     };
+}
+
+namespace boost
+{
+    std::string to_string(const bunsan::categorized_error::error_code &ec);
 }
