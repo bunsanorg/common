@@ -61,7 +61,7 @@ namespace bunsan{namespace detail
         typedef boost::iterator_range<const_iterator> const_range;
 
         /*!
-         * \brief Registeres new factory with unique identifier.
+         * \brief Registers new factory with unique identifier.
          *
          * \warning factory should not return null pointer
          *
