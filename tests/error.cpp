@@ -7,6 +7,11 @@
 
 #include <bunsan/filesystem/fstream.hpp>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
+#include <vector>
+
 #include <cerrno>
 
 BOOST_AUTO_TEST_SUITE(error)
@@ -119,6 +124,27 @@ BOOST_AUTO_TEST_CASE(system_error)
             return true;
         };
     BOOST_CHECK_EXCEPTION(throw_(), bunsan::error, check);
+}
+
+struct my_error: virtual bunsan::error {};
+
+struct check_my_error
+{
+    bool operator()(const std::exception &e) const
+    {
+        const std::string s = e.what();
+        BOOST_TEST_MESSAGE(s);
+        std::vector<std::string> msg;
+        boost::algorithm::split(msg, s, boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
+        BOOST_REQUIRE_GE(msg.size(), 2);
+        BOOST_CHECK_EQUAL(msg[1], "Dynamic exception type: boost::exception_detail::clone_impl<error::my_error>");
+        return true;
+    }
+};
+
+BOOST_AUTO_TEST_CASE(dynamic_exception_type)
+{
+    BOOST_CHECK_EXCEPTION(BOOST_THROW_EXCEPTION(my_error()), std::exception, check_my_error());
 }
 
 BOOST_AUTO_TEST_SUITE_END() // error
