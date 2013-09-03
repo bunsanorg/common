@@ -1,10 +1,17 @@
 #pragma once
 
+#include <bunsan/runtime/demangle.hpp>
 #include <bunsan/runtime/stacktrace.hpp>
 
 #include <boost/exception/all.hpp>
+#include <boost/version.hpp>
 
 #include <exception>
+
+// see bunsan::error::info_name()
+#if BOOST_VERSION < 105400
+#   include <typeinfo>
+#endif
 
 namespace bunsan
 {
@@ -62,5 +69,16 @@ namespace bunsan
         typedef boost::error_info<struct tag_stacktrace, runtime::stacktrace> stacktrace;
 
         typedef boost::errinfo_nested_exception nested_exception;
+
+        template <typename Tag, typename T>
+        static inline std::string info_name(const boost::error_info<Tag, T> &x)
+        {
+    #if BOOST_VERSION >= 105400
+            return boost::error_info_name(x);
+    #else
+            (void) x;
+            return runtime::demangle(typeid(Tag *).name());
+    #endif
+        }
     };
 }
