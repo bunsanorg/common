@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 2.8)
 
 include(BunsanCommon)
 
-# BOOST
 bunsan_use_boost(system filesystem serialization thread)
 
 if(${UNIX})
