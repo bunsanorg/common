@@ -93,10 +93,9 @@ namespace bunsan
     } \
     catch (::std::ios_base::failure &e) \
     /* TODO: should be removed when std::ios_base::failure is derived from std::system_error */ \
+    /* note: BUNSAN_FILESYSTEM_FSTREAM_WRAP is used to wrap that type */ \
     { \
-        BOOST_THROW_EXCEPTION(::bunsan::system_error(e.what()) \
-            .enable_nested_current() \
-            ERROR_INFO); \
+        throw; \
     } \
     catch (::std::bad_alloc &) \
     /* should not be wrapped, there are no enough memory */ \
