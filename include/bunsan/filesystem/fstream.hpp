@@ -7,6 +7,9 @@
 
 namespace bunsan{namespace filesystem
 {
+    template <typename Fstream, std::ios_base::openmode BaseOpenmode>
+    class basic_stream;
+
     namespace detail
     {
         template <bool enable>
@@ -22,6 +25,18 @@ namespace bunsan{namespace filesystem
             template <typename T>
             static inline void call(T &) {}
         };
+
+        template <typename Fstream, std::ios_base::openmode BaseOpenmode>
+        const boost::filesystem::path &path(basic_stream<Fstream, BaseOpenmode> &stream)
+        {
+            return stream.m_path;
+        }
+
+        template <typename Fstream, std::ios_base::openmode BaseOpenmode>
+        std::ios_base::openmode openmode(basic_stream<Fstream, BaseOpenmode> &stream)
+        {
+            return stream.m_openmode;
+        }
     }
 
     template <typename ... Args>
@@ -113,6 +128,12 @@ namespace bunsan{namespace filesystem
             }
         }
 
+        template <typename Fstream_, std::ios_base::openmode BaseOpenmode_>
+        friend const boost::filesystem::path &detail::path(basic_stream<Fstream_, BaseOpenmode_> &stream);
+
+        template <typename Fstream_, std::ios_base::openmode BaseOpenmode_>
+        friend std::ios_base::openmode detail::openmode(basic_stream<Fstream_, BaseOpenmode_> &stream);
+
     private:
         boost::filesystem::path m_path;
         std::ios_base::openmode m_openmode = BaseOpenmode;
@@ -136,4 +157,34 @@ namespace bunsan{namespace filesystem
     typedef basic_ifstream<wchar_t> wifstream;
     typedef basic_ofstream<wchar_t> wofstream;
     typedef basic_fstream<wchar_t> wfstream;
+
+/*!
+ * \brief Wrapper for exception-safe usage of bunsan::filesystem::fstream.
+ *
+ * \code{.cpp}
+ * bunsan::filesystem::ofstream fout(path);
+ * BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout)
+ * {
+ *     fout << "data";
+ * }
+ * BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+ * fout.close();
+ * \endcode
+ */
+#define BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(FSTREAM) \
+    try
+
+#define BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(FSTREAM) \
+    catch (::boost::exception &) \
+    { /* do not catch exceptions thrown by nested wrappers */ \
+        throw; \
+    } \
+    catch (::std::ios_base::failure &) \
+    { \
+        BOOST_THROW_EXCEPTION(::bunsan::filesystem::system_error().enable_nested_current() << \
+                              ::bunsan::filesystem::error::path( \
+                                  ::bunsan::filesystem::detail::path(FSTREAM)) << \
+                              ::bunsan::filesystem::error::openmode( \
+                                  ::bunsan::filesystem::detail::openmode(FSTREAM))); \
+    }
 }}
