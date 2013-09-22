@@ -24,3 +24,8 @@ namespace bunsan{namespace filesystem
         BUNSAN_INHERIT_EXPLICIT_CONSTRUCTOR(system_error, bunsan::system_error)
     };
 }}
+
+namespace boost
+{
+    std::string to_string(const bunsan::filesystem::error::openmode &openmode);
+}
