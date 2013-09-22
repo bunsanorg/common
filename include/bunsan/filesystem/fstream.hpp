@@ -3,9 +3,27 @@
 #include <bunsan/filesystem/error.hpp>
 
 #include <boost/filesystem/fstream.hpp>
+#include <boost/scope_exit.hpp>
 
 namespace bunsan{namespace filesystem
 {
+    namespace detail
+    {
+        template <bool enable>
+        struct flusher
+        {
+            template <typename T>
+            static inline void call(T &obj) { obj.flush(); }
+        };
+
+        template <>
+        struct flusher<false>
+        {
+            template <typename T>
+            static inline void call(T &) {}
+        };
+    }
+
     template <typename ... Args>
     using basic_filebuf = boost::filesystem::basic_filebuf<Args...>;
 
@@ -75,11 +93,24 @@ namespace bunsan{namespace filesystem
 
         void close()
         {
-            Fstream::close();
-            if (this->fail())
-                BOOST_THROW_EXCEPTION(system_error("close") <<
+            try
+            {
+                // note: if we don't call flush before close(), close() will override errno
+                // note: flush is only enabled for output streams
+                detail::flusher<BaseOpenmode & std::ios_base::out>::call(*this);
+
+                // note: close() sets failbit on any error
+                const std::ios_base::iostate state = exceptions();
+                BOOST_SCOPE_EXIT_ALL(this, state) { exceptions(state); }; //< rollback
+                exceptions(state | std::ios_base::failbit);
+                Fstream::close();
+            }
+            catch (std::ios_base::failure)
+            {
+                BOOST_THROW_EXCEPTION(system_error("close").enable_nested_current() <<
                                       error::path(m_path) <<
                                       error::openmode(m_openmode));
+            }
         }
 
     private:
