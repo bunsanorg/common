@@ -67,14 +67,7 @@ void throw1()
 
 void throw2()
 {
-    BUNSAN_EXCEPTIONS_WRAP_BEGIN()
-    {
-        bunsan::filesystem::ifstream fin("/definitely/not/existing/file/with/some/unpredictable/name");
-        int x;
-        fin >> x;
-        fin.close();
-    }
-    BUNSAN_EXCEPTIONS_WRAP_END()
+    bunsan::filesystem::ifstream fin("/definitely/not/existing/file/with/some/unpredictable/name");
 }
 
 typedef boost::error_info<struct tag_info, std::string> info;
