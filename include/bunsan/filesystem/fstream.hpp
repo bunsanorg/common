@@ -117,6 +117,8 @@ namespace bunsan{namespace filesystem
                 // note: close() sets failbit on any error
                 const std::ios_base::iostate state = exceptions();
                 BOOST_SCOPE_EXIT_ALL(this, state) { exceptions(state); }; //< rollback
+                // exceptions() should not throw here
+                this->clear(this->rdstate() & ~std::ios_base::failbit);
                 exceptions(state | std::ios_base::failbit);
                 Fstream::close();
             }
