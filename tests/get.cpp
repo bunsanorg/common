@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(ptree)
     vl.put_value("231dasmnw");
     vl2.put_value("njskdnjsdnjkasd");
     BOOST_CHECK(bunsan::ptree_get(pt, "some.path", vl) == vl);
-    pt.get_child("some.path")==vl;
+    BOOST_CHECK(pt.get_child("some.path") == vl);
     BOOST_CHECK(bunsan::ptree_get(pt, "some.path", vl2) == vl);
     bunsan::ptree_get(pt, "some.path").put("name0", "value0");
     bunsan::ptree_get(pt, "some.path").put("name1", "value1");
