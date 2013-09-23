@@ -124,7 +124,8 @@ namespace bunsan{namespace filesystem
             }
             catch (std::ios_base::failure)
             {
-                BOOST_THROW_EXCEPTION(system_error("close").enable_nested_current() <<
+                BOOST_THROW_EXCEPTION(system_error("close") <<
+                                      enable_nested_current() <<
                                       error::path(m_path) <<
                                       error::openmode(m_openmode));
             }
@@ -183,7 +184,8 @@ namespace bunsan{namespace filesystem
     } \
     catch (::std::ios_base::failure &) \
     { \
-        BOOST_THROW_EXCEPTION(::bunsan::filesystem::system_error().enable_nested_current() << \
+        BOOST_THROW_EXCEPTION(::bunsan::filesystem::system_error() << \
+                              ::bunsan::enable_nested_current() << \
                               ::bunsan::filesystem::error::path( \
                                   ::bunsan::filesystem::detail::path(FSTREAM)) << \
                               ::bunsan::filesystem::error::openmode( \
