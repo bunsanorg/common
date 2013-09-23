@@ -1,7 +1,6 @@
 #pragma once
 
 #include <bunsan/error.hpp>
-#include <bunsan/forward_constructor.hpp>
 #include <bunsan/system_error.hpp>
 
 #include <boost/filesystem/path.hpp>
@@ -19,9 +18,9 @@ namespace bunsan{namespace filesystem
         typedef boost::error_info<struct tag_openmode, std::ios_base::openmode> openmode;
     };
 
-    struct system_error: virtual error, virtual bunsan::system_error
+    struct system_error: bunsan::system_error, virtual error
     {
-        BUNSAN_INHERIT_EXPLICIT_CONSTRUCTOR(system_error, bunsan::system_error)
+        using bunsan::system_error::system_error;
     };
 }}
 
