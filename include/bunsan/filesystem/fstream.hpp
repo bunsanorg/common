@@ -122,7 +122,7 @@ namespace bunsan{namespace filesystem
                 exceptions(state | std::ios_base::failbit);
                 Fstream::close();
             }
-            catch (std::ios_base::failure)
+            catch (std::ios_base::failure &)
             {
                 BOOST_THROW_EXCEPTION(system_error("close") <<
                                       enable_nested_current() <<
