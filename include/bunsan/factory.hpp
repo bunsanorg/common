@@ -81,6 +81,20 @@ namespace bunsan{namespace detail
             return false;
         }
 
+        static bool unregister(map_type *&factories,
+                               const key_type &type)
+        {
+            if (!factories)
+                return false;
+            const std::size_t number_removed = factories->erase(type);
+            if (factories->empty())
+            {
+                delete factories;
+                factories = nullptr;
+            }
+            return number_removed;
+        }
+
         /*!
          * \brief Returns factory registered with specified identifier.
          *
