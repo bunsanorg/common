@@ -113,12 +113,12 @@ namespace test
             explicit init(const std::string data_, const std::string &data2_):
                 m_data(data_), m_data2(data2_) {}
 
-            virtual std::string f()
+            std::string f() override
             {
                 return m_data + m_data2;
             }
 
-            virtual std::string g()
+            std::string g() override
             {
                 return m_data2 + m_data;
             }
@@ -143,7 +143,7 @@ namespace test
         public:
             init() {}
 
-            virtual int code()
+            int code() override
             {
                 return 123;
             }
