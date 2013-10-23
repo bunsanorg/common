@@ -80,6 +80,20 @@ namespace test
     public:
         virtual int code()=0;
     BUNSAN_FACTORY_END(fact2)
+
+    class fact_derived: public fact
+    {
+    public:
+        std::string f() override
+        {
+            return "fact_derived::f()";
+        }
+
+        std::string g() override
+        {
+            return "fact_derived::g()";
+        }
+    };
 }
 
 namespace test
@@ -181,6 +195,12 @@ BOOST_AUTO_TEST_CASE(all)
         BOOST_CHECK(ptr->code() == 123);
         BOOST_CHECK_EXCEPTION(test::fact2::instance("noinit"), bunsan::unknown_factory_error, check_unknown_factory_error("noinit"));
         BOOST_CHECK(!test::fact2::instance_optional("noinit"));
+    }
+    {
+        test::fact::shared_ptr<test::fact_derived> derived_ptr(new test::fact_derived);
+        test::fact_ptr ptr = derived_ptr;
+        BOOST_CHECK_EQUAL(ptr->f(), "fact_derived::f()");
+        BOOST_CHECK_EQUAL(ptr->g(), "fact_derived::g()");
     }
 }
 

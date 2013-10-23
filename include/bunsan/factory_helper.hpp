@@ -35,7 +35,9 @@ namespace bunsan
 {\
 public: \
     struct unknown_##CLASS##_error: virtual ::bunsan::unknown_factory_error {}; \
-    typedef std::shared_ptr<CLASS> CLASS##_ptr; \
+    template <typename T> \
+    using shared_ptr = std::shared_ptr<T>; \
+    typedef shared_ptr<CLASS> CLASS##_ptr; \
     typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error> bunsan_factory; \
     typedef typename bunsan_factory::factory_type factory_type; \
     static inline factory_type factory(const typename bunsan_factory::key_type &type) \
