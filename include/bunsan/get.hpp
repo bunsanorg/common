@@ -5,9 +5,6 @@
 #include <boost/optional.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
 #include <string>
 
 namespace bunsan

@@ -14,7 +14,8 @@
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <string>
 
 namespace bunsan{namespace stream_enum

@@ -5,8 +5,6 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include <iostream>
-
 namespace bunsan{namespace filesystem
 {
     struct error: virtual bunsan::error
