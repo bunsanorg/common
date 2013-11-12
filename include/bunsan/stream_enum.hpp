@@ -113,12 +113,10 @@ namespace bunsan{namespace stream_enum
         virtual ::bunsan::stream_enum::invalid_value_error {}; \
     struct BUNSAN_STREAM_ENUM_ERROR_STRING(ENUM): \
         virtual BUNSAN_STREAM_ENUM_ERROR(ENUM), \
-        virtual ::bunsan::stream_enum::invalid_string_representation_error \
-    {} ; \
+        virtual ::bunsan::stream_enum::invalid_string_representation_error {}; \
     struct BUNSAN_STREAM_ENUM_ERROR_ENUM(ENUM): \
         virtual BUNSAN_STREAM_ENUM_ERROR(ENUM), \
-        virtual ::bunsan::stream_enum::invalid_enum_representation_error \
-    {};
+        virtual ::bunsan::stream_enum::invalid_enum_representation_error {};
 
 // ******************************** ERRORS ******************************** //
 
