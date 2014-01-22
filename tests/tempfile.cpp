@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(swap_)
     swap(tmp, tmp2);
     BOOST_CHECK(!tmp.auto_remove());
     BOOST_CHECK(tmp2.auto_remove());
-    BOOST_CHECK(tmp2.path()==tmppath);
+    BOOST_CHECK(tmp2.path() == tmppath);
 }
 
 BOOST_AUTO_TEST_CASE(model)
@@ -71,5 +71,43 @@ BOOST_AUTO_TEST_CASE(model)
     touch(tmp);
     BOOST_CHECK_EQUAL(tmp.path().extension(), ".tgz");
 }
+
+BOOST_AUTO_TEST_SUITE(create)
+
+BOOST_AUTO_TEST_CASE(regular_file_fail)
+{
+    BOOST_CHECK_THROW(
+        (
+            tempfile::regular_file_in_tempdir("no-percent-string"),
+            tempfile::regular_file_in_tempdir("no-percent-string")
+        ),
+        bunsan::unable_to_create_unique_temp_regular_file);
+}
+
+BOOST_AUTO_TEST_CASE(regular_file)
+{
+    const tempfile tmp = tempfile::regular_file_in_tempdir("%%%%-%%%%-%%%%-%%%%.suff");
+    BOOST_CHECK(boost::filesystem::is_regular_file(tmp.path()));
+    BOOST_CHECK_EQUAL(tmp.path().extension(), ".suff");
+}
+
+BOOST_AUTO_TEST_CASE(directory_file_fail)
+{
+    BOOST_CHECK_THROW(
+        (
+            tempfile::directory_in_tempdir("no-percent-string"),
+            tempfile::directory_in_tempdir("no-percent-string")
+        ),
+        bunsan::unable_to_create_unique_temp_directory);
+}
+
+BOOST_AUTO_TEST_CASE(directory)
+{
+    const tempfile tmp = tempfile::directory_in_tempdir("%%%%%-%%%%%-%%%%-%%%%.suff");
+    BOOST_CHECK(boost::filesystem::is_directory(tmp.path()));
+    BOOST_CHECK_EQUAL(tmp.path().extension(), ".suff");
+}
+
+BOOST_AUTO_TEST_SUITE_END() // create
 
 BOOST_AUTO_TEST_SUITE_END() // tempfile
