@@ -7,6 +7,8 @@ add_custom_command(
     COMMAND test_generator_stream_enum ${CMAKE_CURRENT_BINARY_DIR}/stream_enum.cpp
     DEPENDS test_generator_stream_enum
 )
-bunsan_tests_project_add_test(${CMAKE_CURRENT_BINARY_DIR}/stream_enum.cpp stream_enum)
+bunsan_tests_project_add_test(stream_enum
+    ${CMAKE_CURRENT_BINARY_DIR}/stream_enum.cpp
+)
 
 bunsan_testing_project_footer()
