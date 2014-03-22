@@ -25,7 +25,7 @@ namespace bunsan{namespace asio
             {
                 boost::system::error_code error(
                     boost::asio::error::invalid_argument);
-                m_connection.get_io_service().post(
+                get_io_service().post(
                     std::bind(handler, error)
                 );
             }
@@ -57,6 +57,11 @@ namespace bunsan{namespace asio
                     handle_read_header(ec, data, handler);
                 }
             );
+        }
+
+        boost::asio::io_service &get_io_service()
+        {
+            return m_connection.get_io_service();
         }
 
         void close()

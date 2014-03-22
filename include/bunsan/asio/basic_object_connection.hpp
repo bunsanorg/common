@@ -36,6 +36,11 @@ namespace bunsan{namespace asio
                 });
         }
 
+        boost::asio::io_service &get_io_service()
+        {
+            return m_block_connection.get_io_service();
+        }
+
         void close()
         {
             m_block_connection.close();

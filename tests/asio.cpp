@@ -34,6 +34,8 @@ BOOST_AUTO_TEST_CASE(block_connection)
 {
     std::string bc1_data, bc2_data;
     ba::block_connection<socket> bc1(socket1), bc2(socket2);
+    BOOST_CHECK_EQUAL(&bc1.get_io_service(), &io_service);
+    BOOST_CHECK_EQUAL(&bc2.get_io_service(), &io_service);
     bc1.async_write("first request",
         [&](const boost::system::error_code &ec)
         {
@@ -244,6 +246,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(
 {
     server_session<ObjectConnection> server(socket1);
     client_session<ObjectConnection> client(socket2);
+
+    BOOST_CHECK_EQUAL(&server.oc->get_io_service(), &io_service);
+    BOOST_CHECK_EQUAL(&client.oc->get_io_service(), &io_service);
 
     server();
     client();
