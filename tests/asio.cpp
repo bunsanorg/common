@@ -203,37 +203,31 @@ struct client_session: session<ObjectConnection>
     using session<ObjectConnection>::oc;
     using session<ObjectConnection>::msg;
 
-    bool wait_eof = false;
-
 #include <boost/asio/yield.hpp>
     void operator()(
         const boost::system::error_code &ec=
             boost::system::error_code{})
     {
-        if (ec)
+        reenter (this)
         {
-            BOOST_CHECK(wait_eof);
-            BOOST_CHECK_EQUAL(ec, boost::asio::error::eof);
-        }
-        else
-        {
-            reenter (this)
-            {
-                yield oc->async_read(*msg, *this);
-                BOOST_CHECK_EQUAL(*msg, 10);
+            yield oc->async_read(*msg, *this);
+            BOOST_REQUIRE(!ec);
+            BOOST_CHECK_EQUAL(*msg, 10);
 
-                *msg = 100;
-                yield oc->async_write(*msg, *this);
+            *msg = 100;
+            yield oc->async_write(*msg, *this);
+            BOOST_REQUIRE(!ec);
 
-                yield oc->async_read(*msg, *this);
-                BOOST_CHECK_EQUAL(*msg, 20);
+            yield oc->async_read(*msg, *this);
+            BOOST_REQUIRE(!ec);
+            BOOST_CHECK_EQUAL(*msg, 20);
 
-                *msg = 200;
-                yield oc->async_write(*msg, *this);
+            *msg = 200;
+            yield oc->async_write(*msg, *this);
+            BOOST_REQUIRE(!ec);
 
-                wait_eof = true;
-                yield oc->async_read(*msg, *this);
-            }
+            yield oc->async_read(*msg, *this);
+            BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
         }
     }
 #include <boost/asio/unyield.hpp>
