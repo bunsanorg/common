@@ -14,9 +14,9 @@ BOOST_AUTO_TEST_SUITE(asio)
 
 namespace ba = bunsan::asio;
 
-struct serialization_factory
+struct socket_pair_fixture
 {
-    serialization_factory():
+    socket_pair_fixture():
         socket1(io_service),
         socket2(io_service)
     {
@@ -28,7 +28,7 @@ struct serialization_factory
     socket socket1, socket2;
 };
 
-BOOST_FIXTURE_TEST_SUITE(serialization, serialization_factory)
+BOOST_FIXTURE_TEST_SUITE(serialization, socket_pair_fixture)
 
 BOOST_AUTO_TEST_CASE(block_connection)
 {
@@ -96,8 +96,8 @@ BOOST_AUTO_TEST_CASE(block_connection)
 }
 
 typedef boost::mpl::list<
-            ba::binary_object_connection<serialization_factory::socket>,
-            ba::text_object_connection<serialization_factory::socket>
+            ba::binary_object_connection<socket_pair_fixture::socket>,
+            ba::text_object_connection<socket_pair_fixture::socket>
         > object_connections;
 
 template <typename T>
@@ -152,7 +152,7 @@ private:
 template <typename ObjectConnection>
 struct session: boost::asio::coroutine
 {
-    explicit session(serialization_factory::socket &socket_):
+    explicit session(socket_pair_fixture::socket &socket_):
         oc(std::make_shared<ObjectConnection>(socket_)),
         msg(std::make_shared<message<int>>()) {}
 
@@ -173,24 +173,22 @@ struct server_session: session<ObjectConnection>
             boost::system::error_code{})
     {
         BOOST_REQUIRE(!ec);
-        if (!ec)
+
+        reenter (this)
         {
-            reenter (this)
-            {
-                *msg = 10;
-                yield oc->async_write(*msg, *this);
+            *msg = 10;
+            yield oc->async_write(*msg, *this);
 
-                yield oc->async_read(*msg, *this);
-                BOOST_CHECK_EQUAL(*msg, 100);
+            yield oc->async_read(*msg, *this);
+            BOOST_CHECK_EQUAL(*msg, 100);
 
-                *msg = 20;
-                yield oc->async_write(*msg, *this);
+            *msg = 20;
+            yield oc->async_write(*msg, *this);
 
-                yield oc->async_read(*msg, *this);
-                BOOST_CHECK_EQUAL(*msg, 200);
+            yield oc->async_read(*msg, *this);
+            BOOST_CHECK_EQUAL(*msg, 200);
 
-                oc->close();
-            }
+            oc->close();
         }
     }
 #include <boost/asio/unyield.hpp>
@@ -210,6 +208,8 @@ struct client_session: session<ObjectConnection>
     {
         reenter (this)
         {
+            BOOST_REQUIRE(!ec);
+
             yield oc->async_read(*msg, *this);
             BOOST_REQUIRE(!ec);
             BOOST_CHECK_EQUAL(*msg, 10);
