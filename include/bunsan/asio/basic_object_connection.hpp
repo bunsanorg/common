@@ -3,13 +3,14 @@
 #include <bunsan/asio/block_connection.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <sstream>
 
 namespace bunsan{namespace asio
 {
     template <typename IArchive, typename OArchive, typename Connection>
-    class basic_object_connection
+    class basic_object_connection: private boost::noncopyable
     {
     public:
         explicit basic_object_connection(Connection &connection):
