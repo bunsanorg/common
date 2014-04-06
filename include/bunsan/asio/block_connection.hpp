@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bunsan/asio/async_result.hpp>
+
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -17,8 +19,17 @@ namespace bunsan{namespace asio
             m_connection(connection) {}
 
         template <typename Handler>
-        void async_write(const std::string &data, Handler handler)
+        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
+            void (boost::system::error_code))
+        async_write(const std::string &data, Handler &&handler)
         {
+            BUNSAN_ASIO_INITFN_BEGIN(
+                Handler, handler,
+                void (boost::system::error_code),
+                real_handler,
+                result
+            )
+
             std::ostringstream header_stream;
             const header size = data.size();
             header_stream << std::setw(HEADER_SIZE) << std::hex << size;
@@ -27,7 +38,7 @@ namespace bunsan{namespace asio
                 boost::system::error_code error(
                     boost::asio::error::invalid_argument);
                 get_io_service().post(
-                    std::bind(handler, error)
+                    std::bind(real_handler, error)
                 );
             }
             m_outbound_header = header_stream.str();
@@ -37,27 +48,40 @@ namespace bunsan{namespace asio
                 boost::asio::buffer(data)
             };
             boost::asio::async_write(m_connection, buffers,
-                [handler](
+                [real_handler](
                     const boost::system::error_code &ec,
                     const std::size_t) mutable
                 {
-                    handler(ec);
+                    real_handler(ec);
                 });
+
+            BUNSAN_ASIO_INITFN_END(result)
         }
 
         template <typename Handler>
-        void async_read(std::string &data, Handler handler)
+        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
+            void (boost::system::error_code))
+        async_read(std::string &data, Handler &&handler)
         {
+            BUNSAN_ASIO_INITFN_BEGIN(
+                Handler, handler,
+                void (boost::system::error_code),
+                real_handler,
+                result
+            )
+
             boost::asio::async_read(
                 m_connection,
                 boost::asio::buffer(m_inbound_header),
-                [this, &data, handler](
+                [this, &data, real_handler](
                     const boost::system::error_code &ec,
                     const std::size_t)
                 {
-                    handle_read_header(ec, data, handler);
+                    handle_read_header(ec, data, real_handler);
                 }
             );
+
+            BUNSAN_ASIO_INITFN_END(result)
         }
 
         boost::asio::io_service &get_io_service()

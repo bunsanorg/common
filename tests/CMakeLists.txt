@@ -1,4 +1,7 @@
 bunsan_testing_project_header()
+
+bunsan_use_boost(coroutine)
+
 bunsan_testing_project_aux_add_tests()
 
 add_subdirectory(generators)

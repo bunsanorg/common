@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bunsan/asio/async_result.hpp>
 #include <bunsan/asio/block_connection.hpp>
 
 #include <boost/asio.hpp>
@@ -17,24 +18,46 @@ namespace bunsan{namespace asio
             m_block_connection(connection) {}
 
         template <typename T, typename Handler>
-        void async_write(const T &obj, Handler handler)
+        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
+            void (boost::system::error_code))
+        async_write(const T &obj, Handler &&handler)
         {
+            BUNSAN_ASIO_INITFN_BEGIN(
+                Handler, handler,
+                void (boost::system::error_code),
+                real_handler,
+                result
+            )
+
             std::ostringstream sout;
             {
                 OArchive oa(sout);
                 oa << obj;
             }
-            m_block_connection.async_write(sout.str(), handler);
+            m_block_connection.async_write(sout.str(), real_handler);
+
+            BUNSAN_ASIO_INITFN_END(result)
         }
 
         template <typename T, typename Handler>
-        void async_read(T &obj, Handler handler)
+        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
+            void (boost::system::error_code))
+        async_read(T &obj, Handler &&handler)
         {
+            BUNSAN_ASIO_INITFN_BEGIN(
+                Handler, handler,
+                void (boost::system::error_code),
+                real_handler,
+                result
+            )
+
             m_block_connection.async_read(data_,
-                [this, &obj, handler](const boost::system::error_code &ec)
+                [this, &obj, real_handler](const boost::system::error_code &ec)
                 {
-                    handle_read(ec, obj, handler);
+                    handle_read(ec, obj, real_handler);
                 });
+
+            BUNSAN_ASIO_INITFN_END(result)
         }
 
         boost::asio::io_service &get_io_service()

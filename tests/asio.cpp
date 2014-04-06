@@ -6,6 +6,7 @@
 #include <bunsan/asio/text_object_connection.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -246,6 +247,58 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(
 
     server();
     client();
+
+    io_service.run();
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(
+    object_connection_spawn,
+    ObjectConnection,
+    object_connections)
+{
+    boost::asio::spawn(io_service,
+        [&](boost::asio::yield_context yield)
+        {
+            ObjectConnection oc(socket1);
+            message<int> msg;
+
+            msg = 10;
+            oc.async_write(msg, yield);
+
+            oc.async_read(msg, yield);
+            BOOST_CHECK_EQUAL(msg, 100);
+
+            msg = 20;
+            oc.async_write(msg, yield);
+
+            oc.async_read(msg, yield);
+            BOOST_CHECK_EQUAL(msg, 200);
+
+            oc.close();
+        });
+
+    boost::asio::spawn(io_service,
+        [&](boost::asio::yield_context yield)
+        {
+            ObjectConnection oc(socket2);
+            message<int> msg;
+
+            oc.async_read(msg, yield);
+            BOOST_CHECK_EQUAL(msg, 10);
+
+            msg = 100;
+            oc.async_write(msg, yield);
+
+            oc.async_read(msg, yield);
+            BOOST_CHECK_EQUAL(msg, 20);
+
+            msg = 200;
+            oc.async_write(msg, yield);
+
+            boost::system::error_code ec;
+            oc.async_read(msg, yield[ec]);
+            BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+        });
 
     io_service.run();
 }
