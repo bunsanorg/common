@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <functional>
 #include <iomanip>
@@ -9,7 +10,7 @@
 namespace bunsan{namespace asio
 {
     template <typename Connection>
-    class block_connection
+    class block_connection: private boost::noncopyable
     {
     public:
         explicit block_connection(Connection &connection):
