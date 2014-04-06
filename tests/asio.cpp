@@ -3,6 +3,7 @@
 
 #include <bunsan/asio/binary_object_connection.hpp>
 #include <bunsan/asio/block_connection.hpp>
+#include <bunsan/asio/queued_writer.hpp>
 #include <bunsan/asio/text_object_connection.hpp>
 
 #include <boost/asio.hpp>
@@ -10,6 +11,8 @@
 #include <boost/mpl/list.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
 
 BOOST_AUTO_TEST_SUITE(asio)
 
@@ -371,5 +374,92 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(
 }
 
 BOOST_AUTO_TEST_SUITE_END() // serialization
+
+BOOST_FIXTURE_TEST_SUITE(queued_writer, socket_pair_fixture)
+
+struct data
+{
+    template <typename Archive>
+    void serialize(Archive &ar, const unsigned int)
+    {
+        ar & BOOST_SERIALIZATION_NVP(thread);
+        ar & BOOST_SERIALIZATION_NVP(iteration);
+    }
+
+    std::size_t thread = 0;
+    std::size_t iteration = 0;
+};
+
+constexpr std::size_t worker_number = 10;
+constexpr std::size_t thread_number = 4;
+constexpr std::size_t thread_iterations = 100;
+constexpr std::size_t iterations = thread_number * thread_iterations;
+
+BOOST_AUTO_TEST_CASE(test)
+{
+    ba::text_object_connection<
+        socket_pair_fixture::socket
+    > oc1(socket1), oc2(socket2);
+    ba::queued_writer<
+        data,
+        decltype(oc1)
+    > writer(oc1);
+
+    boost::thread_group threads;
+
+    boost::barrier start_barrier(thread_number);
+    boost::barrier close_barrier(thread_number);
+
+    boost::asio::spawn(io_service,
+        [&](boost::asio::yield_context yield)
+        {
+            data msg;
+            std::vector<std::size_t> thread_iteration(thread_number);
+
+            for (std::size_t iteration = 0; iteration < iterations; ++iteration)
+            {
+                BOOST_TEST_MESSAGE(iteration << " iteration");
+
+                oc2.async_read(msg, yield);
+
+                BOOST_TEST_MESSAGE(msg.thread << ": " << msg.iteration);
+                BOOST_REQUIRE_LT(msg.thread, thread_number);
+                BOOST_REQUIRE_EQUAL(msg.iteration, thread_iteration[msg.thread]++);
+            }
+
+            boost::system::error_code ec;
+            oc2.async_read(msg, yield[ec]);
+            BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+        });
+
+    for (std::size_t i = 0; i < worker_number; ++i)
+        threads.create_thread(boost::bind(
+            &boost::asio::io_service::run,
+            &io_service
+        ));
+
+    for (std::size_t thread = 0; thread < thread_number; ++thread)
+    {
+        threads.create_thread(
+            [&, thread]()
+            {
+                start_barrier.wait();
+
+                data d;
+                d.thread = thread;
+                for (std::size_t i = 0; i < thread_iterations; ++i)
+                {
+                    d.iteration = i;
+                    writer.write(d);
+                }
+
+                if (close_barrier.wait())
+                    writer.close();
+            });
+    }
+    threads.join_all();
+}
+
+BOOST_AUTO_TEST_SUITE_END() // queued_writer
 
 BOOST_AUTO_TEST_SUITE_END() // asio
