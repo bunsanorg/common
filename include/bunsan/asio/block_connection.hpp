@@ -116,6 +116,7 @@ namespace bunsan{namespace asio
                     boost::system::error_code error(
                         boost::asio::error::invalid_argument);
                     handler(error);
+                    return;
                 }
 
                 m_inbound_data.resize(size);
