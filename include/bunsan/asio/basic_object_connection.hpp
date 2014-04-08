@@ -22,21 +22,17 @@ namespace bunsan{namespace asio
             void (boost::system::error_code))
         async_write(const T &obj, Handler &&handler)
         {
-            BUNSAN_ASIO_INITFN_BEGIN(
-                Handler, handler,
-                void (boost::system::error_code),
-                real_handler,
-                result
-            )
-
             std::ostringstream sout;
             {
                 OArchive oa(sout);
                 oa << obj;
             }
-            m_block_connection.async_write(sout.str(), real_handler);
+            m_outbound_data = sout.str();
 
-            BUNSAN_ASIO_INITFN_END(result)
+            return m_block_connection.async_write(
+                m_outbound_data,
+                std::forward<Handler>(handler)
+            );
         }
 
         template <typename T, typename Handler>
@@ -51,7 +47,7 @@ namespace bunsan{namespace asio
                 result
             )
 
-            m_block_connection.async_read(data_,
+            m_block_connection.async_read(m_inbound_data,
                 [this, &obj, real_handler](const boost::system::error_code &ec)
                 {
                     handle_read(ec, obj, real_handler);
@@ -83,7 +79,7 @@ namespace bunsan{namespace asio
             }
             else
             {
-                std::istringstream sin(data_);
+                std::istringstream sin(m_inbound_data);
                 try
                 {
                     IArchive ia(sin);
@@ -102,6 +98,7 @@ namespace bunsan{namespace asio
 
     private:
         block_connection<Connection> m_block_connection;
-        std::string data_;
+        std::string m_inbound_data;
+        std::string m_outbound_data;
     };
 }}
