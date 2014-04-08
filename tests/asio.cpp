@@ -392,7 +392,7 @@ struct data
 
 constexpr std::size_t worker_number = 10;
 constexpr std::size_t thread_number = 4;
-constexpr std::size_t thread_iterations = 100;
+constexpr std::size_t thread_iterations = 20;
 constexpr std::size_t iterations = thread_number * thread_iterations;
 
 BOOST_AUTO_TEST_CASE(test)
@@ -410,27 +410,36 @@ BOOST_AUTO_TEST_CASE(test)
     boost::barrier start_barrier(thread_number);
     boost::barrier close_barrier(thread_number);
 
-    boost::asio::spawn(io_service,
-        [&](boost::asio::yield_context yield)
+    data msg;
+    std::vector<std::size_t> thread_iteration(thread_number);
+    std::size_t iteration = 0;
+
+    boost::function<void ()> read;
+
+    const auto handle_read =
+        [&](const boost::system::error_code &ec)
         {
-            data msg;
-            std::vector<std::size_t> thread_iteration(thread_number);
-
-            for (std::size_t iteration = 0; iteration < iterations; ++iteration)
+            if (ec)
             {
-                BOOST_TEST_MESSAGE(iteration << " iteration");
-
-                oc2.async_read(msg, yield);
-
-                BOOST_TEST_MESSAGE(msg.thread << ": " << msg.iteration);
-                BOOST_REQUIRE_LT(msg.thread, thread_number);
-                BOOST_REQUIRE_EQUAL(msg.iteration, thread_iteration[msg.thread]++);
+                BOOST_REQUIRE_EQUAL(iteration, iterations);
+                BOOST_REQUIRE(ec == boost::asio::error::eof);
+                return;
             }
 
-            boost::system::error_code ec;
-            oc2.async_read(msg, yield[ec]);
-            BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
-        });
+            BOOST_REQUIRE_LT(msg.thread, thread_number);
+            BOOST_REQUIRE_EQUAL(msg.iteration, thread_iteration[msg.thread]++);
+            ++iteration;
+
+            read();
+        };
+
+    read =
+        [&]()
+        {
+            oc2.async_read(msg, handle_read);
+        };
+
+    read();
 
     for (std::size_t i = 0; i < worker_number; ++i)
         threads.create_thread(boost::bind(

@@ -15,7 +15,7 @@ namespace bunsan{namespace asio
     {
     public:
         typedef boost::function<
-            void (const boost::system::error_code &)
+            void (boost::system::error_code)
         > write_handler;
 
     public:
