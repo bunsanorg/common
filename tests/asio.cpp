@@ -501,4 +501,124 @@ BOOST_AUTO_TEST_CASE(test)
 
 BOOST_AUTO_TEST_SUITE_END() // queued_writer
 
+BOOST_FIXTURE_TEST_SUITE(buffer_connection, local_socket_fixture)
+
+constexpr std::size_t worker_number = 10;
+
+const std::vector<std::string> message = {
+    "hello",
+    "world",
+    "this",
+    "is",
+    "some",
+    "asynchronous",
+    "message",
+    "just",
+    "list",
+    "of",
+    "strings"
+};
+
+std::size_t message_size()
+{
+    std::size_t size = 0;
+    for (const auto &msg: message)
+        size += msg.size();
+    return size;
+}
+
+constexpr std::size_t message_number = 1000;
+
+void writer(socket_pair_fixture::socket &socket)
+{
+    for (std::size_t i = 0; i < message_number; ++i)
+    {
+        for (const std::string &msg: message)
+            boost::asio::write(socket, boost::asio::buffer(msg));
+    }
+    socket.close();
+}
+
+void reader(socket_pair_fixture::socket &socket)
+{
+    std::vector<char> buffer;
+    for (std::size_t i = 0; i < message_number; ++i)
+    {
+        for (const std::string &msg: message)
+        {
+            buffer.resize(msg.size());
+            const std::size_t size = boost::asio::read(
+                socket,
+                boost::asio::buffer(buffer)
+            );
+            BOOST_ASSERT(size == buffer.size());
+            const std::string actual_msg(buffer.data(), buffer.size());
+            BOOST_ASSERT(actual_msg == msg);
+        }
+    }
+    buffer.resize(1);
+    boost::system::error_code ec;
+    const std::size_t size = boost::asio::read(
+        socket,
+        boost::asio::buffer(buffer),
+        ec
+    );
+    BOOST_ASSERT(ec == boost::asio::error::eof);
+    BOOST_ASSERT(size == 0);
+}
+
+BOOST_AUTO_TEST_CASE(test)
+{
+    boost::thread_group threads;
+
+    std::size_t read_size = 0, write_size = 0;
+    bool eof = false;
+
+    ba::buffer_connection<socket, socket> buffer(
+        pair(0).second,
+        pair(1).first,
+        [&](const boost::system::error_code &ec, const std::size_t size)
+        {
+            read_size += size;
+            if (ec)
+            {
+                BOOST_ASSERT(ec == boost::asio::error::eof);
+                BOOST_ASSERT(!eof);
+                eof = true;
+            }
+        },
+        [&](const boost::system::error_code &ec, const std::size_t size)
+        {
+            write_size += size;
+            BOOST_ASSERT(!ec);
+        }
+    );
+    buffer.start();
+
+    for (std::size_t i = 0; i < worker_number; ++i)
+        threads.create_thread(boost::bind(
+            &boost::asio::io_service::run,
+            &io_service
+        ));
+
+    threads.create_thread(boost::bind(
+        writer,
+        boost::ref(pair(0).first)
+    ));
+
+    threads.create_thread(boost::bind(
+        reader,
+        boost::ref(pair(1).second)
+    ));
+
+    threads.join_all();
+
+    BOOST_CHECK(eof);
+    const std::size_t expected_size = message_number * message_size();
+    BOOST_CHECK_EQUAL(write_size, expected_size);
+    BOOST_CHECK_EQUAL(read_size, expected_size);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // buffer_connection
+
 BOOST_AUTO_TEST_SUITE_END() // asio
