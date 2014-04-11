@@ -50,13 +50,13 @@ namespace bunsan{namespace asio
         void close()
         {
             m_strand.dispatch(boost::bind(
-                &buffer_connection::finish,
+                &buffer_connection::close_,
                 this
             ));
         }
 
     private:
-        void finish()
+        void close_()
         {
             if (m_last)
                 return;
