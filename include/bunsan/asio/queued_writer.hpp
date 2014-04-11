@@ -47,6 +47,14 @@ namespace bunsan{namespace asio
             ));
         }
 
+        void terminate()
+        {
+            m_strand.post(boost::bind(
+                &queued_writer<T, Connection>::terminate_,
+                this
+            ));
+        }
+
     private:
         void push(T object)
         {
@@ -66,6 +74,12 @@ namespace bunsan{namespace asio
             m_last = true;
             if (m_queue.empty())
                 m_connection.close();
+        }
+
+        void terminate_()
+        {
+            m_last = true;
+            m_connection.close();
         }
 
         void spawn_writer()
