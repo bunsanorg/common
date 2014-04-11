@@ -42,7 +42,7 @@ namespace bunsan{namespace asio
         void close()
         {
             m_strand.post(boost::bind(
-                &queued_writer<T, Connection>::finish,
+                &queued_writer<T, Connection>::close_,
                 this
             ));
         }
@@ -58,7 +58,7 @@ namespace bunsan{namespace asio
             }
         }
 
-        void finish()
+        void close_()
         {
             if (m_last)
                 return;
