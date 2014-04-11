@@ -55,6 +55,14 @@ namespace bunsan{namespace asio
             ));
         }
 
+        void terminate()
+        {
+            m_strand.post(boost::bind(
+                &buffer_connection::terminate_,
+                this
+            ));
+        }
+
     private:
         void close_()
         {
@@ -66,8 +74,19 @@ namespace bunsan{namespace asio
                 m_sink.close();
         }
 
+        void terminate_()
+        {
+            m_last = true;
+            m_terminated = true;
+            m_source.close();
+            m_sink.close();
+        }
+
         void spawn_reader()
         {
+            if (m_terminated)
+                return;
+
             m_source.async_read_some(
                 boost::asio::buffer(m_inbound_data),
                 m_strand.wrap(boost::bind(
@@ -81,6 +100,9 @@ namespace bunsan{namespace asio
 
         void spawn_writer()
         {
+            if (m_terminated)
+                return;
+
             const std::vector<char> &buffer = m_queue.front();
             boost::asio::async_write(
                 m_sink,
@@ -149,5 +171,6 @@ namespace bunsan{namespace asio
         char m_inbound_data[4096];
         std::deque<std::vector<char>> m_queue;
         bool m_last = false;
+        bool m_terminated = false;
     };
 }}
