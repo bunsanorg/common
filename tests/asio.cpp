@@ -3,6 +3,7 @@
 
 #include <bunsan/asio/binary_object_connection.hpp>
 #include <bunsan/asio/block_connection.hpp>
+#include <bunsan/asio/buffer_connection.hpp>
 #include <bunsan/asio/queued_writer.hpp>
 #include <bunsan/asio/text_object_connection.hpp>
 
@@ -18,18 +19,47 @@ BOOST_AUTO_TEST_SUITE(asio)
 
 namespace ba = bunsan::asio;
 
-struct socket_pair_fixture
+struct local_socket_fixture
 {
-    socket_pair_fixture():
-        socket1(io_service),
-        socket2(io_service)
+    typedef boost::asio::local::stream_protocol::socket socket;
+
+    struct socket_pair
     {
-        boost::asio::local::connect_pair(socket1, socket2);
+        explicit socket_pair(boost::asio::io_service &io_service):
+            first(io_service),
+            second(io_service)
+        {}
+
+        socket first, second;
+    };
+
+    socket_pair &pair(const std::size_t index)
+    {
+        if (index >= pairs.size())
+            pairs.resize(index + 1);
+        if (!pairs[index])
+        {
+            pairs[index].reset(new socket_pair(io_service));
+            boost::asio::local::connect_pair(
+                pairs[index]->first,
+                pairs[index]->second
+            );
+        }
+        return *pairs[index];
     }
 
-    typedef boost::asio::local::stream_protocol::socket socket;
     boost::asio::io_service io_service;
-    socket socket1, socket2;
+    std::vector<std::unique_ptr<socket_pair>> pairs;
+};
+
+struct socket_pair_fixture: local_socket_fixture
+{
+    socket_pair_fixture():
+        socket1(pair(0).first),
+        socket2(pair(0).second)
+    {}
+
+    socket &socket1, &socket2;
 };
 
 BOOST_FIXTURE_TEST_SUITE(serialization, socket_pair_fixture)
