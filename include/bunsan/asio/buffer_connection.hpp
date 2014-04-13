@@ -34,6 +34,14 @@ namespace bunsan{namespace asio
         buffer_connection(Source &source, Sink &sink):
             buffer_connection(source, sink, handler{}, handler{}) {}
 
+        bool close_sink_on_eof() const { return m_close_sink_on_eof; }
+
+        /// \warning not thread safe, must be executed before start()
+        void set_close_sink_on_eof(const bool value=true)
+        {
+            m_close_sink_on_eof = value;
+        }
+
         void start()
         {
             m_strand.dispatch(boost::bind(
@@ -152,7 +160,7 @@ namespace bunsan{namespace asio
             m_queue.pop_front();
             if (m_queue.empty())
             {
-                if (m_last)
+                if (m_last && m_close_sink_on_eof)
                     m_sink.close();
             }
             else
@@ -172,5 +180,7 @@ namespace bunsan{namespace asio
         std::deque<std::vector<char>> m_queue;
         bool m_last = false;
         bool m_terminated = false;
+
+        bool m_close_sink_on_eof = true;
     };
 }}
