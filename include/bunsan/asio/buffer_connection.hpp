@@ -42,6 +42,14 @@ namespace bunsan{namespace asio
             m_close_sink_on_eof = value;
         }
 
+        bool discard_on_sink_error() const { return m_discard_on_sink_error; }
+
+        /// \warning not thread safe, must be executed before start()
+        void set_discard_on_sink_error(const bool value=true)
+        {
+            m_discard_on_sink_error = value;
+        }
+
         void start()
         {
             m_strand.dispatch(boost::bind(
@@ -111,6 +119,13 @@ namespace bunsan{namespace asio
             if (m_terminated)
                 return;
 
+            if (!m_sink_ok)
+            {
+                if (m_discard_on_sink_error)
+                    m_queue.clear();
+                return;
+            }
+
             const std::vector<char> &buffer = m_queue.front();
             boost::asio::async_write(
                 m_sink,
@@ -131,20 +146,28 @@ namespace bunsan{namespace asio
             if (m_handle_read)
                 m_handle_read(ec, size);
 
-            m_queue.emplace_back(
-                m_inbound_data,
-                m_inbound_data + size
-            );
+            if (size && (m_sink_ok || !m_discard_on_sink_error))
+            {
+                m_queue.emplace_back(
+                    m_inbound_data,
+                    m_inbound_data + size
+                );
 
-            if (m_queue.size() == 1)
-            { // queue was empty before, writer is required
-                spawn_writer();
+                if (m_queue.size() == 1)
+                { // queue was empty before, writer is required
+                    spawn_writer();
+                }
             }
 
             if (ec || m_last)
+            {
+                m_source_ok = false;
                 m_last = true;
+            }
             else
+            {
                 spawn_reader();
+            }
         }
 
         void handle_write(
@@ -154,10 +177,29 @@ namespace bunsan{namespace asio
             if (m_handle_write)
                 m_handle_write(ec, size);
 
-            if (ec)
-                return;
+            if (size)
+            {
+                if (size < m_queue.front().size())
+                {
+                    BOOST_ASSERT(ec);
+                    m_queue.front().erase(
+                        m_queue.front().begin(),
+                        m_queue.front().begin() + size
+                    );
+                }
+                else
+                {
+                    BOOST_ASSERT(size == m_queue.front().size());
+                    m_queue.pop_front();
+                }
+            }
 
-            m_queue.pop_front();
+            if (ec)
+            {
+                m_sink_ok = false;
+                return;
+            }
+
             if (m_queue.empty())
             {
                 if (m_last && m_close_sink_on_eof)
@@ -181,6 +223,10 @@ namespace bunsan{namespace asio
         bool m_last = false;
         bool m_terminated = false;
 
+        bool m_source_ok = true;
+        bool m_sink_ok = true;
+
         bool m_close_sink_on_eof = true;
+        bool m_discard_on_sink_error = false;
     };
 }}
