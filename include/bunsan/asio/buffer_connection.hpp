@@ -82,17 +82,17 @@ namespace bunsan{namespace asio
     private:
         void close_()
         {
-            if (m_last)
+            if (m_closed)
                 return;
 
-            m_last = true;
+            m_closed = true;
             if (m_queue.empty())
                 m_sink.close();
         }
 
         void terminate_()
         {
-            m_last = true;
+            m_closed = true;
             m_terminated = true;
             m_source.close();
             m_sink.close();
@@ -159,15 +159,10 @@ namespace bunsan{namespace asio
                 }
             }
 
-            if (ec || m_last)
-            {
+            if (ec)
                 m_source_ok = false;
-                m_last = true;
-            }
-            else
-            {
+            else if (!m_closed)
                 spawn_reader();
-            }
         }
 
         void handle_write(
@@ -202,7 +197,7 @@ namespace bunsan{namespace asio
 
             if (m_queue.empty())
             {
-                if (m_last && m_close_sink_on_eof)
+                if (m_closed || (!m_source_ok && m_close_sink_on_eof))
                     m_sink.close();
             }
             else
@@ -220,7 +215,7 @@ namespace bunsan{namespace asio
 
         char m_inbound_data[4096];
         std::deque<std::vector<char>> m_queue;
-        bool m_last = false;
+        bool m_closed = false;
         bool m_terminated = false;
 
         bool m_source_ok = true;
