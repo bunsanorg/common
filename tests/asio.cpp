@@ -131,9 +131,9 @@ BOOST_AUTO_TEST_CASE(block_connection)
 }
 
 typedef boost::mpl::list<
-            ba::binary_object_connection<socket_pair_fixture::socket>,
-            ba::text_object_connection<socket_pair_fixture::socket>
-        > object_connections;
+    ba::binary_object_connection<socket_pair_fixture::socket>,
+    ba::text_object_connection<socket_pair_fixture::socket>
+> object_connections;
 
 template <typename T>
 class message
