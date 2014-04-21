@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/mpl/list.hpp>
+#include <boost/mpl/size_t.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 #include <boost/thread.hpp>
@@ -527,8 +528,7 @@ std::size_t message_size()
     return size;
 }
 
-constexpr std::size_t message_number = 1000;
-
+template <std::size_t message_number>
 void writer(socket_pair_fixture::socket &socket)
 {
     for (std::size_t i = 0; i < message_number; ++i)
@@ -539,6 +539,7 @@ void writer(socket_pair_fixture::socket &socket)
     socket.close();
 }
 
+template <std::size_t message_number>
 void reader(socket_pair_fixture::socket &socket)
 {
     std::vector<char> buffer;
@@ -567,8 +568,15 @@ void reader(socket_pair_fixture::socket &socket)
     BOOST_ASSERT(size == 0);
 }
 
-BOOST_AUTO_TEST_CASE(test)
+typedef boost::mpl::list<
+    boost::mpl::size_t<1000>,
+    boost::mpl::size_t<0>
+> message_numbers;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test, MessageNumber, message_numbers)
 {
+    constexpr std::size_t message_number = MessageNumber::value;
+
     boost::thread_group threads;
 
     std::size_t read_size = 0, write_size = 0;
@@ -602,12 +610,12 @@ BOOST_AUTO_TEST_CASE(test)
         ));
 
     threads.create_thread(boost::bind(
-        writer,
+        writer<message_number>,
         boost::ref(pair(0).first)
     ));
 
     threads.create_thread(boost::bind(
-        reader,
+        reader<message_number>,
         boost::ref(pair(1).second)
     ));
 

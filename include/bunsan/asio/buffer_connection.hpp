@@ -163,6 +163,9 @@ namespace bunsan{namespace asio
                 m_source_ok = false;
             else if (!m_closed)
                 spawn_reader();
+
+            if (m_queue.empty())
+                try_close_sink();
         }
 
         void handle_write(
@@ -196,14 +199,15 @@ namespace bunsan{namespace asio
             }
 
             if (m_queue.empty())
-            {
-                if (m_closed || (!m_source_ok && m_close_sink_on_eof))
-                    m_sink.close();
-            }
+                try_close_sink();
             else
-            {
                 spawn_writer();
-            }
+        }
+
+        void try_close_sink()
+        {
+            if (m_closed || (!m_source_ok && m_close_sink_on_eof))
+                m_sink.close();
         }
 
     private:
