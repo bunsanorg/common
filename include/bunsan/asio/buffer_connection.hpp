@@ -65,6 +65,11 @@ namespace bunsan{namespace asio
             m_discard_on_sink_error = value;
         }
 
+        bool empty() const
+        {
+            return m_queue.empty();
+        }
+
         void start()
         {
             m_strand.dispatch(boost::bind(
