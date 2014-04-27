@@ -18,6 +18,11 @@ namespace bunsan{namespace asio
             void (boost::system::error_code, std::size_t)
         > handler;
 
+        // note: (nullptr, 0) on EOF or close
+        typedef boost::function<
+            void (const char *, std::size_t)
+        > data_handler;
+
     public:
         buffer_connection(
             Source &source,
@@ -33,6 +38,16 @@ namespace bunsan{namespace asio
 
         buffer_connection(Source &source, Sink &sink):
             buffer_connection(source, sink, handler{}, handler{}) {}
+
+        void set_read_data_handler(const data_handler &handle_data)
+        {
+            m_handle_read_data = handle_data;
+        }
+
+        void set_write_data_handler(const data_handler &handle_data)
+        {
+            m_handle_write_data = handle_data;
+        }
 
         bool close_sink_on_eof() const { return m_close_sink_on_eof; }
 
@@ -152,6 +167,8 @@ namespace bunsan{namespace asio
                     m_inbound_data,
                     m_inbound_data + size
                 );
+                if (m_handle_read_data)
+                    m_handle_read_data(m_inbound_data, size);
 
                 if (m_queue.size() == 1)
                 { // queue was empty before, writer is required
@@ -160,9 +177,15 @@ namespace bunsan{namespace asio
             }
 
             if (ec)
+            {
+                if (m_handle_read_data)
+                    m_handle_read_data(nullptr, 0);
                 m_source_ok = false;
+            }
             else if (!m_closed)
+            {
                 spawn_reader();
+            }
 
             if (m_queue.empty())
                 try_close_sink();
@@ -177,6 +200,8 @@ namespace bunsan{namespace asio
 
             if (size)
             {
+                if (m_handle_write_data)
+                    m_handle_write_data(m_queue.front().data(), size);
                 if (size < m_queue.front().size())
                 {
                     BOOST_ASSERT(ec);
@@ -207,13 +232,19 @@ namespace bunsan{namespace asio
         void try_close_sink()
         {
             if (m_closed || (!m_source_ok && m_close_sink_on_eof))
+            {
+                if (m_handle_write_data)
+                    m_handle_write_data(nullptr, 0);
                 m_sink.close();
+            }
         }
 
     private:
         boost::asio::io_service::strand m_strand;
         handler m_handle_read;
         handler m_handle_write;
+        data_handler m_handle_read_data;
+        data_handler m_handle_write_data;
         Source &m_source;
         Sink &m_sink;
 
