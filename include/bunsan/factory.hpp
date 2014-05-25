@@ -4,7 +4,6 @@
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/iterator/transform_iterator.hpp>
-#include <boost/optional.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -17,7 +16,10 @@ namespace bunsan
 {
     struct unknown_factory_error: virtual error
     {
-        typedef boost::error_info<struct tag_factory_type, std::string> factory_type;
+        typedef boost::error_info<
+            struct tag_factory_type,
+            std::string
+        > factory_type;
     };
 }
 
@@ -29,9 +31,10 @@ namespace bunsan{namespace detail
      * bunsan::factory is abstract factory implementation, where each derived
      * class is registered in abstract factory by std::string identifier
      * on library load using bunsan::factory::register_new().
-     * Later instance of this type may be created using bunsan::factory::instance().
+     * Later instance of this type may be created by bunsan::factory::instance().
      *
-     * \note We need class name different than "factory" to use it as member function's.
+     * \note We need class name different than "factory"
+     * to use it as member function's.
      */
     template <typename Signature, typename UnknownError>
     class factory_base;
@@ -44,12 +47,16 @@ namespace bunsan{namespace detail
         typedef std::function<Result (Args...)> factory_type;
         typedef UnknownError unknown_error;
         typedef std::string key_type;
-        typedef std::integral_constant<std::size_t, sizeof...(Args)> arguments_size;
+        typedef std::integral_constant<
+            std::size_t,
+            sizeof...(Args)
+        > arguments_size;
         typedef std::unordered_map<key_type, factory_type> map_type;
         typedef typename map_type::value_type value_type;
         typedef typename map_type::const_iterator map_const_iterator;
 
-        struct iterator_converter: std::unary_function<const value_type &, const key_type &>
+        struct iterator_converter:
+            std::unary_function<const value_type &, const key_type &>
         {
             const key_type &operator()(const value_type &pair) const
             {
@@ -57,7 +64,10 @@ namespace bunsan{namespace detail
             }
         };
 
-        typedef boost::transform_iterator<iterator_converter, map_const_iterator> const_iterator;
+        typedef boost::transform_iterator<
+            iterator_converter,
+            map_const_iterator
+        > const_iterator;
         typedef boost::iterator_range<const_iterator> const_range;
 
         /*!
@@ -84,10 +94,11 @@ namespace bunsan{namespace detail
         /*!
          * \brief Returns factory registered with specified identifier.
          *
-         * \throws unknown_factory if factory is not registered
+         * \return Empty factory if it is not registered.
          */
-        static factory_type factory(const map_type *const factories,
-                                    const key_type &type)
+        static factory_type factory_optional(
+            const map_type *const factories,
+            const key_type &type)
         {
             if (factories)
             {
@@ -95,43 +106,20 @@ namespace bunsan{namespace detail
                 if (iter != factories->end())
                     return iter->second;
             }
-            BOOST_THROW_EXCEPTION(unknown_error() <<
-                                  unknown_factory_error::factory_type(type));
+            return factory_type();
         }
 
         /*!
          * \brief Returns factory registered with specified identifier.
          *
-         * \return null if factory is not registered
-         */
-        static boost::optional<factory_type> factory_optional(const map_type *const factories,
-                                                              const key_type &type)
-        {
-            if (factories)
-            {
-                const map_const_iterator iter = factories->find(type);
-                if (iter != factories->end())
-                    return iter->second;
-            }
-            return boost::optional<factory_type>();
-        }
-
-        /*!
-         * \brief Returns new instance of specified type.
-         *
          * \throws unknown_factory if factory is not registered
          */
-        static result_type instance(const map_type *const factories,
-                                    const key_type &type,
-                                    Args &&...args)
+        static factory_type factory(const map_type *const factories,
+                                    const key_type &type)
         {
-            if (factories)
-            {
-                const map_const_iterator iter = factories->find(type);
-                if (iter != factories->end())
-                    // TODO should we assert that it is not nullptr?
-                    return iter->second(std::forward<Args>(args)...);
-            }
+            const factory_type f = factory_optional(factories, type);
+            if (f)
+                return f;
             BOOST_THROW_EXCEPTION(unknown_error() <<
                                   unknown_factory_error::factory_type(type));
         }
@@ -145,14 +133,30 @@ namespace bunsan{namespace detail
                                              const key_type &type,
                                              Args &&...args)
         {
-            if (factories)
-            {
-                const map_const_iterator iter = factories->find(type);
-                if (iter != factories->end())
-                    // TODO should we assert that it is not nullptr?
-                    return iter->second(std::forward<Args>(args)...);
-            }
+            const factory_type f = factory_optional(factories, type);
+            if (f)
+                return f(std::forward<Args>(args)...);
             return result_type();
+        }
+
+        /*!
+         * \brief Returns new instance of specified type.
+         *
+         * \throws unknown_factory if factory is not registered
+         */
+        static result_type instance(const map_type *const factories,
+                                    const key_type &type,
+                                    Args &&...args)
+        {
+            const result_type r = instance_optional(
+                factories,
+                type,
+                std::forward<Args>(args)...
+            );
+            if (r)
+                return r;
+            BOOST_THROW_EXCEPTION(unknown_error() <<
+                                  unknown_factory_error::factory_type(type));
         }
 
         /// Iterate over registered factory identifiers.
@@ -176,6 +180,7 @@ namespace bunsan{namespace detail
 
 namespace bunsan
 {
-    template <typename Signature, typename UnknownError=bunsan::unknown_factory_error>
+    template <typename Signature,
+              typename UnknownError=bunsan::unknown_factory_error>
     using factory = detail::factory_base<Signature, UnknownError>;
 }

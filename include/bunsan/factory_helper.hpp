@@ -31,34 +31,52 @@ namespace bunsan
 #ifdef BUNSAN_FACTORY_BEGIN
 #   error ASSERTION: BUNSAN_FACTORY_BEGIN is in use
 #endif
+
 #define BUNSAN_FACTORY_BEGIN(CLASS, ...) \
 {\
 public: \
-    struct unknown_##CLASS##_error: virtual ::bunsan::unknown_factory_error {}; \
+    struct unknown_##CLASS##_error: \
+        virtual ::bunsan::unknown_factory_error {}; \
     template <typename T> \
     using shared_ptr = std::shared_ptr<T>; \
     typedef shared_ptr<CLASS> CLASS##_ptr; \
-    typedef bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error> bunsan_factory; \
+    typedef bunsan::factory< \
+        CLASS##_ptr (__VA_ARGS__), \
+        unknown_##CLASS##_error \
+    > bunsan_factory; \
     typedef typename bunsan_factory::factory_type factory_type; \
-    static inline factory_type factory(const typename bunsan_factory::key_type &type) \
-    { \
-        return bunsan_factory::factory(factories, type); \
-    } \
-    static inline boost::optional<factory_type> factory_optional(const typename bunsan_factory::key_type &type) \
+    static inline factory_type factory_optional( \
+        const typename bunsan_factory::key_type &type) \
     { \
         return bunsan_factory::factory_optional(factories, type); \
     } \
-    template <typename ... Args> \
-    static inline typename std::enable_if<bunsan_factory::arguments_size::value == sizeof...(Args), \
-    CLASS##_ptr>::type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
+    static inline factory_type factory( \
+        const typename bunsan_factory::key_type &type) \
     { \
-        return bunsan_factory::instance(factories, type, std::forward<Args>(args)...); \
+        return bunsan_factory::factory(factories, type); \
     } \
     template <typename ... Args> \
-    static inline typename std::enable_if<bunsan_factory::arguments_size::value == sizeof...(Args), \
-    CLASS##_ptr>::type instance_optional(const typename bunsan_factory::key_type &type, Args &&...args) \
+    static inline typename std::enable_if< \
+        bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
+    type instance_optional(const typename bunsan_factory::key_type &type, \
+                           Args &&...args) \
     { \
-        return bunsan_factory::instance_optional(factories, type, std::forward<Args>(args)...); \
+        return bunsan_factory::instance_optional( \
+            factories, \
+            type, \
+            std::forward<Args>(args)...\
+        ); \
+    } \
+    template <typename ... Args> \
+    static inline typename std::enable_if< \
+        bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
+    type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
+    { \
+        return bunsan_factory::instance( \
+            factories, \
+            type, \
+            std::forward<Args>(args)...\
+        ); \
     } \
     static inline typename bunsan_factory::const_range registered() \
     { \
@@ -80,7 +98,9 @@ private:
 #endif
 #define BUNSAN_FACTORY_END(CLASS) \
 protected: \
-    static inline bool register_new(const typename bunsan_factory::key_type &type, const factory_type &f) \
+    static inline bool register_new( \
+        const typename bunsan_factory::key_type &type, \
+        const factory_type &f) \
     { \
         return bunsan_factory::register_new(factories, type, f); \
     } \
