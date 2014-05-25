@@ -1,13 +1,9 @@
 #include <bunsan/error.hpp>
 
-bunsan::error::error()
-{
-    (*this) << enable_stacktrace();
-}
+bunsan::error::error() {}
 
 bunsan::error::error(const std::string &message_)
 {
-    (*this) << enable_stacktrace();
     (*this) << message(message_);
 }
 
