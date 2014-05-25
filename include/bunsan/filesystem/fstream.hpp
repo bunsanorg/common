@@ -27,13 +27,15 @@ namespace bunsan{namespace filesystem
         };
 
         template <typename Fstream, std::ios_base::openmode BaseOpenmode>
-        const boost::filesystem::path &path(basic_stream<Fstream, BaseOpenmode> &stream)
+        const boost::filesystem::path &path(
+            basic_stream<Fstream, BaseOpenmode> &stream)
         {
             return stream.m_path;
         }
 
         template <typename Fstream, std::ios_base::openmode BaseOpenmode>
-        std::ios_base::openmode openmode(basic_stream<Fstream, BaseOpenmode> &stream)
+        std::ios_base::openmode openmode(
+            basic_stream<Fstream, BaseOpenmode> &stream)
         {
             return stream.m_openmode;
         }
@@ -110,7 +112,8 @@ namespace bunsan{namespace filesystem
         {
             try
             {
-                // note: if we don't call flush before close(), close() will override errno
+                // note: if we don't call flush before close(),
+                // close() will override errno
                 // note: flush is only enabled for output streams
                 detail::flusher<BaseOpenmode & std::ios_base::out>::call(*this);
 
@@ -132,10 +135,12 @@ namespace bunsan{namespace filesystem
         }
 
         template <typename Fstream_, std::ios_base::openmode BaseOpenmode_>
-        friend const boost::filesystem::path &detail::path(basic_stream<Fstream_, BaseOpenmode_> &stream);
+        friend const boost::filesystem::path &detail::path(
+            basic_stream<Fstream_, BaseOpenmode_> &stream);
 
         template <typename Fstream_, std::ios_base::openmode BaseOpenmode_>
-        friend std::ios_base::openmode detail::openmode(basic_stream<Fstream_, BaseOpenmode_> &stream);
+        friend std::ios_base::openmode detail::openmode(
+            basic_stream<Fstream_, BaseOpenmode_> &stream);
 
     private:
         boost::filesystem::path m_path;
@@ -143,13 +148,22 @@ namespace bunsan{namespace filesystem
     };
 
     template <typename CharT, typename Traits=std::char_traits<CharT>>
-    using basic_ifstream = basic_stream<boost::filesystem::basic_ifstream<CharT, Traits>, std::ios_base::in>;
+    using basic_ifstream = basic_stream<
+        boost::filesystem::basic_ifstream<CharT, Traits>,
+        std::ios_base::in
+    >;
 
     template <typename CharT, typename Traits=std::char_traits<CharT>>
-    using basic_ofstream = basic_stream<boost::filesystem::basic_ofstream<CharT, Traits>, std::ios_base::out>;
+    using basic_ofstream = basic_stream<
+        boost::filesystem::basic_ofstream<CharT, Traits>,
+        std::ios_base::out
+    >;
 
     template <typename CharT, typename Traits=std::char_traits<CharT>>
-    using basic_fstream = basic_stream<boost::filesystem::basic_fstream<CharT, Traits>, std::ios_base::openmode{}>;
+    using basic_fstream = basic_stream<
+        boost::filesystem::basic_fstream<CharT, Traits>,
+        std::ios_base::openmode{}
+    >;
 
     typedef basic_filebuf<char> filebuf;
     typedef basic_ifstream<char> ifstream;
@@ -184,11 +198,12 @@ namespace bunsan{namespace filesystem
     } \
     catch (::std::ios_base::failure &) \
     { \
-        BOOST_THROW_EXCEPTION(::bunsan::filesystem::system_error() << \
-                              ::bunsan::enable_nested_current() << \
-                              ::bunsan::filesystem::error::path( \
-                                  ::bunsan::filesystem::detail::path(FSTREAM)) << \
-                              ::bunsan::filesystem::error::openmode( \
-                                  ::bunsan::filesystem::detail::openmode(FSTREAM))); \
+        BOOST_THROW_EXCEPTION( \
+            ::bunsan::filesystem::system_error() << \
+            ::bunsan::enable_nested_current() << \
+            ::bunsan::filesystem::error::path( \
+                ::bunsan::filesystem::detail::path(FSTREAM)) << \
+            ::bunsan::filesystem::error::openmode( \
+                ::bunsan::filesystem::detail::openmode(FSTREAM))); \
     }
 }}
