@@ -4,6 +4,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <locale>
 #include <string>
@@ -22,6 +23,14 @@ namespace bunsan{namespace property_tree
                    const std::locale &loc = std::locale())
     {
         boost::filesystem::initial_path();
+
+        BOOST_SCOPE_EXIT_ALL()
+        {
+            boost::filesystem::current_path(
+                boost::filesystem::initial_path()
+            );
+        };
+
         boost::filesystem::current_path(
             boost::filesystem::absolute(
                 boost::filesystem::path(filename)
@@ -31,9 +40,6 @@ namespace bunsan{namespace property_tree
             boost::filesystem::path(filename).filename().string(),
             pt,
             loc
-        );
-        boost::filesystem::current_path(
-            boost::filesystem::initial_path()
         );
     }
 }}
