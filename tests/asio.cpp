@@ -4,6 +4,7 @@
 #include <bunsan/asio/binary_object_connection.hpp>
 #include <bunsan/asio/block_connection.hpp>
 #include <bunsan/asio/buffer_connection.hpp>
+#include <bunsan/asio/line_connection.hpp>
 #include <bunsan/asio/queued_writer.hpp>
 #include <bunsan/asio/text_object_connection.hpp>
 
@@ -628,5 +629,53 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test, MessageNumber, message_numbers)
 }
 
 BOOST_AUTO_TEST_SUITE_END() // buffer_connection
+
+BOOST_FIXTURE_TEST_SUITE(line_connection, socket_pair_fixture)
+
+BOOST_AUTO_TEST_CASE(test)
+{
+    ba::line_connection<socket> sink(socket1), source(socket2);
+
+    std::string msg, buf;
+
+    msg = "hello, world";
+    sink.async_write(msg,
+        [&](const boost::system::error_code &ec)
+        {
+            BOOST_REQUIRE(!ec);
+
+            msg = "speak C++";
+            sink.async_write(msg,
+                [&](const boost::system::error_code &ec)
+                {
+                    BOOST_REQUIRE(!ec);
+                    sink.close();
+                });
+        });
+
+    source.async_read(buf,
+        [&](const boost::system::error_code &ec)
+        {
+            BOOST_REQUIRE(!ec);
+            BOOST_CHECK_EQUAL(buf, "hello, world");
+
+            source.async_read(buf,
+                [&](const boost::system::error_code &ec)
+                {
+                    BOOST_REQUIRE(!ec);
+                    BOOST_CHECK_EQUAL(buf, "speak C++");
+
+                    source.async_read(buf,
+                        [&](const boost::system::error_code &ec)
+                        {
+                            BOOST_REQUIRE(ec == boost::asio::error::eof);
+                        });
+                });
+        });
+
+    io_service.run();
+}
+
+BOOST_AUTO_TEST_SUITE_END() // line_connection
 
 BOOST_AUTO_TEST_SUITE_END() // asio
