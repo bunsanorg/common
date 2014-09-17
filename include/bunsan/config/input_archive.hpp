@@ -272,7 +272,7 @@ namespace bunsan{namespace config
         struct load_variant<>
         {
             template <typename Archive, typename Variant>
-            void load(const std::string &name, Archive &, Variant &)
+            static void load(const std::string &name, Archive &, Variant &)
             {
                 BOOST_THROW_EXCEPTION(
                     variant_load_invalid_key_error() <<
