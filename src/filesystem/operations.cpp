@@ -75,7 +75,7 @@ namespace bunsan{namespace filesystem
             copy_tree(from, to, option, ec);
             if (ec)
                 BOOST_FILESYSTEM_THROW(boost::filesystem::filesystem_error(
-                                       "bunsan::filesystem::copy_tree", from, to, ec));
+                                       "", from, to, ec));
         }
         BUNSAN_EXCEPTIONS_WRAP_END_COPY_TREE()
     }
