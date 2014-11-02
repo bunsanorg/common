@@ -18,6 +18,7 @@ namespace bunsan
     namespace exception_detail
     {
         typedef boost::error_info<struct tag_original_exception, boost::exception_ptr> original_exception;
+        typedef boost::error_info<struct tag_original_what, std::string> original_what;
 
         /// \todo use std::exception_ptr
         template <typename T>
@@ -32,6 +33,8 @@ namespace bunsan
 
             const char *what() const noexcept override
             {
+                if (!boost::get_error_info<original_what>(*this))
+                    (*this) << original_what(T::what());
                 return boost::diagnostic_information_what(*this);
             }
         };
