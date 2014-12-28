@@ -1,6 +1,6 @@
 bunsan_testing_project_header()
 
-bunsan_use_boost(coroutine thread)
+bunsan_use_boost(context coroutine thread)
 
 bunsan_testing_project_aux_add_tests()
 
