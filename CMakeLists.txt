@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 include(BunsanCommon)
 
-bunsan_use_boost(system filesystem serialization)
+bunsan_use_boost(system filesystem program_options serialization)
 
 if(${UNIX})
     bunsan_use(dl)
@@ -23,6 +23,8 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/error.cpp
     src/categorized_error.cpp
     src/system_error.cpp
+
+    src/application/application.cpp
 
     src/runtime/demangle.cpp
     src/runtime/stacktrace.cpp
