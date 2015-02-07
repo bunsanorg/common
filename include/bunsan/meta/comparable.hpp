@@ -39,11 +39,11 @@ namespace bunsan{namespace meta
         public: \
             static constexpr bool value = sizeof(check(member_ OPERATOR member_))==sizeof(yes); \
         };
-    BUNSAN_META_OPERATOR(is_equality_comparable, ==);
-    BUNSAN_META_OPERATOR(is_less_equal_comparable, <=);
-    BUNSAN_META_OPERATOR(is_greater_equal_comparable, >=);
-    BUNSAN_META_OPERATOR(is_less_than_comparable, <=);
-    BUNSAN_META_OPERATOR(is_greater_than_comparable, >=);
+    BUNSAN_META_OPERATOR(is_equality_comparable, ==)
+    BUNSAN_META_OPERATOR(is_less_equal_comparable, <=)
+    BUNSAN_META_OPERATOR(is_greater_equal_comparable, >=)
+    BUNSAN_META_OPERATOR(is_less_than_comparable, <=)
+    BUNSAN_META_OPERATOR(is_greater_than_comparable, >=)
 #undef BUNSAN_META_OPERATOR
     }
 
