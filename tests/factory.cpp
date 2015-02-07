@@ -66,6 +66,7 @@ namespace test
     class base
     {
     public:
+        virtual ~base() {}
         virtual std::string g()=0;
     };
 
