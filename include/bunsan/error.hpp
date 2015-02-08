@@ -104,7 +104,7 @@ namespace bunsan
     };
     typedef error_manip<tag_enable_nested> enable_nested;
 
-    template<>
+    template <>
     struct error_manip<struct tag_enable_nested_current>
     {
         void operator()(const boost::exception &e) const;
