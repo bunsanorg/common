@@ -3,7 +3,6 @@
 
 #include <bunsan/factory.hpp>
 #include <bunsan/factory_helper.hpp>
-#include <bunsan/range/construct_from_range.hpp>
 
 #include <memory>
 #include <set>
@@ -45,7 +44,7 @@ BOOST_AUTO_TEST_CASE(basic)
     BOOST_CHECK_EXCEPTION(bunsan_factory::instance(map, ""), bunsan::unknown_factory_error, check_unknown_factory_error(""));
     BOOST_CHECK(!bunsan_factory::instance_optional(map, ""));
     {
-        const auto set = bunsan::range::construct_from_range<std::set<std::string>>(
+        const auto set = boost::copy_range<std::set<std::string>>(
             bunsan_factory::registered(map));
         const std::set<std::string> req = {"zero", "one"};
         BOOST_CHECK(req == set);
@@ -166,7 +165,7 @@ BOOST_AUTO_TEST_CASE(all)
 {
     {
         {
-            const auto set = bunsan::range::construct_from_range<std::set<std::string>>(test::fact::registered());
+            const auto set = boost::copy_range<std::set<std::string>>(test::fact::registered());
             const std::set<std::string> req = {"init"};
             BOOST_CHECK(req == set);
         }
@@ -187,7 +186,7 @@ BOOST_AUTO_TEST_CASE(all)
     }
     {
         {
-            const auto set = bunsan::range::construct_from_range<std::set<std::string>>(test::fact2::registered());
+            const auto set = boost::copy_range<std::set<std::string>>(test::fact2::registered());
             const std::set<std::string> req = {"init"};
             BOOST_CHECK(req == set);
         }
