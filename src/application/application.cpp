@@ -15,7 +15,6 @@ namespace bunsan{namespace application
         BOOST_ASSERT(!m_argv[m_argc]);
     }
 
-
     boost::optional<std::string> application::executable() const
     {
         if (m_argv[0])
