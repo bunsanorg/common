@@ -1,8 +1,10 @@
-bunsan_testing_project_header()
+bunsan_tests_project_header()
 
-bunsan_use_boost(context coroutine thread)
+bunsan_tests_use_parent_project()
+bunsan_tests_use_package(Boost context coroutine thread)
+bunsan_tests_use_bunsan_package(bunsan_testing bunsan_testing)
 
-bunsan_testing_project_aux_add_tests()
+bunsan_tests_project_aux_add_tests()
 
 add_subdirectory(generators)
 add_custom_command(
@@ -14,4 +16,4 @@ bunsan_tests_project_add_test(stream_enum
     ${CMAKE_CURRENT_BINARY_DIR}/stream_enum.cpp
 )
 
-bunsan_testing_project_footer()
+bunsan_tests_project_footer()
