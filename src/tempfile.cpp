@@ -1,7 +1,7 @@
 #include <bunsan/tempfile.hpp>
 
 #include <bunsan/filesystem/error.hpp>
-#include <bunsan/logging/legacy.hpp>
+#include <bunsan/logging/trivial.hpp>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/scope_exit.hpp>
@@ -100,24 +100,23 @@ void bunsan::tempfile::auto_remove(bool do_auto_remove)
 
 bunsan::tempfile::~tempfile()
 {
-    if (m_do_auto_remove)
+    if (m_do_auto_remove && !m_path.empty())
     {
         try
         {
-            SLOG("trying to remove tempfile " << m_path);
+            BUNSAN_LOG_TRACE << "Removing tempfile " << m_path;
             if (boost::filesystem::exists(m_path))
                 boost::filesystem::remove_all(m_path);
         }
         catch(std::exception &e)
         {
-            DLOG(error);
-            SLOG(e.what());
-            SLOG("unable to remove tempfile " << m_path);
+            BUNSAN_LOG_ERROR << "Unable to remove tempfile " <<
+                               m_path << ": " << e.what();
         }
         catch(...)
         {
-            DLOG(unknown error);
-            SLOG("unable to remove tempfile " << m_path);
+            BUNSAN_LOG_ERROR << "Unable to remove tempfile " <<
+                               m_path << ": unknown";
         }
     }
 }
