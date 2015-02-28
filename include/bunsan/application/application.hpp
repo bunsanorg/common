@@ -53,6 +53,8 @@ namespace bunsan{namespace application
         /// Default implementation provides help and version flags.
         virtual void initialize_argument_parser(argument_parser &parser);
 
+        virtual void initialize_logging();
+
     private:
         const int m_argc;
         const char *const *const m_argv;

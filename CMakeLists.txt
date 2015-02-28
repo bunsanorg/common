@@ -23,9 +23,12 @@ bunsan_add_shared_library(${PROJECT_NAME}
 bunsan_use_boost(${PROJECT_NAME}
     system
     filesystem
+    log
+    log_setup
     program_options
     serialization
 )
+target_compile_definitions(${PROJECT_NAME} PUBLIC BOOST_LOG_DYN_LINK)
 if(${UNIX})
     target_link_libraries(${PROJECT_NAME} PRIVATE dl)
 elseif(${WIN32})

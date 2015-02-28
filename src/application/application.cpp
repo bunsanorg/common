@@ -1,6 +1,13 @@
 #include <bunsan/application/application.hpp>
 
+#include <bunsan/logging/expressions/scope.hpp>
+#include <bunsan/logging/trivial.hpp>
+
 #include <boost/assert.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/support/date_time.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/console.hpp>
 
 #include <iostream>
 
@@ -29,6 +36,7 @@ namespace bunsan{namespace application
         try
         {
             initialize_argument_parser(m_parser);
+            initialize_logging();
             const variables_map variables =
                 m_parser.parse_command_line(m_argc, m_argv);
             if (variables.count("help"))
@@ -49,17 +57,15 @@ namespace bunsan{namespace application
         }
         catch (std::exception &e)
         {
-            std::cerr << "Error of type [" <<
-                         runtime::type_name(e) << "]\n" <<
-                         e.what() << std::endl;
+            BUNSAN_LOG_ERROR << "Error of type [" <<
+                                runtime::type_name(e) << "]\n" << e.what();
             return exit_failure;
         }
     }
 
     int application::argument_parser_error(std::exception &e)
     {
-        std::cerr << "Argument parser error: " <<
-                     e.what() << std::endl;
+        BUNSAN_LOG_ERROR << "Argument parser error: " << e.what();
         print_help();
         return argument_parser_failure;
     }
@@ -85,5 +91,31 @@ namespace bunsan{namespace application
         parser.add_options()
         ("help,h", "Print help")
         ("version", "Print version");
+    }
+
+    void application::initialize_logging()
+    {
+        namespace log = boost::log;
+        namespace keywords = log::keywords;
+        namespace attrs = log::attributes;
+        namespace expr = log::expressions;
+
+        log::add_common_attributes();
+        log::add_console_log(
+            std::cerr,
+            keywords::format = (
+                expr::stream << "[" <<
+                expr::format_date_time<boost::posix_time::ptime>(
+                    "TimeStamp",
+                    "%d %b %Y %H:%M:%S.%f"
+                ) <<
+                " <" << log::trivial::severity << "> " <<
+                logging::expressions::file <<
+                "(" << logging::expressions::function << ")" <<
+                ":" << logging::expressions::line <<
+                "] " <<
+                expr::smessage
+            )
+        );
     }
 }}
