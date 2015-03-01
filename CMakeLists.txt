@@ -13,6 +13,7 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/system_error.cpp
 
     src/application/application.cpp
+    src/application/global_registry.cpp
 
     src/runtime/demangle.cpp
     src/runtime/stacktrace.cpp
