@@ -39,12 +39,12 @@ public: \
         virtual ::bunsan::unknown_factory_error {}; \
     template <typename T> \
     using shared_ptr = std::shared_ptr<T>; \
-    typedef shared_ptr<CLASS> CLASS##_ptr; \
-    typedef bunsan::factory< \
+    using CLASS##_ptr = shared_ptr<CLASS>; \
+    using bunsan_factory = bunsan::factory< \
         CLASS##_ptr (__VA_ARGS__), \
         unknown_##CLASS##_error \
-    > bunsan_factory; \
-    typedef typename bunsan_factory::factory_type factory_type; \
+    >; \
+    using factory_type = typename bunsan_factory::factory_type; \
     static inline factory_type factory_optional( \
         const typename bunsan_factory::key_type &type) \
     { \
@@ -107,8 +107,8 @@ protected: \
 private: \
     static typename bunsan_factory::map_type *factories; \
 }; \
-typedef CLASS::CLASS##_ptr CLASS##_ptr; \
-typedef CLASS::unknown_##CLASS##_error unknown_##CLASS##_error;
+using CLASS##_ptr = CLASS::CLASS##_ptr; \
+using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
 
 /*!
  * \def BUNSAN_FACTORY_DEFINE(CLASS)

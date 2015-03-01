@@ -2,8 +2,8 @@
 
 #include <bunsan/error.hpp>
 
-#include <boost/range/iterator_range.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -16,10 +16,10 @@ namespace bunsan
 {
     struct unknown_factory_error: virtual error
     {
-        typedef boost::error_info<
+        using factory_type = boost::error_info<
             struct tag_factory_type,
             std::string
-        > factory_type;
+        >;
     };
 }
 
@@ -43,17 +43,14 @@ namespace bunsan{namespace detail
     class factory_base<Result (Args...), UnknownError>
     {
     public:
-        typedef Result result_type;
-        typedef std::function<Result (Args...)> factory_type;
-        typedef UnknownError unknown_error;
-        typedef std::string key_type;
-        typedef std::integral_constant<
-            std::size_t,
-            sizeof...(Args)
-        > arguments_size;
-        typedef std::unordered_map<key_type, factory_type> map_type;
-        typedef typename map_type::value_type value_type;
-        typedef typename map_type::const_iterator map_const_iterator;
+        using result_type = Result;
+        using factory_type = std::function<Result (Args...)>;
+        using unknown_error = UnknownError;
+        using key_type = std::string;
+        using arguments_size = std::integral_constant<std::size_t, sizeof...(Args)>;
+        using map_type = std::unordered_map<key_type, factory_type>;
+        using value_type = typename map_type::value_type;
+        using map_const_iterator = typename map_type::const_iterator;
 
         struct iterator_converter:
             std::unary_function<const value_type &, const key_type &>
@@ -64,11 +61,11 @@ namespace bunsan{namespace detail
             }
         };
 
-        typedef boost::transform_iterator<
+        using const_iterator = boost::transform_iterator<
             iterator_converter,
             map_const_iterator
-        > const_iterator;
-        typedef boost::iterator_range<const_iterator> const_range;
+        >;
+        using const_range = boost::iterator_range<const_iterator>;
 
         /*!
          * \brief Registers new factory with unique identifier.
