@@ -2,6 +2,7 @@
 
 #include <bunsan/logging/expressions/scope.hpp>
 #include <bunsan/logging/trivial.hpp>
+#include <bunsan/runtime/demangle.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/log/expressions.hpp>
