@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bunsan/error.hpp>
+#include <bunsan/lazy_ptr.hpp>
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -51,6 +52,7 @@ namespace bunsan{namespace detail
         using map_type = std::unordered_map<key_type, factory_type>;
         using value_type = typename map_type::value_type;
         using map_const_iterator = typename map_type::const_iterator;
+        using map_ptr_type = global_lazy_ptr<map_type>;
 
         struct iterator_converter:
             std::unary_function<const value_type &, const key_type &>
@@ -74,12 +76,10 @@ namespace bunsan{namespace detail
          *
          * \return false if identifier is already used
          */
-        static bool register_new(map_type *&factories,
+        static bool register_new(const map_ptr_type &factories,
                                  const key_type &type,
                                  const factory_type &f)
         {
-            if (!factories)
-                factories = new map_type;
             if (factories->find(type) == factories->end())
             {
                 factories->insert(value_type(type, f));
@@ -94,15 +94,12 @@ namespace bunsan{namespace detail
          * \return Empty factory if it is not registered.
          */
         static factory_type factory_optional(
-            const map_type *const factories,
+            const map_ptr_type &factories,
             const key_type &type)
         {
-            if (factories)
-            {
-                const map_const_iterator iter = factories->find(type);
-                if (iter != factories->end())
-                    return iter->second;
-            }
+            const map_const_iterator iter = factories->find(type);
+            if (iter != factories->end())
+                return iter->second;
             return factory_type();
         }
 
@@ -111,7 +108,7 @@ namespace bunsan{namespace detail
          *
          * \throws unknown_factory if factory is not registered
          */
-        static factory_type factory(const map_type *const factories,
+        static factory_type factory(const map_ptr_type &factories,
                                     const key_type &type)
         {
             const factory_type f = factory_optional(factories, type);
@@ -126,7 +123,7 @@ namespace bunsan{namespace detail
          *
          * \return nullptr if factory is not registered
          */
-        static result_type instance_optional(const map_type *const factories,
+        static result_type instance_optional(const map_ptr_type &factories,
                                              const key_type &type,
                                              Args &&...args)
         {
@@ -141,7 +138,7 @@ namespace bunsan{namespace detail
          *
          * \throws unknown_factory if factory is not registered
          */
-        static result_type instance(const map_type *const factories,
+        static result_type instance(const map_ptr_type &factories,
                                     const key_type &type,
                                     Args &&...args)
         {
@@ -157,20 +154,12 @@ namespace bunsan{namespace detail
         }
 
         /// Iterate over registered factory identifiers.
-        static const_range registered(const map_type *const factories)
+        static const_range registered(const map_ptr_type &factories)
         {
-            if (factories)
-            {
-                return const_range{
-                    factories->begin(),
-                    factories->end()
-                };
-            }
-            else
-            {
-                /// \see factory::null unit test
-                return const_range();
-            }
+            return const_range{
+                factories->begin(),
+                factories->end()
+            };
         }
     };
 }}

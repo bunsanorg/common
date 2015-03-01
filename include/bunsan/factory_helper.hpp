@@ -105,7 +105,7 @@ protected: \
         return bunsan_factory::register_new(factories, type, f); \
     } \
 private: \
-    static typename bunsan_factory::map_type *factories; \
+    static typename bunsan_factory::map_ptr_type factories; \
 }; \
 using CLASS##_ptr = CLASS::CLASS##_ptr; \
 using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
@@ -135,4 +135,4 @@ namespace bunsan
 #   error ASSERTION: BUNSAN_FACTORY_DEFINE is in use
 #endif
 #define BUNSAN_FACTORY_DEFINE(CLASS) \
-    typename CLASS::bunsan_factory::map_type *CLASS::factories;
+    typename CLASS::bunsan_factory::map_ptr_type CLASS::factories;
