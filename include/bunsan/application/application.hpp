@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bunsan/application/argument_parser.hpp>
+#include <bunsan/application/global_registry.hpp>
 
 #include <boost/optional.hpp>
 
@@ -59,5 +60,6 @@ namespace bunsan{namespace application
         const char *const *const m_argv;
         std::string m_name;
         argument_parser m_parser;
+        global_registry_ptr m_global_registry;
     };
 }}

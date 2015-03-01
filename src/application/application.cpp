@@ -17,7 +17,8 @@ namespace bunsan{namespace application
     application::application(const int argc, const char *const argv[]):
         m_argc(argc),
         m_argv(argv),
-        m_parser("Options")
+        m_parser("Options"),
+        m_global_registry(global_registry::lock())
     {
         BOOST_ASSERT(m_argv);
         BOOST_ASSERT(!m_argv[m_argc]);

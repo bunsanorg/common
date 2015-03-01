@@ -12,6 +12,26 @@ BOOST_AUTO_TEST_SUITE(application)
 
 BOOST_AUTO_TEST_SUITE(application)
 
+struct reg_mock
+{
+    static const bool registered;
+    static int ctor;
+    static int dtor;
+
+    reg_mock() { ++ctor; }
+    ~reg_mock() { ++dtor; }
+
+    static void reset()
+    {
+        ctor = dtor = 0;
+    }
+};
+
+const bool reg_mock::registered =
+    ba::global_registry::register_unique_state_factory<reg_mock>();
+int reg_mock::ctor = 0;
+int reg_mock::dtor = 0;
+
 class myapplication: public ba::application
 {
 public:
@@ -85,6 +105,21 @@ BOOST_AUTO_TEST_CASE(argument_parser_failure)
     myapplication app(sizeof(argv) / sizeof(argv[0]) - 1, argv);
     BOOST_CHECK_EQUAL(app.exec(), 12);
     BOOST_CHECK(app.called_argument_parser_error);
+}
+
+BOOST_AUTO_TEST_CASE(global_registry)
+{
+    reg_mock::reset();
+    BOOST_CHECK_EQUAL(reg_mock::ctor, 0);
+    BOOST_CHECK_EQUAL(reg_mock::dtor, 0);
+    {
+        const char *const argv[] = { "executable", nullptr };
+        myapplication app(1, argv);
+        BOOST_CHECK_EQUAL(reg_mock::ctor, 1);
+        BOOST_CHECK_EQUAL(reg_mock::dtor, 0);
+    }
+    BOOST_CHECK_EQUAL(reg_mock::ctor, 1);
+    BOOST_CHECK_EQUAL(reg_mock::dtor, 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // application
