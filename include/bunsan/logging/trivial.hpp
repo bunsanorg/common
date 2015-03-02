@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bunsan/logging/keywords/scope.hpp>
+#include <bunsan/logging/severity.hpp>
 #include <bunsan/logging/sources/scope.hpp>
 
 #include <boost/current_function.hpp>
@@ -22,17 +23,18 @@ namespace bunsan{namespace logging{namespace trivial
         >
     > {};
 
-    // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+    // FIXME check macro usage
     BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
         global,
-        logger<boost::log::trivial::severity_level>
+        logger<severity>
     )
 }}}
 
 #define BUNSAN_LOG_TRIVIAL(SEV) \
     BOOST_LOG_STREAM_WITH_PARAMS( \
         ::bunsan::logging::trivial::global::get(), \
-        (::boost::log::keywords::severity = ::boost::log::trivial::SEV) \
+        (::boost::log::keywords::severity = \
+             ::bunsan::logging::severity::SEV) \
         (::bunsan::logging::keywords::file = __FILE__) \
         (::bunsan::logging::keywords::line = __LINE__) \
         (::bunsan::logging::keywords::function = __func__) \

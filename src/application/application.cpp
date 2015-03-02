@@ -111,7 +111,7 @@ namespace bunsan{namespace application
                     "TimeStamp",
                     "%d %b %Y %H:%M:%S.%f"
                 ) <<
-                " <" << log::trivial::severity << "> " <<
+                " <" << logging::expressions::severity << "> " <<
                 logging::expressions::file <<
                 "(" << logging::expressions::function << ")" <<
                 ":" << logging::expressions::line <<
