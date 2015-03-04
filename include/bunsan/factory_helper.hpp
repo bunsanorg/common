@@ -2,6 +2,8 @@
 
 #include <bunsan/factory.hpp>
 
+#include <boost/preprocessor/cat.hpp>
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -97,7 +99,7 @@ private:
 #   error ASSERTION: BUNSAN_FACTORY_END is in use
 #endif
 #define BUNSAN_FACTORY_END(CLASS) \
-protected: \
+public: \
     static inline bool register_new( \
         const typename bunsan_factory::key_type &type, \
         const factory_type &f) \
@@ -136,3 +138,15 @@ namespace bunsan
 #endif
 #define BUNSAN_FACTORY_DEFINE(CLASS) \
     typename CLASS::bunsan_factory::map_ptr_type CLASS::factories;
+
+#ifdef BUNSAN_FACTORY_REGISTER
+#   error ASSERTION: BUNSAN_FACTORY_REGISTER is in use
+#endif
+#define BUNSAN_FACTORY_REGISTER(VAR, FACTORY, NAME, CODE) \
+    static const bool BOOST_PP_CAT(bunsan_factory_register_, BOOST_PP_CAT(VAR, __LINE__)) = \
+        FACTORY::register_new(NAME, CODE);
+#ifdef BUNSAN_FACTORY_REGISTER_TOKEN
+#   error ASSERTION: BUNSAN_FACTORY_REGISTER_TOKEN is in use
+#endif
+#define BUNSAN_FACTORY_REGISTER_TOKEN(FACTORY, TOKEN, CODE) \
+    BUNSAN_FACTORY_REGISTER(TOKEN, FACTORY, #TOKEN, CODE)
