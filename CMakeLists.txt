@@ -21,6 +21,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/filesystem/error.cpp
     src/filesystem/operations.cpp
 )
+bunsan_use_threads(${PROJECT_NAME})
 bunsan_use_boost(${PROJECT_NAME}
     system
     filesystem
@@ -28,8 +29,8 @@ bunsan_use_boost(${PROJECT_NAME}
     log_setup
     program_options
     serialization
+    thread
 )
-target_compile_definitions(${PROJECT_NAME} PUBLIC BOOST_LOG_DYN_LINK)
 if(${UNIX})
     target_link_libraries(${PROJECT_NAME} PRIVATE dl)
 elseif(${WIN32})
