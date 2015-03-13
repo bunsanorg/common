@@ -23,11 +23,10 @@ namespace bunsan{namespace logging{namespace trivial
         >
     > {};
 
-    // FIXME check macro usage
-    BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
-        global,
-        logger<severity>
-    )
+    struct global
+    {
+        static logger<severity> &get();
+    };
 }}}
 
 #define BUNSAN_LOG_TRIVIAL(SEV) \

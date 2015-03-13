@@ -1,14 +1,9 @@
 #include <bunsan/application/application.hpp>
 
-#include <bunsan/logging/expressions/scope.hpp>
 #include <bunsan/logging/trivial.hpp>
 #include <bunsan/runtime/demangle.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/support/date_time.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/utility/setup/console.hpp>
 
 #include <iostream>
 
@@ -38,7 +33,6 @@ namespace bunsan{namespace application
         try
         {
             initialize_argument_parser(m_parser);
-            initialize_logging();
             const variables_map variables =
                 m_parser.parse_command_line(m_argc, m_argv);
             if (variables.count("help"))
@@ -93,31 +87,5 @@ namespace bunsan{namespace application
         parser.add_options()
         ("help,h", "Print help")
         ("version", "Print version");
-    }
-
-    void application::initialize_logging()
-    {
-        namespace log = boost::log;
-        namespace keywords = log::keywords;
-        namespace attrs = log::attributes;
-        namespace expr = log::expressions;
-
-        log::add_common_attributes();
-        log::add_console_log(
-            std::cerr,
-            keywords::format = (
-                expr::stream << "[" <<
-                expr::format_date_time<boost::posix_time::ptime>(
-                    "TimeStamp",
-                    "%d %b %Y %H:%M:%S.%f"
-                ) <<
-                " <" << logging::expressions::severity << "> " <<
-                logging::expressions::file <<
-                "(" << logging::expressions::function << ")" <<
-                ":" << logging::expressions::line <<
-                "] " <<
-                expr::smessage
-            )
-        );
     }
 }}
