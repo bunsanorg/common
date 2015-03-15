@@ -21,6 +21,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/filesystem/error.cpp
     src/filesystem/operations.cpp
 
+    src/logging/core.cpp
     src/logging/trivial.cpp
 )
 bunsan_use_threads(${PROJECT_NAME})
