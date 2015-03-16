@@ -26,6 +26,7 @@ namespace bunsan{namespace logging{namespace trivial
     struct global
     {
         static logger<severity> &get();
+        static void remove_default_sink();
     };
 }}}
 

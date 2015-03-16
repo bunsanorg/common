@@ -8,4 +8,6 @@ namespace bunsan{namespace logging
 
     inline bool enable() { return set_enabled(true); }
     inline bool disable() { return set_enabled(false); }
+
+    void remove_default_sink();
 }}
