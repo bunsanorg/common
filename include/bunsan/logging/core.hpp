@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/log/core.hpp>
+#include <bunsan/logging/severity.hpp>
 
 namespace bunsan{namespace logging
 {
@@ -10,4 +10,6 @@ namespace bunsan{namespace logging
     inline bool disable() { return set_enabled(false); }
 
     void remove_default_sink();
+
+    void set_minimum_severity(const severity minimum_severity);
 }}
