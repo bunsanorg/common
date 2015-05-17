@@ -86,9 +86,11 @@ namespace bunsan
         // DEPRECATED
 
         /// create tempfile in specified directory
+        [[deprecated]]
         static tempfile in_dir(const boost::filesystem::path &dir);
 
         /// create tempfile in system temp dir
+        [[deprecated]]
         static tempfile unique();
 
         /*!
@@ -96,12 +98,14 @@ namespace bunsan
          *
          * \pre model.filename() == model
          */
+        [[deprecated]]
         static tempfile unique(const boost::filesystem::path &model);
 
         /*!
          * \brief create tempfile using model:
          * % symbols will be replaced by random symbols [0-9a-f]
          */
+        [[deprecated]]
         static tempfile from_model(const boost::filesystem::path &model);
 
     private:
