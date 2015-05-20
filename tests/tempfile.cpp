@@ -41,11 +41,10 @@ BOOST_AUTO_TEST_CASE(auto_remove)
 {
     boost::filesystem::path tmppath;
     {
-        tempfile tmp = tempfile::unique();
+        tempfile tmp = tempfile::regular_file_in_tempdir();
         tmppath = tmp.path();
         BOOST_CHECK(tmp.auto_remove());
-        BOOST_CHECK(!exists(tmp));
-        touch(tmp);
+        BOOST_CHECK(exists(tmp));
     }
     BOOST_CHECK(!exists(tmppath));
 }
@@ -53,9 +52,8 @@ BOOST_AUTO_TEST_CASE(auto_remove)
 BOOST_AUTO_TEST_CASE(swap_)
 {
     boost::filesystem::path tmppath;
-    tempfile tmp = tempfile::unique();
+    tempfile tmp = tempfile::regular_file_in_tempdir();
     tmppath = tmp.path();
-    touch(tmp);
     tempfile tmp2;
     BOOST_CHECK(tmp.auto_remove());
     BOOST_CHECK(!tmp2.auto_remove());
@@ -67,8 +65,7 @@ BOOST_AUTO_TEST_CASE(swap_)
 
 BOOST_AUTO_TEST_CASE(model)
 {
-    tempfile tmp = tempfile::unique("%%%%-%%%%-%%%%-%%%%.tgz");
-    touch(tmp);
+    tempfile tmp = tempfile::regular_file_in_tempdir("%%%%-%%%%-%%%%-%%%%.tgz");
     BOOST_CHECK_EQUAL(tmp.path().extension(), ".tgz");
 }
 

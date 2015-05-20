@@ -12,32 +12,6 @@
 const boost::filesystem::path bunsan::tempfile::default_model =
     "%%%%-%%%%-%%%%-%%%%";
 
-// static creators
-
-bunsan::tempfile bunsan::tempfile::in_dir(
-    const boost::filesystem::path &dir)
-{
-    return from_model(dir / default_model);
-}
-
-bunsan::tempfile bunsan::tempfile::from_model(
-    const boost::filesystem::path &model)
-{
-    return tempfile(boost::filesystem::unique_path(model));
-}
-
-bunsan::tempfile bunsan::tempfile::unique()
-{
-    return unique(default_model);
-}
-
-bunsan::tempfile bunsan::tempfile::unique(
-    const boost::filesystem::path &model)
-{
-    BOOST_ASSERT(model == model.filename());
-    return from_model(boost::filesystem::temp_directory_path() / model);
-}
-
 // constructors
 
 bunsan::tempfile::tempfile(): m_do_auto_remove(false) {}
