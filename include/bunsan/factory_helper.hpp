@@ -40,8 +40,8 @@ public: \
     struct unknown_##CLASS##_error: \
         virtual ::bunsan::unknown_factory_error {}; \
     template <typename T> \
-    using basic_ptr = std::shared_ptr<T>; \
-    using CLASS##_ptr = basic_ptr<CLASS>; \
+    using shared_ptr = std::shared_ptr<T>; \
+    using CLASS##_ptr = shared_ptr<CLASS>; \
     using bunsan_factory = bunsan::factory< \
         CLASS##_ptr (__VA_ARGS__), \
         unknown_##CLASS##_error \
@@ -85,14 +85,9 @@ public: \
         return bunsan_factory::registered(factories); \
     } \
     template <typename T, typename ... Args> \
-    static inline basic_ptr<T> make_basic_ptr(Args &&...args) \
+    static inline shared_ptr<T> make_shared(Args &&...args) \
     { \
         return std::make_shared<T>(std::forward<Args>(args)...); \
-    } \
-    template <typename T, typename ... Args> \
-    static inline CLASS##_ptr make_ptr(Args &&...args) \
-    { \
-        return make_basic_ptr<T>(std::forward<Args>(args)...); \
     } \
 private:
 

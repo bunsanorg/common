@@ -153,7 +153,7 @@ namespace test
         const bool init::factory_reg_hook = test::fact::register_new("init",
             [](const std::string &data_, const std::string data2_)
             {
-                return fact::make_ptr<init>(data_, data2_);
+                return fact::make_shared<init>(data_, data2_);
             });
     }
 
@@ -176,7 +176,7 @@ namespace test
         const bool init::factory_reg_hook = test::fact2::register_new("init",
             []()
             {
-                return fact2::make_ptr<init>();
+                return fact2::make_shared<init>();
             });
     }
 }
@@ -233,8 +233,8 @@ BOOST_AUTO_TEST_CASE(all)
         BOOST_CHECK(!test::fact2::instance_optional("noinit"));
     }
     {
-        test::fact::basic_ptr<test::fact_derived> derived_ptr =
-            test::fact::make_basic_ptr<test::fact_derived>();
+        test::fact::shared_ptr<test::fact_derived> derived_ptr =
+            test::fact::make_shared<test::fact_derived>();
         test::fact_ptr ptr = derived_ptr;
         BOOST_CHECK_EQUAL(ptr->f(), "fact_derived::f()");
         BOOST_CHECK_EQUAL(ptr->g(), "fact_derived::g()");
