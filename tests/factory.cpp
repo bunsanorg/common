@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(basic)
     );
     BOOST_CHECK(!bunsan_factory::instance_optional(map, "strange"));
     BOOST_CHECK(bunsan_factory::register_new(
-        map, "zero", [](){ return int_ptr(new int(0)); }
+        map, "zero", [](){ return std::make_shared<int>(0); }
     ));
     BOOST_CHECK(!bunsan_factory::register_new(
-        map, "zero", [](){ return int_ptr(new int(-1)); }
+        map, "zero", [](){ return std::make_shared<int>(-1); }
     ));
     BOOST_CHECK_EXCEPTION(
         bunsan_factory::factory(map, "strange"),
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(basic)
     BOOST_CHECK_EQUAL(*zero_fact(), 0);
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "zero"), 0);
     BOOST_CHECK(  bunsan_factory::register_new(
-        map, "one", [](){ return int_ptr(new int(1)); }
+        map, "one", [](){ return std::make_shared<int>(1); }
     ));
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "zero"), 0);
     BOOST_CHECK_EQUAL(*bunsan_factory::instance(map, "one"), 1);
@@ -153,8 +153,7 @@ namespace test
         const bool init::factory_reg_hook = test::fact::register_new("init",
             [](const std::string &data_, const std::string data2_)
             {
-                fact_ptr ptr(new init(data_, data2_));
-                return ptr;
+                return fact::make_ptr<init>(data_, data2_);
             });
     }
 
@@ -177,8 +176,7 @@ namespace test
         const bool init::factory_reg_hook = test::fact2::register_new("init",
             []()
             {
-                fact2_ptr ptr(new init);
-                return ptr;
+                return fact2::make_ptr<init>();
             });
     }
 }
@@ -235,7 +233,8 @@ BOOST_AUTO_TEST_CASE(all)
         BOOST_CHECK(!test::fact2::instance_optional("noinit"));
     }
     {
-        test::fact::shared_ptr<test::fact_derived> derived_ptr(new test::fact_derived);
+        test::fact::basic_ptr<test::fact_derived> derived_ptr =
+            test::fact::make_basic_ptr<test::fact_derived>();
         test::fact_ptr ptr = derived_ptr;
         BOOST_CHECK_EQUAL(ptr->f(), "fact_derived::f()");
         BOOST_CHECK_EQUAL(ptr->g(), "fact_derived::g()");
