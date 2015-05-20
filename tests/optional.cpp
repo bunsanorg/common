@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(move)
 {
     typedef std::unique_ptr<int> ptr_t;
     bunsan::optional<ptr_t> default_ctor;
-    bunsan::optional<ptr_t> a(new int(10));
+    bunsan::optional<ptr_t> a(std::make_unique<int>(10));
     bunsan::optional<ptr_t> b = std::move(a);
     BOOST_CHECK(!a);
     BOOST_REQUIRE(b);

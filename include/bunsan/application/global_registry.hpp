@@ -38,17 +38,13 @@ namespace bunsan{namespace application
     template <typename T>
     global_state_ptr make_global_any_state(T state)
     {
-        std::unique_ptr<global_state> ptr(
-            new global_state_any<T>(std::move(state))
-        );
-        return ptr;
+        return std::make_unique<global_state_any<T>>(std::move(state));
     }
 
     template <typename T>
     global_state_ptr make_global_unique_state()
     {
-        std::unique_ptr<T> ptr(new T{});
-        return make_global_any_state(std::move(ptr));
+        return make_global_any_state(std::make_unique<T>());
     }
 
     class global_registry: private boost::noncopyable

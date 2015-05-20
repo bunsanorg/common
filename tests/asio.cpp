@@ -41,7 +41,7 @@ struct local_socket_fixture
             pairs.resize(index + 1);
         if (!pairs[index])
         {
-            pairs[index].reset(new socket_pair(io_service));
+            pairs[index] = std::make_unique<socket_pair>(io_service);
             boost::asio::local::connect_pair(
                 pairs[index]->first,
                 pairs[index]->second
