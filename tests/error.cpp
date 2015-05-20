@@ -30,14 +30,34 @@ struct
 {
     bool operator()(const boost::exception &e) const
     {
+        return boost::get_error_info<bunsan::error::message>(e);
+    }
+} check_message;
+
+struct
+{
+    bool operator()(const boost::exception &e) const
+    {
+        return boost::get_error_info<bunsan::system_error::what_message>(e);
+    }
+} check_what_message;
+
+struct
+{
+    bool operator()(const boost::exception &e) const
+    {
         return boost::get_error_info<bunsan::error::stacktrace>(e);
     }
-} check;
+} check_stacktrace;
 
 
 BOOST_AUTO_TEST_CASE(throw_)
 {
-    BOOST_CHECK_EXCEPTION(BOOST_THROW_EXCEPTION(bunsan::error("message")), bunsan::error, check);
+    BOOST_CHECK_EXCEPTION(
+        BOOST_THROW_EXCEPTION(bunsan::error("message")),
+        bunsan::error,
+        check_message
+    );
 }
 
 // for stacktrace
@@ -75,7 +95,9 @@ const std::string info_text = "INFO_TEXT_TO_CHECK";
 
 bool check_info(const boost::exception &e)
 {
-    return check(e) && boost::get_error_info<info>(e) && *boost::get_error_info<info>(e) == info_text;
+    return check_stacktrace(e) &&
+           boost::get_error_info<info>(e) &&
+           *boost::get_error_info<info>(e) == info_text;
 }
 
 void throw_error_info()
@@ -90,11 +112,11 @@ void throw_error_info()
 BOOST_AUTO_TEST_CASE(wrap)
 {
     BOOST_CHECK_EXCEPTION(throw0(), std::runtime_error, print);
-    BOOST_CHECK_EXCEPTION(throw0(), boost::exception, check);
+    BOOST_CHECK_EXCEPTION(throw0(), boost::exception, check_stacktrace);
     BOOST_CHECK_EXCEPTION(throw1(), bunsan::error, print);
-    BOOST_CHECK_EXCEPTION(throw1(), bunsan::error, check);
+    BOOST_CHECK_EXCEPTION(throw1(), bunsan::error, check_stacktrace);
     BOOST_CHECK_EXCEPTION(throw2(), std::exception, print);
-    BOOST_CHECK_EXCEPTION(throw2(), boost::exception, check);
+    BOOST_CHECK_EXCEPTION(throw2(), boost::exception, check_what_message);
     BOOST_CHECK_EXCEPTION(throw_error_info(), std::exception, print);
     BOOST_CHECK_EXCEPTION(throw_error_info(), boost::exception, check_info);
 }
