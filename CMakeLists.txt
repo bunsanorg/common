@@ -6,6 +6,38 @@ project(bunsan_common)
 
 find_package(BunsanCMake CONFIG REQUIRED)
 
+if(UNIX)
+    set(runtime_libs dl)
+    set(runtime_srcs
+        src/runtime/unix/stacktrace.cpp
+    )
+    include(CheckIncludeFileCXX)
+    CHECK_INCLUDE_FILE_CXX(dlfcn.h BUNSAN_HAS_DLFCN)
+    if(BUNSAN_HAS_DLFCN)
+        list(APPEND runtime_srcs
+             src/runtime/unix/stream-dlfcn.cpp)
+    else()
+        list(APPEND runtime_srcs
+             src/runtime/unix/stream-fallback.cpp)
+    endif()
+elseif(WIN32)
+    set(runtime_srcs
+        src/runtime/win32/stacktrace.cpp
+    )
+    if(MSVC)
+        set(runtime_libs dbghelp)
+        list(APPEND runtime_srcs
+             src/runtime/win32/stream-msvc.cpp)
+    else()
+        set(runtime_libs psapi)
+        list(APPEND runtime_srcs
+             src/runtime/win32/stream-fallback.cpp)
+    endif()
+else()
+    set(runtime_srcs
+        src/runtime/fallback/stacktrace.cpp
+    )
+endif()
 bunsan_add_library(${PROJECT_NAME}
     src/tempfile.cpp
     src/error.cpp
@@ -16,7 +48,8 @@ bunsan_add_library(${PROJECT_NAME}
     src/application/global_registry.cpp
 
     src/runtime/demangle.cpp
-    src/runtime/stacktrace.cpp
+    src/runtime/detail/format.cpp
+    ${runtime_srcs}
 
     src/filesystem/error.cpp
     src/filesystem/operations.cpp
@@ -24,6 +57,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/logging/core.cpp
     src/logging/trivial.cpp
 )
+target_link_libraries(${PROJECT_NAME} PRIVATE ${runtime_libs})
 bunsan_use_threads(${PROJECT_NAME})
 bunsan_use_boost(${PROJECT_NAME}
     system
@@ -34,15 +68,6 @@ bunsan_use_boost(${PROJECT_NAME}
     serialization
     thread
 )
-if(${UNIX})
-    target_link_libraries(${PROJECT_NAME} PRIVATE dl)
-elseif(${WIN32})
-    if(${MSVC})
-        target_link_libraries(${PROJECT_NAME} PRIVATE dbghelp)
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE psapi)
-    endif()
-endif()
 
 bunsan_install_headers()
 bunsan_install_targets(${PROJECT_NAME})
