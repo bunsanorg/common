@@ -50,7 +50,7 @@ namespace bunsan{namespace config{namespace traits
     struct type_key
     {
         /// \note it is not possible to define "const char *" field in header
-        inline static constexpr const char *call()
+        static constexpr const char *call()
         {
             return nullptr;
         }
@@ -132,7 +132,7 @@ namespace bunsan{namespace config{namespace traits
         template <> \
         struct type_key<PARENT, DERIVED> \
         { \
-            inline static constexpr const char *call() \
+            static constexpr const char *call() \
             { \
                 return FIELD; \
             } \

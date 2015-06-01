@@ -47,18 +47,18 @@ public: \
         unknown_##CLASS##_error \
     >; \
     using factory_type = typename bunsan_factory::factory_type; \
-    static inline factory_type factory_optional( \
+    static factory_type factory_optional( \
         const typename bunsan_factory::key_type &type) \
     { \
         return bunsan_factory::factory_optional(factories, type); \
     } \
-    static inline factory_type factory( \
+    static factory_type factory( \
         const typename bunsan_factory::key_type &type) \
     { \
         return bunsan_factory::factory(factories, type); \
     } \
     template <typename ... Args> \
-    static inline typename std::enable_if< \
+    static typename std::enable_if< \
         bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
     type instance_optional(const typename bunsan_factory::key_type &type, \
                            Args &&...args) \
@@ -70,7 +70,7 @@ public: \
         ); \
     } \
     template <typename ... Args> \
-    static inline typename std::enable_if< \
+    static typename std::enable_if< \
         bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
     type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
     { \
@@ -80,12 +80,12 @@ public: \
             std::forward<Args>(args)...\
         ); \
     } \
-    static inline typename bunsan_factory::const_range registered() \
+    static typename bunsan_factory::const_range registered() \
     { \
         return bunsan_factory::registered(factories); \
     } \
     template <typename T, typename ... Args> \
-    static inline shared_ptr<T> make_shared(Args &&...args) \
+    static shared_ptr<T> make_shared(Args &&...args) \
     { \
         return std::make_shared<T>(std::forward<Args>(args)...); \
     } \
@@ -105,7 +105,7 @@ private:
 #endif
 #define BUNSAN_FACTORY_END(CLASS) \
 public: \
-    static inline bool register_new( \
+    static bool register_new( \
         const typename bunsan_factory::key_type &type, \
         const factory_type &f) \
     { \

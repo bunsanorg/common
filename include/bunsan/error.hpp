@@ -62,7 +62,7 @@ namespace bunsan
         typedef boost::errinfo_nested_exception nested_exception;
 
         template <typename Tag, typename T>
-        static inline std::string info_name(const boost::error_info<Tag, T> &x)
+        static std::string info_name(const boost::error_info<Tag, T> &x)
         {
     #if BOOST_VERSION >= 105400
             return boost::error_info_name(x);

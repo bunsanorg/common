@@ -16,14 +16,14 @@ namespace bunsan{namespace filesystem
         struct flusher
         {
             template <typename T>
-            static inline void call(T &obj) { obj.flush(); }
+            static void call(T &obj) { obj.flush(); }
         };
 
         template <>
         struct flusher<false>
         {
             template <typename T>
-            static inline void call(T &) {}
+            static void call(T &) {}
         };
 
         template <typename Fstream, std::ios_base::openmode BaseOpenmode>

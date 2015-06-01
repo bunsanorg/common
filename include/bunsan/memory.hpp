@@ -18,7 +18,7 @@ namespace bunsan
         struct ptr_maker<std::unique_ptr<T>>
         {
             template <typename ... Args>
-            inline static std::unique_ptr<T> call(Args &&...args)
+            static std::unique_ptr<T> call(Args &&...args)
             {
                 return std::make_unique<T>(std::forward<Args>(args)...);
             }
@@ -28,7 +28,7 @@ namespace bunsan
         struct ptr_maker<std::shared_ptr<T>>
         {
             template <typename ... Args>
-            inline static std::shared_ptr<T> call(Args &&...args)
+            static std::shared_ptr<T> call(Args &&...args)
             {
                 return std::make_shared<T>(std::forward<Args>(args)...);
             }
@@ -38,7 +38,7 @@ namespace bunsan
         struct ptr_maker<boost::intrusive_ptr<T>>
         {
             template <typename ... Args>
-            inline static boost::intrusive_ptr<T> call(Args &&...args)
+            static boost::intrusive_ptr<T> call(Args &&...args)
             {
                 boost::intrusive_ptr<T> ptr(new T(std::forward<Args>(args)...));
                 return ptr;
@@ -49,7 +49,7 @@ namespace bunsan
         struct ptr_maker<boost::shared_ptr<T>>
         {
             template <typename ... Args>
-            inline static boost::shared_ptr<T> call(Args &&...args)
+            static boost::shared_ptr<T> call(Args &&...args)
             {
                 return boost::make_shared<T>(std::forward<Args>(args)...);
             }

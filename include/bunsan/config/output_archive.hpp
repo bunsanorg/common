@@ -25,7 +25,7 @@ namespace bunsan{namespace config
         typedef std::integral_constant<bool, false> is_loading;
         typedef std::integral_constant<bool, true> is_saving;
 
-        inline unsigned int get_library_version() { return 0; }
+        unsigned int get_library_version() { return 0; }
 
     public:
         explicit output_archive(Ptree &ptree): m_ptree(&ptree) {}

@@ -11,7 +11,7 @@ namespace bunsan
     template <typename Tag>
     struct error_manip
     {
-        // inline void operator()(const Error &) const {}
+        // void operator()(const Error &) const {}
     };
 
     template <typename Error, typename Tag>
