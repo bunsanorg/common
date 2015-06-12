@@ -7,6 +7,7 @@
 
 namespace bunsan{namespace application
 {
+    using boost::program_options::bool_switch;
     using boost::program_options::value;
     using boost::program_options::variables_map;
 
