@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE logging_fallback
 #include <boost/test/unit_test.hpp>
 
-#include <bunsan/logging/fallback.hpp>
+#include <bunsan/log/fallback.hpp>
 
 #include <boost/algorithm/string/predicate.hpp>
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <bunsan/logging/severity.hpp>
+#include <bunsan/log/severity.hpp>
 
-namespace bunsan{namespace logging
+namespace bunsan{namespace log
 {
     bool set_enabled(bool enabled);
 

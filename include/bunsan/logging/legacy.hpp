@@ -2,7 +2,7 @@
 
 #warning "This logging implementation is deprecated!"
 
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/trivial.hpp>
 
 #define SLOG(M) BUNSAN_LOG_INFO << M
 

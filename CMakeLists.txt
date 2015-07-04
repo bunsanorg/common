@@ -58,8 +58,8 @@ bunsan_add_library(${PROJECT_NAME}
     src/filesystem/error.cpp
     src/filesystem/operations.cpp
 
-    src/logging/core.cpp
-    src/logging/trivial.cpp
+    src/log/core.cpp
+    src/log/trivial.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE ${runtime_libs})
 bunsan_use_threads(${PROJECT_NAME})

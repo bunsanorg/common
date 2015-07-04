@@ -1,13 +1,13 @@
 #pragma once
 
-#include <bunsan/logging/keywords/scope.hpp>
+#include <bunsan/log/keywords/scope.hpp>
 
 #include <boost/log/attributes/attribute_set.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/core/record.hpp>
 #include <boost/scope_exit.hpp>
 
-namespace bunsan{namespace logging{namespace sources
+namespace bunsan{namespace log{namespace sources
 {
     namespace detail
     {

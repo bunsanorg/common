@@ -1,14 +1,14 @@
 #pragma once
 
-#include <bunsan/logging/keywords/scope.hpp>
-#include <bunsan/logging/severity.hpp>
-#include <bunsan/logging/sources/scope.hpp>
+#include <bunsan/log/keywords/scope.hpp>
+#include <bunsan/log/severity.hpp>
+#include <bunsan/log/sources/scope.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/trivial.hpp>
 
-namespace bunsan{namespace logging{namespace trivial
+namespace bunsan{namespace log{namespace trivial
 {
     template <typename Level = int>
     class logger: public boost::log::sources::basic_composite_logger<
@@ -32,13 +32,13 @@ namespace bunsan{namespace logging{namespace trivial
 
 #define BUNSAN_LOG_TRIVIAL(SEV) \
     BOOST_LOG_STREAM_WITH_PARAMS( \
-        ::bunsan::logging::trivial::global::get(), \
+        ::bunsan::log::trivial::global::get(), \
         (::boost::log::keywords::severity = \
-             ::bunsan::logging::severity::SEV) \
-        (::bunsan::logging::keywords::file = __FILE__) \
-        (::bunsan::logging::keywords::line = __LINE__) \
-        (::bunsan::logging::keywords::function = __func__) \
-        (::bunsan::logging::keywords::pretty_function = BOOST_CURRENT_FUNCTION) \
+             ::bunsan::log::severity::SEV) \
+        (::bunsan::log::keywords::file = __FILE__) \
+        (::bunsan::log::keywords::line = __LINE__) \
+        (::bunsan::log::keywords::function = __func__) \
+        (::bunsan::log::keywords::pretty_function = BOOST_CURRENT_FUNCTION) \
     )
 
 #define BUNSAN_LOG_TRACE BUNSAN_LOG_TRIVIAL(trace)

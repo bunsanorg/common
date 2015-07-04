@@ -1,7 +1,7 @@
 #include <bunsan/tempfile.hpp>
 
 #include <bunsan/filesystem/error.hpp>
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/trivial.hpp>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/scope_exit.hpp>

@@ -2,7 +2,7 @@
 
 #include <bunsan/stream_enum.hpp>
 
-namespace bunsan{namespace logging
+namespace bunsan{namespace log
 {
     BUNSAN_STREAM_ENUM_CLASS(severity,
     (

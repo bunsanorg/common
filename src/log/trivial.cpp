@@ -1,6 +1,6 @@
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/trivial.hpp>
 
-#include <bunsan/logging/expressions/scope.hpp>
+#include <bunsan/log/expressions/scope.hpp>
 
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
@@ -10,27 +10,27 @@
 #include <iostream>
 #include <mutex>
 
-namespace bunsan{namespace logging{namespace trivial
+namespace bunsan{namespace log{namespace trivial
 {
-    namespace log = boost::log;
+    namespace blog = boost::log;
 
     static void initialize_attributes()
     {
         static std::once_flag once;
-        std::call_once(once, log::add_common_attributes);
+        std::call_once(once, blog::add_common_attributes);
     }
 
     static std::once_flag default_sink_create_flag;
     static std::once_flag default_sink_remove_flag;
-    static boost::shared_ptr<log::sinks::sink> default_sink;
+    static boost::shared_ptr<blog::sinks::sink> default_sink;
 
     static void initialize_default_sink()
     {
-        namespace keywords = log::keywords;
-        namespace attrs = log::attributes;
-        namespace expr = log::expressions;
+        namespace keywords = blog::keywords;
+        namespace attrs = blog::attributes;
+        namespace expr = blog::expressions;
 
-        default_sink = log::add_console_log(
+        default_sink = blog::add_console_log(
             std::cerr,
             keywords::format = (
                 expr::stream << "[" <<
@@ -38,10 +38,10 @@ namespace bunsan{namespace logging{namespace trivial
                     "TimeStamp",
                     "%d %b %Y %H:%M:%S.%f"
                 ) <<
-                " <" << logging::expressions::severity << "> " <<
-                logging::expressions::file <<
-                "(" << logging::expressions::function << ")" <<
-                ":" << logging::expressions::line <<
+                " <" << log::expressions::severity << "> " <<
+                log::expressions::file <<
+                "(" << log::expressions::function << ")" <<
+                ":" << log::expressions::line <<
                 "] " <<
                 expr::smessage
             )
@@ -63,7 +63,7 @@ namespace bunsan{namespace logging{namespace trivial
         std::call_once(default_sink_remove_flag, []{
             if (default_sink)
             {
-                log::core::get()->remove_sink(default_sink);
+                blog::core::get()->remove_sink(default_sink);
                 default_sink.reset();
             }
         });

@@ -1,12 +1,12 @@
-#include <bunsan/logging/core.hpp>
+#include <bunsan/log/core.hpp>
 
-#include <bunsan/logging/expressions/scope.hpp>
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/expressions/scope.hpp>
+#include <bunsan/log/trivial.hpp>
 
 #include <boost/log/core.hpp>
 #include <boost/phoenix/bind.hpp>
 
-namespace bunsan{namespace logging
+namespace bunsan{namespace log
 {
     bool set_enabled(bool enabled)
     {

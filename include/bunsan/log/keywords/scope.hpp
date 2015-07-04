@@ -2,7 +2,7 @@
 
 #include <boost/parameter/keyword.hpp>
 
-namespace bunsan{namespace logging{namespace keywords
+namespace bunsan{namespace log{namespace keywords
 {
     BOOST_PARAMETER_KEYWORD(tag, file)
     BOOST_PARAMETER_KEYWORD(tag, line)

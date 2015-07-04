@@ -1,6 +1,6 @@
 #include <bunsan/application/application.hpp>
 
-#include <bunsan/logging/trivial.hpp>
+#include <bunsan/log/trivial.hpp>
 #include <bunsan/runtime/demangle.hpp>
 
 #include <boost/assert.hpp>

@@ -5,7 +5,7 @@
 #include <ostream>
 #include <utility>
 
-namespace bunsan{namespace logging{namespace fallback
+namespace bunsan{namespace log{namespace fallback
 {
     class logger
     {
@@ -30,7 +30,7 @@ namespace bunsan{namespace logging{namespace fallback
 }}}
 
 #define BUNSAN_LOG_SEV_INTO(SEV, STREAM) \
-    ::bunsan::logging::fallback::logger(STREAM) << \
+    ::bunsan::log::fallback::logger(STREAM) << \
         "[" << ::boost::posix_time::second_clock::local_time() << \
         " <" << #SEV << "> " << __FILE__ << \
         "(" << __func__ << "):" << __LINE__ << "] "
