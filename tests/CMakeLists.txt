@@ -2,7 +2,7 @@ bunsan_tests_project_header()
 
 bunsan_tests_use_parent_project()
 bunsan_tests_use_package(Boost coroutine context thread)
-bunsan_tests_use_bunsan_package(bunsan_testing bunsan_testing)
+bunsan_tests_use_bunsan_package(bunsan_test bunsan_test)
 
 bunsan_tests_project_aux_add_tests()
 

@@ -4,8 +4,8 @@
 #include <bunsan/filesystem/fstream.hpp>
 #include <bunsan/filesystem/operations.hpp>
 
-#include <bunsan/testing/filesystem/tempfile.hpp>
-#include <bunsan/testing/filesystem/write_data.hpp>
+#include <bunsan/test/filesystem/tempfile.hpp>
+#include <bunsan/test/filesystem/write_data.hpp>
 
 BOOST_AUTO_TEST_SUITE(filesystem)
 
@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_SUITE(fstream)
 
 BOOST_AUTO_TEST_CASE(failbit)
 {
-    bunsan::testing::filesystem::tempfile tmp;
-    bunsan::testing::filesystem::write_data(tmp.path, "not integer");
+    bunsan::test::filesystem::tempfile tmp;
+    bunsan::test::filesystem::write_data(tmp.path, "not integer");
     bunsan::filesystem::ifstream fin(tmp.path);
     BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin)
     {
