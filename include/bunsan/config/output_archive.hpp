@@ -22,10 +22,10 @@ namespace bunsan{namespace config
     class output_archive
     {
     public:
-        typedef std::integral_constant<bool, false> is_loading;
-        typedef std::integral_constant<bool, true> is_saving;
+        using is_loading = std::integral_constant<bool, false>;
+        using is_saving = std::integral_constant<bool, true> ;
 
-        unsigned int get_library_version() { return 0; }
+        constexpr unsigned int get_library_version() { return 0; }
 
     public:
         explicit output_archive(Ptree &ptree): m_ptree(&ptree) {}
@@ -171,8 +171,8 @@ namespace bunsan{namespace config
     template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
     void output_archive<Ptree>::save(const boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> &obj)
     {
-        typedef boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> visitor_type;
-        typedef output_archive_detail::save_visitor<output_archive<Ptree>, visitor_type> save_visitor;
+        using visitor_type = boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>;
+        using save_visitor = output_archive_detail::save_visitor<output_archive<Ptree>, visitor_type>;
         save_visitor visitor(*this);
         boost::apply_visitor(visitor, obj);
     }

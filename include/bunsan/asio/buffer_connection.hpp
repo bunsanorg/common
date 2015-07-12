@@ -14,14 +14,14 @@ namespace bunsan{namespace asio
     class buffer_connection
     {
     public:
-        typedef boost::function<
+        using handler = boost::function<
             void (boost::system::error_code, std::size_t)
-        > handler;
+        >;
 
         // note: (nullptr, 0) on EOF or close
-        typedef boost::function<
+        using data_handler = boost::function<
             void (const char *, std::size_t)
-        > data_handler;
+        >;
 
     public:
         buffer_connection(

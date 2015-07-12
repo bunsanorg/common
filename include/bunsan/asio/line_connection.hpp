@@ -14,7 +14,7 @@ namespace bunsan{namespace asio
 {
     struct invalid_data_error: virtual error
     {
-        typedef boost::error_info<struct tag_data, std::string> data;
+        using data = boost::error_info<struct tag_data, std::string>;
     };
 
     template <typename Connection>

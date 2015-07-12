@@ -165,15 +165,15 @@ namespace bunsan{namespace filesystem
         std::ios_base::openmode{}
     >;
 
-    typedef basic_filebuf<char> filebuf;
-    typedef basic_ifstream<char> ifstream;
-    typedef basic_ofstream<char> ofstream;
-    typedef basic_fstream<char> fstream;
+    using filebuf = basic_filebuf<char>;
+    using ifstream = basic_ifstream<char>;
+    using ofstream = basic_ofstream<char>;
+    using fstream = basic_fstream<char>;
 
-    typedef basic_filebuf<wchar_t> wfilebuf;
-    typedef basic_ifstream<wchar_t> wifstream;
-    typedef basic_ofstream<wchar_t> wofstream;
-    typedef basic_fstream<wchar_t> wfstream;
+    using wfilebuf = basic_filebuf<wchar_t>;
+    using wifstream = basic_ifstream<wchar_t>;
+    using wofstream = basic_ofstream<wchar_t>;
+    using wfstream = basic_fstream<wchar_t>;
 
 /*!
  * \brief Wrapper for exception-safe usage of bunsan::filesystem::fstream.

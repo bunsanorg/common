@@ -25,7 +25,7 @@ namespace bunsan{namespace runtime
     {
         const std::size_t skip = skip_ + 1; // we should skip stacktrace::get()
         stacktrace trace;
-        typedef USHORT (WINAPI *capture_func_type)(ULONG, ULONG, PVOID *, PULONG);
+        using capture_func_type = USHORT (WINAPI *)(ULONG, ULONG, PVOID *, PULONG);
 #if defined(BOOST_MSVC)
         const static capture_func_type capture_stack_trace = &RtlCaptureStackBackTrace;
 #else

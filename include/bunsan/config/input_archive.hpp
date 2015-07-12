@@ -21,10 +21,10 @@ namespace bunsan{namespace config
     class input_archive: private boost::noncopyable
     {
     public:
-        typedef std::integral_constant<bool, true> is_loading;
-        typedef std::integral_constant<bool, false> is_saving;
+        using is_loading = std::integral_constant<bool, true>;
+        using is_saving = std::integral_constant<bool, false>;
 
-        unsigned int get_library_version() { return 0; }
+        constexpr unsigned int get_library_version() { return 0; }
 
     public:
         explicit input_archive(const Ptree &ptree): m_ptree(&ptree) {}

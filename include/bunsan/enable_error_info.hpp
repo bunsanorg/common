@@ -17,8 +17,8 @@ namespace bunsan
 {
     namespace exception_detail
     {
-        typedef boost::error_info<struct tag_original_exception, boost::exception_ptr> original_exception;
-        typedef boost::error_info<struct tag_original_what, std::string> original_what;
+        using original_exception = boost::error_info<struct tag_original_exception, boost::exception_ptr>;
+        using original_what = boost::error_info<struct tag_original_what, std::string>;
 
         /// \todo use std::exception_ptr
         template <typename T>

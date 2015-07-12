@@ -90,7 +90,7 @@ void throw2()
     bunsan::filesystem::ifstream fin("/definitely/not/existing/file/with/some/unpredictable/name");
 }
 
-typedef boost::error_info<struct tag_info, std::string> info;
+using info = boost::error_info<struct tag_info, std::string>;
 const std::string info_text = "INFO_TEXT_TO_CHECK";
 
 bool check_info(const boost::exception &e)

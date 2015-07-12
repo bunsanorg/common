@@ -26,13 +26,13 @@ namespace bunsan{namespace stream_enum
     /// String representation is invalid.
     struct invalid_string_representation_error: virtual invalid_value_error
     {
-        typedef boost::error_info<struct tag_string_value, std::string> string_value;
+        using string_value = boost::error_info<struct tag_string_value, std::string>;
     };
 
     /// Enum representation is invalid.
     struct invalid_enum_representation_error: virtual invalid_value_error
     {
-        typedef boost::error_info<struct tag_enum_value, long long> enum_value;
+        using enum_value = boost::error_info<struct tag_enum_value, long long>;
     };
 }}
 

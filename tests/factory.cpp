@@ -28,8 +28,8 @@ struct check_unknown_factory_error
 
 BOOST_AUTO_TEST_CASE(basic)
 {
-    typedef std::shared_ptr<int> int_ptr;
-    typedef bunsan::factory<int_ptr()> bunsan_factory;
+    using int_ptr = std::shared_ptr<int>;
+    using bunsan_factory = bunsan::factory<int_ptr()>;
     typename bunsan_factory::map_ptr_type map;
     BOOST_CHECK_EXCEPTION(
         bunsan_factory::instance(map, "strange"),

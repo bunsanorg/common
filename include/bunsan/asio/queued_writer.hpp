@@ -14,9 +14,9 @@ namespace bunsan{namespace asio
     class queued_writer: private boost::noncopyable
     {
     public:
-        typedef boost::function<
+        using write_handler = boost::function<
             void (boost::system::error_code)
-        > write_handler;
+        >;
 
     public:
         queued_writer(

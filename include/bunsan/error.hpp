@@ -55,11 +55,11 @@ namespace bunsan
         }
 
         /// Human readable error message
-        typedef boost::error_info<struct tag_message, std::string> message;
+        using message = boost::error_info<struct tag_message, std::string>;
 
-        typedef boost::error_info<struct tag_stacktrace, runtime::stacktrace> stacktrace;
+        using stacktrace = boost::error_info<struct tag_stacktrace, runtime::stacktrace>;
 
-        typedef boost::errinfo_nested_exception nested_exception;
+        using nested_exception = boost::errinfo_nested_exception;
 
         template <typename Tag, typename T>
         static std::string info_name(const boost::error_info<Tag, T> &x)
@@ -89,7 +89,7 @@ namespace bunsan
     private:
         std::size_t m_skip;
     };
-    typedef error_manip<tag_enable_stacktrace> enable_stacktrace;
+    using enable_stacktrace = error_manip<tag_enable_stacktrace>;
 
     template<>
     class error_manip<struct tag_enable_nested>
@@ -102,12 +102,12 @@ namespace bunsan
     private:
         boost::exception_ptr m_ptr;
     };
-    typedef error_manip<tag_enable_nested> enable_nested;
+    using enable_nested = error_manip<tag_enable_nested>;
 
     template <>
     struct error_manip<struct tag_enable_nested_current>
     {
         void operator()(const boost::exception &e) const;
     };
-    typedef error_manip<tag_enable_nested_current> enable_nested_current;
+    using enable_nested_current = error_manip<tag_enable_nested_current>;
 }

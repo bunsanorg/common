@@ -23,7 +23,7 @@ namespace ba = bunsan::asio;
 
 struct local_socket_fixture
 {
-    typedef boost::asio::local::stream_protocol::socket socket;
+    using socket = boost::asio::local::stream_protocol::socket;
 
     struct socket_pair
     {
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE(block_connection)
     io_service.run();
 }
 
-typedef boost::mpl::list<
+using object_connections = boost::mpl::list<
     ba::binary_object_connection<socket_pair_fixture::socket>,
     ba::text_object_connection<socket_pair_fixture::socket>
-> object_connections;
+>;
 
 template <typename T>
 class message
@@ -569,10 +569,10 @@ void reader(socket_pair_fixture::socket &socket)
     BOOST_ASSERT(size == 0);
 }
 
-typedef boost::mpl::list<
+using message_numbers = boost::mpl::list<
     boost::mpl::size_t<1000>,
     boost::mpl::size_t<0>
-> message_numbers;
+>;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test, MessageNumber, message_numbers)
 {

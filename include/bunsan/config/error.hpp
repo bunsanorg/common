@@ -14,7 +14,7 @@ namespace bunsan{namespace config
 
     struct variant_load_key_error: virtual variant_load_error
     {
-        typedef boost::error_info<struct tag_key, std::string> key;
+        using key = boost::error_info<struct tag_key, std::string>;
     };
 
     struct variant_load_invalid_key_error: virtual variant_load_key_error {};

@@ -10,14 +10,14 @@ namespace bunsan
 {
     struct tempfile_error: virtual error
     {
-        typedef boost::error_info<
+        using model = boost::error_info<
             struct tag_model,
             boost::filesystem::path
-        > model;
+        >;
     };
     struct tempfile_create_error: virtual tempfile_error
     {
-        typedef boost::error_info<struct tag_tries, std::size_t> tries;
+        using tries = boost::error_info<struct tag_tries, std::size_t>;
     };
     struct unable_to_create_unique_temp_directory:
         virtual tempfile_create_error {};

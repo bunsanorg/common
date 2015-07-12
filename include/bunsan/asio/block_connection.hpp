@@ -157,7 +157,7 @@ namespace bunsan{namespace asio
     private:
         Connection &m_connection;
 
-        typedef std::uint64_t header;
+        using header = std::uint64_t;
 
         /// Size of hex representation
         static constexpr std::size_t HEADER_SIZE = sizeof(header) * 2;

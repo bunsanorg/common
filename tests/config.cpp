@@ -14,7 +14,7 @@ struct derived {};
 
 BUNSAN_CONFIG_EXPORT(::parent, ::derived, "hello, world!")
 
-typedef boost::variant<std::string, int> variant;
+using variant = boost::variant<std::string, int>;
 
 BUNSAN_CONFIG_EXPORT(variant, std::string, "string")
 BUNSAN_CONFIG_EXPORT(variant, int, "int")

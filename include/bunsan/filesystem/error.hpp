@@ -9,25 +9,25 @@ namespace bunsan{namespace filesystem
 {
     struct error: virtual bunsan::error
     {
-        typedef boost::error_info<
+        using path = boost::error_info<
             struct tag_path,
             boost::filesystem::path
-        > path;
+        >;
 
-        typedef boost::error_info<
+        using source_path = boost::error_info<
             struct tag_source_path,
             boost::filesystem::path
-        > source_path;
+        >;
 
-        typedef boost::error_info<
+        using destination_path = boost::error_info<
             struct tag_destination_path,
             boost::filesystem::path
-        > destination_path;
+        >;
 
-        typedef boost::error_info<
+        using openmode = boost::error_info<
             struct tag_openmode,
             std::ios_base::openmode
-        > openmode;
+        >;
     };
 
     struct system_error: bunsan::system_error, virtual error
