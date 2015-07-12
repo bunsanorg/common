@@ -18,6 +18,8 @@
 #include <ostream>
 #include <string>
 
+#include <cstdint>
+
 namespace bunsan{namespace stream_enum
 {
     /// Base exception class for stream_enum errors.
@@ -32,7 +34,7 @@ namespace bunsan{namespace stream_enum
     /// Enum representation is invalid.
     struct invalid_enum_representation_error: virtual invalid_value_error
     {
-        using enum_value = boost::error_info<struct tag_enum_value, long long>;
+        using enum_value = boost::error_info<struct tag_enum_value, std::intmax_t>;
     };
 }}
 
