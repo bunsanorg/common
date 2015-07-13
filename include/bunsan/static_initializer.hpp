@@ -13,19 +13,15 @@
 #ifdef BUNSAN_STATIC_INITIALIZER_GENERATOR
 // Build system supports automatic initializer creation.
 #define BUNSAN_STATIC_INITIALIZER(NAME, CODE) \
-    extern "C" void BUNSAN_STATIC_INITIALIZER_NAME(NAME)() \
-    CODE
+  extern "C" void BUNSAN_STATIC_INITIALIZER_NAME(NAME)() CODE
 #else
 // No build system support, use C++ facilities.
-#define BUNSAN_STATIC_INITIALIZER(NAME, CODE) \
-    namespace \
-    { \
-        struct BUNSAN_STATIC_INITIALIZER_NAME(NAME) \
-        { \
-            BUNSAN_STATIC_INITIALIZER_NAME(NAME)() \
-            CODE \
-        } BOOST_PP_CAT(BUNSAN_STATIC_INITIALIZER_NAME(NAME), _sentry); \
-    }
+#define BUNSAN_STATIC_INITIALIZER(NAME, CODE)                    \
+  namespace {                                                    \
+  struct BUNSAN_STATIC_INITIALIZER_NAME(NAME) {                  \
+    BUNSAN_STATIC_INITIALIZER_NAME(NAME)() CODE                  \
+  } BOOST_PP_CAT(BUNSAN_STATIC_INITIALIZER_NAME(NAME), _sentry); \
+  }
 
 #define BUNSAN_STATIC_INITIALIZER_TEXT(CODE) int N
 #endif

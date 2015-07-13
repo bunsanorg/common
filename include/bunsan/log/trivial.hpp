@@ -8,38 +8,35 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/trivial.hpp>
 
-namespace bunsan{namespace log{namespace trivial
-{
-    template <typename Level = int>
-    class logger: public boost::log::sources::basic_composite_logger<
-        char,
-        logger<Level>,
-        boost::log::sources::multi_thread_model<
-            boost::log::aux::light_rw_mutex
-        >,
-        boost::log::sources::features<
-            boost::log::sources::severity<Level>,
-            sources::scope
-        >
-    > {};
+namespace bunsan {
+namespace log {
+namespace trivial {
 
-    struct global
-    {
-        static logger<severity> &get();
-        static void remove_default_sink();
-    };
-}}}
+template <typename Level = int>
+class logger
+    : public boost::log::sources::basic_composite_logger<
+          char, logger<Level>, boost::log::sources::multi_thread_model<
+                                   boost::log::aux::light_rw_mutex>,
+          boost::log::sources::features<boost::log::sources::severity<Level>,
+                                        sources::scope>> {};
 
-#define BUNSAN_LOG_TRIVIAL(SEV) \
-    BOOST_LOG_STREAM_WITH_PARAMS( \
-        ::bunsan::log::trivial::global::get(), \
-        (::boost::log::keywords::severity = \
-             ::bunsan::log::severity::SEV) \
-        (::bunsan::log::keywords::file = __FILE__) \
-        (::bunsan::log::keywords::line = __LINE__) \
-        (::bunsan::log::keywords::function = __func__) \
-        (::bunsan::log::keywords::pretty_function = BOOST_CURRENT_FUNCTION) \
-    )
+struct global {
+  static logger<severity> &get();
+  static void remove_default_sink();
+};
+
+}  // namespace trivial
+}  // namespace log
+}  // namespace bunsan
+
+#define BUNSAN_LOG_TRIVIAL(SEV)                                          \
+  BOOST_LOG_STREAM_WITH_PARAMS(                                          \
+      ::bunsan::log::trivial::global::get(),                             \
+      (::boost::log::keywords::severity = ::bunsan::log::severity::SEV)( \
+          ::bunsan::log::keywords::file =                                \
+              __FILE__)(::bunsan::log::keywords::line = __LINE__)(       \
+          ::bunsan::log::keywords::function = __func__)(                 \
+          ::bunsan::log::keywords::pretty_function = BOOST_CURRENT_FUNCTION))
 
 #define BUNSAN_LOG_TRACE BUNSAN_LOG_TRIVIAL(trace)
 #define BUNSAN_LOG_DEBUG BUNSAN_LOG_TRIVIAL(debug)

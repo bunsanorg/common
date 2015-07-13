@@ -10,125 +10,89 @@
 #include <iomanip>
 #include <sstream>
 
-namespace bunsan{namespace asio
-{
-    struct invalid_data_error: virtual error
-    {
-        using data = boost::error_info<struct tag_data, std::string>;
-    };
+namespace bunsan {
+namespace asio {
 
-    template <typename Connection>
-    class line_connection: private boost::noncopyable
-    {
-    public:
-        static constexpr char delimiter = '\n';
+struct invalid_data_error : virtual error {
+  using data = boost::error_info<struct tag_data, std::string>;
+};
 
-    public:
-        explicit line_connection(Connection &connection):
-            m_connection(connection) {}
+template <typename Connection>
+class line_connection : private boost::noncopyable {
+ public:
+  static constexpr char delimiter = '\n';
 
-        template <typename Handler>
-        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
-            void (boost::system::error_code))
-        async_write(const std::string &data, Handler &&handler)
-        {
-            BUNSAN_ASIO_INITFN_BEGIN(
-                Handler, handler,
-                void (boost::system::error_code),
-                real_handler,
-                result
-            )
+ public:
+  explicit line_connection(Connection &connection) : m_connection(connection) {}
 
-            if (data.find(delimiter) != std::string::npos)
-                BOOST_THROW_EXCEPTION(
-                    invalid_data_error() <<
-                    invalid_data_error::data(data) <<
-                    invalid_data_error::message("\\n is forbidden"));
+  template <typename Handler>
+  BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler, void(boost::system::error_code))
+      async_write(const std::string &data, Handler &&handler) {
+    BUNSAN_ASIO_INITFN_BEGIN(Handler, handler, void(boost::system::error_code),
+                             real_handler, result)
 
-            std::vector<boost::asio::const_buffer> buffers = {
-                boost::asio::buffer(data),
-                boost::asio::buffer(eoln)
-            };
-            boost::asio::async_write(m_connection, buffers,
-                [real_handler](
-                    const boost::system::error_code &ec,
-                    const std::size_t) mutable
-                {
-                    real_handler(ec);
-                });
+    if (data.find(delimiter) != std::string::npos)
+      BOOST_THROW_EXCEPTION(invalid_data_error()
+                            << invalid_data_error::data(data)
+                            << invalid_data_error::message("\\n is forbidden"));
 
-            BUNSAN_ASIO_INITFN_END(result)
-        }
+    std::vector<boost::asio::const_buffer> buffers = {
+        boost::asio::buffer(data), boost::asio::buffer(eoln)};
+    boost::asio::async_write(
+        m_connection, buffers,
+        [real_handler](const boost::system::error_code &ec,
+                       const std::size_t) mutable { real_handler(ec); });
 
-        template <typename Handler>
-        BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler,
-            void (boost::system::error_code))
-        async_read(std::string &data, Handler &&handler)
-        {
-            BUNSAN_ASIO_INITFN_BEGIN(
-                Handler, handler,
-                void (boost::system::error_code),
-                real_handler,
-                result
-            )
+    BUNSAN_ASIO_INITFN_END(result)
+  }
 
-            boost::asio::async_read_until(
-                m_connection,
-                m_inbound_data,
-                delimiter,
-                [this, &data, real_handler](
-                    const boost::system::error_code &ec,
-                    const std::size_t n)
-                {
-                    handle_read(ec, n, data, real_handler);
-                }
-            );
+  template <typename Handler>
+  BUNSAN_ASIO_INITFN_RESULT_TYPE(Handler, void(boost::system::error_code))
+      async_read(std::string &data, Handler &&handler) {
+    BUNSAN_ASIO_INITFN_BEGIN(Handler, handler, void(boost::system::error_code),
+                             real_handler, result)
 
-            BUNSAN_ASIO_INITFN_END(result)
-        }
+    boost::asio::async_read_until(
+        m_connection, m_inbound_data, delimiter,
+        [this, &data, real_handler](const boost::system::error_code &ec,
+                                    const std::size_t n) {
+          handle_read(ec, n, data, real_handler);
+        });
 
-        boost::asio::io_service &get_io_service()
-        {
-            return m_connection.get_io_service();
-        }
+    BUNSAN_ASIO_INITFN_END(result)
+  }
 
-        void close()
-        {
-            m_connection.close();
-        }
+  boost::asio::io_service &get_io_service() {
+    return m_connection.get_io_service();
+  }
 
-    private:
-        template <typename Handler>
-        void handle_read(
-            const boost::system::error_code &ec,
-            const std::size_t n,
-            std::string &data,
-            Handler handler)
-        {
-            if (n >= 1)
-            {
-                BOOST_ASSERT(n <= m_inbound_data.size());
-                const auto bufs = m_inbound_data.data();
-                data.assign(
-                    buffers_begin(bufs),
-                    buffers_begin(bufs) + n - 1
-                );
-                BOOST_ASSERT(*(buffers_begin(bufs) + n - 1) == delimiter);
-                m_inbound_data.consume(n);
-            }
-            handler(ec);
-        }
+  void close() { m_connection.close(); }
 
-    private:
-        Connection &m_connection;
+ private:
+  template <typename Handler>
+  void handle_read(const boost::system::error_code &ec, const std::size_t n,
+                   std::string &data, Handler handler) {
+    if (n >= 1) {
+      BOOST_ASSERT(n <= m_inbound_data.size());
+      const auto bufs = m_inbound_data.data();
+      data.assign(buffers_begin(bufs), buffers_begin(bufs) + n - 1);
+      BOOST_ASSERT(*(buffers_begin(bufs) + n - 1) == delimiter);
+      m_inbound_data.consume(n);
+    }
+    handler(ec);
+  }
 
-        boost::asio::streambuf m_inbound_data;
+ private:
+  Connection &m_connection;
 
-        static const char eoln[1];
-    };
+  boost::asio::streambuf m_inbound_data;
 
-    template <typename Connection>
-    const char line_connection<Connection>::eoln[1] = {
-        line_connection<Connection>::delimiter
-    };
-}}
+  static const char eoln[1];
+};
+
+template <typename Connection>
+const char line_connection<Connection>::eoln[1] = {
+    line_connection<Connection>::delimiter};
+
+}  // namespace asio
+}  // namespace bunsan

@@ -7,83 +7,74 @@
 #include <boost/log/core/record.hpp>
 #include <boost/scope_exit.hpp>
 
-namespace bunsan{namespace log{namespace sources
-{
-    namespace detail
-    {
-        template <typename T>
-        class attribute_setter
-        {
-        public:
-            explicit attribute_setter(boost::log::attribute_set &attrs):
-                m_attrs(attrs),
-                m_tag(m_attrs.end()) {}
+namespace bunsan {
+namespace log {
+namespace sources {
 
-            template <typename ArgsT, typename Keyword>
-            bool pre(const ArgsT &args,
-                     const Keyword &keyword,
-                     const T &fallback={})
-            {
-                m_value = args[keyword | fallback];
-                return m_value != fallback;
-            }
+namespace detail {
+template <typename T>
+class attribute_setter {
+ public:
+  explicit attribute_setter(boost::log::attribute_set &attrs)
+      : m_attrs(attrs), m_tag(m_attrs.end()) {}
 
-            template <typename Pair>
-            void post(const Pair &ret)
-            {
-                if (ret.second)
-                    m_tag = ret.first;
-            }
+  template <typename ArgsT, typename Keyword>
+  bool pre(const ArgsT &args, const Keyword &keyword, const T &fallback = {}) {
+    m_value = args[keyword | fallback];
+    return m_value != fallback;
+  }
 
-            boost::log::attributes::constant<T> attr() const
-            {
-                return boost::log::attributes::constant<T>(m_value);
-            }
+  template <typename Pair>
+  void post(const Pair &ret) {
+    if (ret.second) m_tag = ret.first;
+  }
 
-            ~attribute_setter()
-            {
-                if (m_tag != m_attrs.end())
-                    m_attrs.erase(m_tag);
-            }
+  boost::log::attributes::constant<T> attr() const {
+    return boost::log::attributes::constant<T>(m_value);
+  }
 
-        private:
-            boost::log::attribute_set &m_attrs;
-            boost::log::attribute_set::iterator m_tag;
-            T m_value;
-        };
-    }
+  ~attribute_setter() {
+    if (m_tag != m_attrs.end()) m_attrs.erase(m_tag);
+  }
 
-    template <typename BaseT>
-    class scope_feature: public BaseT
-    {
-    public:
-        using BaseT::BaseT;
+ private:
+  boost::log::attribute_set &m_attrs;
+  boost::log::attribute_set::iterator m_tag;
+  T m_value;
+};
+}  // namespace detail
 
-    protected:
-        template <typename ArgsT>
-        boost::log::record open_record_unlocked(const ArgsT &args)
-        {
-            detail::attribute_setter<std::string> file(BaseT::attributes());
-            if (file.pre(args, keywords::file))
-                file.post(BaseT::add_attribute_unlocked("File", file.attr()));
+template <typename BaseT>
+class scope_feature : public BaseT {
+ public:
+  using BaseT::BaseT;
 
-            detail::attribute_setter<unsigned> line(BaseT::attributes());
-            if (line.pre(args, keywords::line))
-                line.post(BaseT::add_attribute_unlocked("Line", line.attr()));
+ protected:
+  template <typename ArgsT>
+  boost::log::record open_record_unlocked(const ArgsT &args) {
+    detail::attribute_setter<std::string> file(BaseT::attributes());
+    if (file.pre(args, keywords::file))
+      file.post(BaseT::add_attribute_unlocked("File", file.attr()));
 
-            detail::attribute_setter<std::string> function(BaseT::attributes());
-            if (function.pre(args, keywords::function))
-                function.post(BaseT::add_attribute_unlocked(
-                    "Function", function.attr()));
+    detail::attribute_setter<unsigned> line(BaseT::attributes());
+    if (line.pre(args, keywords::line))
+      line.post(BaseT::add_attribute_unlocked("Line", line.attr()));
 
-            detail::attribute_setter<std::string> pretty_function(BaseT::attributes());
-            if (pretty_function.pre(args, keywords::pretty_function))
-                pretty_function.post(BaseT::add_attribute_unlocked(
-                    "PrettyFunction", pretty_function.attr()));
+    detail::attribute_setter<std::string> function(BaseT::attributes());
+    if (function.pre(args, keywords::function))
+      function.post(BaseT::add_attribute_unlocked("Function", function.attr()));
 
-            return BaseT::open_record_unlocked(args);
-        }
-    };
+    detail::attribute_setter<std::string> pretty_function(BaseT::attributes());
+    if (pretty_function.pre(args, keywords::pretty_function))
+      pretty_function.post(BaseT::add_attribute_unlocked(
+          "PrettyFunction", pretty_function.attr()));
 
-    struct scope: boost::mpl::quote1<scope_feature> {};
-}}}
+    return BaseT::open_record_unlocked(args);
+  }
+};
+
+struct scope : boost::mpl::quote1<scope_feature> {};
+
+}  // namespace sources
+}  // namespace log
+}  // namespace bunsan

@@ -8,56 +8,50 @@
 #include <functional>
 #include <utility>
 
-namespace bunsan{namespace application
-{
-    enum exit_code
-    {
-        exit_success = 0,
-        argument_parser_failure = 100,
-        exit_failure = 200
-    };
+namespace bunsan {
+namespace application {
 
-    class application
-    {
-    public:
-        explicit application(const int argc,
-                             const char *const argv[]);
+enum exit_code {
+  exit_success = 0,
+  argument_parser_failure = 100,
+  exit_failure = 200
+};
 
-        boost::optional<std::string> executable() const;
+class application {
+ public:
+  explicit application(const int argc, const char *const argv[]);
 
-        const std::string &name() const
-        {
-            return m_name;
-        }
+  boost::optional<std::string> executable() const;
 
-        void name(const std::string &name)
-        {
-            m_name = name;
-        }
+  const std::string &name() const { return m_name; }
 
-        virtual ~application();
+  void name(const std::string &name) { m_name = name; }
 
-        /// Should be implemented by user.
-        virtual int main(const variables_map &variables)=0;
+  virtual ~application();
 
-        virtual int exec();
+  /// Should be implemented by user.
+  virtual int main(const variables_map &variables) = 0;
 
-        virtual int argument_parser_error(std::exception &e);
+  virtual int exec();
 
-        void print_help();
+  virtual int argument_parser_error(std::exception &e);
 
-        virtual void print_synopsis();
+  void print_help();
 
-        virtual void print_version();
+  virtual void print_synopsis();
 
-        /// Default implementation provides help and version flags.
-        virtual void initialize_argument_parser(argument_parser &parser);
+  virtual void print_version();
 
-    private:
-        const int m_argc;
-        const char *const *const m_argv;
-        std::string m_name;
-        argument_parser m_parser;
-        global_registry_ptr m_global_registry;
-    };
-}}
+  /// Default implementation provides help and version flags.
+  virtual void initialize_argument_parser(argument_parser &parser);
+
+ private:
+  const int m_argc;
+  const char *const *const m_argv;
+  std::string m_name;
+  argument_parser m_parser;
+  global_registry_ptr m_global_registry;
+};
+
+}  // namespace application
+}  // namespace bunsan

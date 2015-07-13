@@ -11,103 +11,98 @@
 
 // see bunsan::error::info_name()
 #if BOOST_VERSION < 105400
-#   include <typeinfo>
+#include <typeinfo>
 #endif
 
-namespace bunsan
-{
-    struct error: virtual std::exception, virtual boost::exception
-    {
-        /*!
-         * \brief Create error object with stacktrace tag.
-         *
-         * \see stacktrace
-         */
-        error();
+namespace bunsan {
 
-        /*!
-         * \brief Create error object with message and stacktrace tags.
-         *
-         * \see message
-         * \see stacktrace
-         */
-        error(const std::string &message_);
+struct error : virtual std::exception, virtual boost::exception {
+  /*!
+   * \brief Create error object with stacktrace tag.
+   *
+   * \see stacktrace
+   */
+  error();
 
-        const char *what() const noexcept override;
+  /*!
+   * \brief Create error object with message and stacktrace tags.
+   *
+   * \see message
+   * \see stacktrace
+   */
+  error(const std::string &message_);
 
-        /*!
-         * \tparam ErrorInfo boost::error_info instantiation
-         * \return pointer to data associated with ErrorInfo
-         */
-        template <typename ErrorInfo>
-        const typename ErrorInfo::value_type *get() const noexcept
-        {
-            return boost::get_error_info<ErrorInfo>(*this);
-        }
+  const char *what() const noexcept override;
 
-        /*!
-         * \copydoc get
-         */
-        template <typename ErrorInfo>
-        typename ErrorInfo::value_type *get() noexcept
-        {
-            return boost::get_error_info<ErrorInfo>(*this);
-        }
+  /*!
+   * \tparam ErrorInfo boost::error_info instantiation
+   * \return pointer to data associated with ErrorInfo
+   */
+  template <typename ErrorInfo>
+  const typename ErrorInfo::value_type *get() const noexcept {
+    return boost::get_error_info<ErrorInfo>(*this);
+  }
 
-        /// Human readable error message
-        using message = boost::error_info<struct tag_message, std::string>;
+  /*!
+   * \copydoc get
+   */
+  template <typename ErrorInfo>
+  typename ErrorInfo::value_type *get() noexcept {
+    return boost::get_error_info<ErrorInfo>(*this);
+  }
 
-        using stacktrace = boost::error_info<struct tag_stacktrace, runtime::stacktrace>;
+  /// Human readable error message
+  using message = boost::error_info<struct tag_message, std::string>;
 
-        using nested_exception = boost::errinfo_nested_exception;
+  using stacktrace =
+      boost::error_info<struct tag_stacktrace, runtime::stacktrace>;
 
-        template <typename Tag, typename T>
-        static std::string info_name(const boost::error_info<Tag, T> &x)
-        {
-    #if BOOST_VERSION >= 105400
-            return boost::error_info_name(x);
-    #else
-            (void) x;
-            return runtime::demangle(typeid(Tag *).name());
-    #endif
-        }
-    };
+  using nested_exception = boost::errinfo_nested_exception;
 
-    template <>
-    class error_manip<struct tag_enable_stacktrace>
-    {
-    public:
-        /*!
-         * \brief Enable stack trace if not provided.
-         *
-         * \param skip number of nested function to omit in stack trace
-         */
-        explicit error_manip(const std::size_t skip=0): m_skip(skip) {}
+  template <typename Tag, typename T>
+  static std::string info_name(const boost::error_info<Tag, T> &x) {
+#if BOOST_VERSION >= 105400
+    return boost::error_info_name(x);
+#else
+    (void)x;
+    return runtime::demangle(typeid(Tag *).name());
+#endif
+  }
+};
 
-        void operator()(const boost::exception &e) const;
+template <>
+class error_manip<struct tag_enable_stacktrace> {
+ public:
+  /*!
+   * \brief Enable stack trace if not provided.
+   *
+   * \param skip number of nested function to omit in stack trace
+   */
+  explicit error_manip(const std::size_t skip = 0) : m_skip(skip) {}
 
-    private:
-        std::size_t m_skip;
-    };
-    using enable_stacktrace = error_manip<tag_enable_stacktrace>;
+  void operator()(const boost::exception &e) const;
 
-    template<>
-    class error_manip<struct tag_enable_nested>
-    {
-    public:
-        explicit error_manip(const boost::exception_ptr &ptr): m_ptr(ptr) {}
+ private:
+  std::size_t m_skip;
+};
+using enable_stacktrace = error_manip<tag_enable_stacktrace>;
 
-        void operator()(const boost::exception &e) const;
+template <>
+class error_manip<struct tag_enable_nested> {
+ public:
+  explicit error_manip(const boost::exception_ptr &ptr) : m_ptr(ptr) {}
 
-    private:
-        boost::exception_ptr m_ptr;
-    };
-    using enable_nested = error_manip<tag_enable_nested>;
+  void operator()(const boost::exception &e) const;
 
-    template <>
-    struct error_manip<struct tag_enable_nested_current>
-    {
-        void operator()(const boost::exception &e) const;
-    };
-    using enable_nested_current = error_manip<tag_enable_nested_current>;
-}
+ private:
+  boost::exception_ptr m_ptr;
+};
+using enable_nested = error_manip<tag_enable_nested>;
+
+template <>
+struct error_manip<struct tag_enable_nested_current> {
+  void operator()(const boost::exception &e) const;
+};
+using enable_nested_current = error_manip<tag_enable_nested_current>;
+
+}  // namespace bunsan

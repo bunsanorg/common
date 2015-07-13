@@ -30,67 +30,51 @@ namespace bunsan
 }
 \endcode
  */
-#ifdef BUNSAN_FACTORY_BEGIN
-#   error ASSERTION: BUNSAN_FACTORY_BEGIN is in use
-#endif
-
-#define BUNSAN_FACTORY_BEGIN(CLASS, ...) \
-{\
-public: \
-    struct unknown_##CLASS##_error: \
-        virtual ::bunsan::unknown_factory_error {}; \
-    template <typename T> \
-    using shared_ptr = std::shared_ptr<T>; \
-    using CLASS##_ptr = shared_ptr<CLASS>; \
-    using bunsan_factory = bunsan::factory< \
-        CLASS##_ptr (__VA_ARGS__), \
-        unknown_##CLASS##_error \
-    >; \
-    using factory_type = typename bunsan_factory::factory_type; \
-    static factory_type factory_optional( \
-        const typename bunsan_factory::key_type &type) \
-    { \
-        return bunsan_factory::factory_optional(factories, type); \
-    } \
-    static factory_type factory( \
-        const typename bunsan_factory::key_type &type) \
-    { \
-        return bunsan_factory::factory(factories, type); \
-    } \
-    template <typename ... Args> \
-    static typename std::enable_if< \
-        bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
-    type instance_optional(const typename bunsan_factory::key_type &type, \
-                           Args &&...args) \
-    { \
-        return bunsan_factory::instance_optional( \
-            factories, \
-            type, \
-            std::forward<Args>(args)...\
-        ); \
-    } \
-    template <typename ... Args> \
-    static typename std::enable_if< \
-        bunsan_factory::arguments_size::value == sizeof...(Args), CLASS##_ptr>:: \
-    type instance(const typename bunsan_factory::key_type &type, Args &&...args) \
-    { \
-        return bunsan_factory::instance( \
-            factories, \
-            type, \
-            std::forward<Args>(args)...\
-        ); \
-    } \
-    static typename bunsan_factory::const_range registered() \
-    { \
-        return bunsan_factory::registered(factories); \
-    } \
-    template <typename T, typename ... Args> \
-    static shared_ptr<T> make_shared(Args &&...args) \
-    { \
-        return std::make_shared<T>(std::forward<Args>(args)...); \
-    } \
-private:
-
+#define BUNSAN_FACTORY_BEGIN(CLASS, ...)                                       \
+  {                                                                            \
+   public:                                                                     \
+    struct unknown_##CLASS##_error : virtual ::bunsan::unknown_factory_error { \
+    };                                                                         \
+    template <typename T>                                                      \
+    using shared_ptr = std::shared_ptr<T>;                                     \
+    using CLASS##_ptr = shared_ptr<CLASS>;                                     \
+    using bunsan_factory =                                                     \
+        bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error>;    \
+    using factory_type = typename bunsan_factory::factory_type;                \
+    static factory_type factory_optional(                                      \
+        const typename bunsan_factory::key_type &type) {                       \
+      return bunsan_factory::factory_optional(factories, type);                \
+    }                                                                          \
+    static factory_type factory(                                               \
+        const typename bunsan_factory::key_type &type) {                       \
+      return bunsan_factory::factory(factories, type);                         \
+    }                                                                          \
+    template <typename... Args>                                                \
+    static typename std::enable_if<bunsan_factory::arguments_size::value ==    \
+                                       sizeof...(Args),                        \
+                                   CLASS##_ptr>::type                          \
+    instance_optional(const typename bunsan_factory::key_type &type,           \
+                      Args &&... args) {                                       \
+      return bunsan_factory::instance_optional(factories, type,                \
+                                               std::forward<Args>(args)...);   \
+    }                                                                          \
+    template <typename... Args>                                                \
+    static typename std::enable_if<bunsan_factory::arguments_size::value ==    \
+                                       sizeof...(Args),                        \
+                                   CLASS##_ptr>::type                          \
+    instance(const typename bunsan_factory::key_type &type, Args &&... args) { \
+      return bunsan_factory::instance(factories, type,                         \
+                                      std::forward<Args>(args)...);            \
+    }                                                                          \
+    static typename bunsan_factory::const_range registered() {                 \
+      return bunsan_factory::registered(factories);                            \
+    }                                                                          \
+    template <typename T, typename... Args>                                    \
+    static shared_ptr<T> make_shared(Args &&... args) {                        \
+      return std::make_shared<T>(std::forward<Args>(args)...);                 \
+    }                                                                          \
+                                                                               \
+   private:
 /*!
  * \def BUNSAN_FACTORY_END(CLASS)
  *
@@ -101,21 +85,20 @@ private:
  * \see BUNSAN_FACTORY_BEGIN
  */
 #ifdef BUNSAN_FACTORY_END
-#   error ASSERTION: BUNSAN_FACTORY_END is in use
+#error ASSERTION: BUNSAN_FACTORY_END is in use
 #endif
-#define BUNSAN_FACTORY_END(CLASS) \
-public: \
-    static bool register_new( \
-        const typename bunsan_factory::key_type &type, \
-        const factory_type &f) \
-    { \
-        return bunsan_factory::register_new(factories, type, f); \
-    } \
-private: \
-    static typename bunsan_factory::map_ptr_type factories; \
-}; \
-using CLASS##_ptr = CLASS::CLASS##_ptr; \
-using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
+#define BUNSAN_FACTORY_END(CLASS)                                           \
+   public:                                                                  \
+    static bool register_new(const typename bunsan_factory::key_type &type, \
+                             const factory_type &f) {                       \
+      return bunsan_factory::register_new(factories, type, f);              \
+    }                                                                       \
+                                                                            \
+   private:                                                                 \
+    static typename bunsan_factory::map_ptr_type factories;                 \
+  };                                                                        \
+  using CLASS##_ptr = CLASS::CLASS##_ptr;                                   \
+  using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
 
 /*!
  * \def BUNSAN_FACTORY_DEFINE(CLASS)
@@ -138,20 +121,13 @@ namespace bunsan
 }
 \endcode
  */
-#ifdef BUNSAN_FACTORY_DEFINE
-#   error ASSERTION: BUNSAN_FACTORY_DEFINE is in use
-#endif
 #define BUNSAN_FACTORY_DEFINE(CLASS) \
-    typename CLASS::bunsan_factory::map_ptr_type CLASS::factories;
+  typename CLASS::bunsan_factory::map_ptr_type CLASS::factories;
 
-#ifdef BUNSAN_FACTORY_REGISTER
-#   error ASSERTION: BUNSAN_FACTORY_REGISTER is in use
-#endif
-#define BUNSAN_FACTORY_REGISTER(VAR, FACTORY, NAME, CODE) \
-    static const bool BOOST_PP_CAT(bunsan_factory_register_, BOOST_PP_CAT(VAR, __LINE__)) = \
-        FACTORY::register_new(NAME, CODE);
-#ifdef BUNSAN_FACTORY_REGISTER_TOKEN
-#   error ASSERTION: BUNSAN_FACTORY_REGISTER_TOKEN is in use
-#endif
+#define BUNSAN_FACTORY_REGISTER(VAR, FACTORY, NAME, CODE)       \
+  static const bool BOOST_PP_CAT(bunsan_factory_register_,      \
+                                 BOOST_PP_CAT(VAR, __LINE__)) = \
+      FACTORY::register_new(NAME, CODE);
+
 #define BUNSAN_FACTORY_REGISTER_TOKEN(FACTORY, TOKEN, CODE) \
-    BUNSAN_FACTORY_REGISTER(TOKEN, FACTORY, #TOKEN, CODE)
+  BUNSAN_FACTORY_REGISTER(TOKEN, FACTORY, #TOKEN, CODE)

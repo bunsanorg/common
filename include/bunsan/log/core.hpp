@@ -2,14 +2,17 @@
 
 #include <bunsan/log/severity.hpp>
 
-namespace bunsan{namespace log
-{
-    bool set_enabled(bool enabled);
+namespace bunsan {
+namespace log {
 
-    inline bool enable() { return set_enabled(true); }
-    inline bool disable() { return set_enabled(false); }
+bool set_enabled(bool enabled);
 
-    void remove_default_sink();
+inline bool enable() { return set_enabled(true); }
+inline bool disable() { return set_enabled(false); }
 
-    void set_minimum_severity(const severity minimum_severity);
-}}
+void remove_default_sink();
+
+void set_minimum_severity(const severity minimum_severity);
+
+}  // namespace log
+}  // namespace bunsan

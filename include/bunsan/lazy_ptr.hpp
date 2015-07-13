@@ -4,61 +4,47 @@
 
 #include <mutex>
 
-namespace bunsan
-{
-    namespace detail
-    {
-        template <typename T, bool Destroy>
-        class basic_lazy_ptr: private boost::noncopyable
-        {
-        public:
-            constexpr basic_lazy_ptr() {}
+namespace bunsan {
 
-            ~basic_lazy_ptr()
-            {
-                if (Destroy)
-                    delete m_ptr;
-            }
+namespace detail {
+template <typename T, bool Destroy>
+class basic_lazy_ptr : private boost::noncopyable {
+ public:
+  constexpr basic_lazy_ptr() {}
 
-            T *operator->() const
-            {
-                ensure_initialized();
-                return m_ptr;
-            }
+  ~basic_lazy_ptr() {
+    if (Destroy) delete m_ptr;
+  }
 
-            T *get() const
-            {
-                ensure_initialized();
-                return m_ptr;
-            }
+  T *operator->() const {
+    ensure_initialized();
+    return m_ptr;
+  }
 
-            T &operator*() const
-            {
-                return *get();
-            }
+  T *get() const {
+    ensure_initialized();
+    return m_ptr;
+  }
 
-        private:
-            void initialize() const
-            {
-                m_ptr = new T{};
-            }
+  T &operator*() const { return *get(); }
 
-            void ensure_initialized() const
-            {
-                std::call_once(m_once,
-                    &basic_lazy_ptr<T, Destroy>::initialize, this
-                );
-            }
+ private:
+  void initialize() const { m_ptr = new T{}; }
 
-        private:
-            mutable std::once_flag m_once;
-            mutable T *m_ptr = nullptr;
-        };
-    }
+  void ensure_initialized() const {
+    std::call_once(m_once, &basic_lazy_ptr<T, Destroy>::initialize, this);
+  }
 
-    template <typename T>
-    using lazy_ptr = detail::basic_lazy_ptr<T, true>;
+ private:
+  mutable std::once_flag m_once;
+  mutable T *m_ptr = nullptr;
+};
+}  // namespace detail
 
-    template <typename T>
-    using global_lazy_ptr = detail::basic_lazy_ptr<T, false>;
-}
+template <typename T>
+using lazy_ptr = detail::basic_lazy_ptr<T, true>;
+
+template <typename T>
+using global_lazy_ptr = detail::basic_lazy_ptr<T, false>;
+
+}  // namespace bunsan

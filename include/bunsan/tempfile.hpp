@@ -6,91 +6,80 @@
 
 #include <string>
 
-namespace bunsan
-{
-    struct tempfile_error: virtual error
-    {
-        using model = boost::error_info<
-            struct tag_model,
-            boost::filesystem::path
-        >;
-    };
-    struct tempfile_create_error: virtual tempfile_error
-    {
-        using tries = boost::error_info<struct tag_tries, std::size_t>;
-    };
-    struct unable_to_create_unique_temp_directory:
-        virtual tempfile_create_error {};
-    struct unable_to_create_unique_temp_regular_file:
-        virtual tempfile_create_error {};
+namespace bunsan {
 
-    /*!
-     * \note Model is pattern with '%' symbols
-     * that are replaced by random symbols from [0-9a-f]
-     */
-    class tempfile
-    {
-    public:
-        tempfile();
+struct tempfile_error : virtual error {
+  using model = boost::error_info<struct tag_model, boost::filesystem::path>;
+};
+struct tempfile_create_error : virtual tempfile_error {
+  using tries = boost::error_info<struct tag_tries, std::size_t>;
+};
+struct unable_to_create_unique_temp_directory : virtual tempfile_create_error {
+};
+struct unable_to_create_unique_temp_regular_file
+    : virtual tempfile_create_error {};
 
-        /// Captures existing filesystem object
-        explicit tempfile(const boost::filesystem::path &path,
-                          bool do_auto_remove=true);
-        tempfile(const tempfile &tmp)=delete;
-        tempfile(tempfile &&tmp) noexcept;
+/*!
+ * \note Model is pattern with '%' symbols
+ * that are replaced by random symbols from [0-9a-f]
+ */
+class tempfile {
+ public:
+  tempfile();
 
-        tempfile &operator=(const tempfile &tmp)=delete;
-        tempfile &operator=(tempfile &&tmp) noexcept;
+  /// Captures existing filesystem object
+  explicit tempfile(const boost::filesystem::path &path,
+                    bool do_auto_remove = true);
+  tempfile(const tempfile &tmp) = delete;
+  tempfile(tempfile &&tmp) noexcept;
 
-        // path access
-        const boost::filesystem::path &path() const;
-        boost::filesystem::path::string_type native() const;
-        std::string generic_string() const;
-        std::string string() const;
+  tempfile &operator=(const tempfile &tmp) = delete;
+  tempfile &operator=(tempfile &&tmp) noexcept;
 
-        bool auto_remove() const;
-        void auto_remove(bool do_auto_remove_);
+  // path access
+  const boost::filesystem::path &path() const;
+  boost::filesystem::path::string_type native() const;
+  std::string generic_string() const;
+  std::string string() const;
 
-        ~tempfile();
+  bool auto_remove() const;
+  void auto_remove(bool do_auto_remove_);
 
-        // swap
-        void swap(tempfile &tmp) noexcept;
+  ~tempfile();
 
-    public:
-        static tempfile regular_file_in_directory(
-            const boost::filesystem::path &directory);
-        static tempfile directory_in_directory(
-            const boost::filesystem::path &directory);
+  // swap
+  void swap(tempfile &tmp) noexcept;
 
-        static tempfile regular_file_in_tempdir();
-        static tempfile directory_in_tempdir();
+ public:
+  static tempfile regular_file_in_directory(
+      const boost::filesystem::path &directory);
+  static tempfile directory_in_directory(
+      const boost::filesystem::path &directory);
 
-        static tempfile regular_file_in_tempdir(
-            const boost::filesystem::path &model);
-        static tempfile directory_in_tempdir(
-            const boost::filesystem::path &model);
+  static tempfile regular_file_in_tempdir();
+  static tempfile directory_in_tempdir();
 
-        static tempfile regular_file_from_model(
-            const boost::filesystem::path &model);
-        static tempfile directory_from_model(
-            const boost::filesystem::path &model);
+  static tempfile regular_file_in_tempdir(const boost::filesystem::path &model);
+  static tempfile directory_in_tempdir(const boost::filesystem::path &model);
 
-    private:
-        /// \return false if exists
-        static bool create_regular_file(const boost::filesystem::path &path);
+  static tempfile regular_file_from_model(const boost::filesystem::path &model);
+  static tempfile directory_from_model(const boost::filesystem::path &model);
 
-        /// \return false if exists
-        static bool create_directory(const boost::filesystem::path &path);
+ private:
+  /// \return false if exists
+  static bool create_regular_file(const boost::filesystem::path &path);
 
-    private:
-        static const boost::filesystem::path default_model;
+  /// \return false if exists
+  static bool create_directory(const boost::filesystem::path &path);
 
-    private:
-        boost::filesystem::path m_path;
-        bool m_do_auto_remove;
-    };
-    inline void swap(tempfile &a, tempfile &b) noexcept
-    {
-        a.swap(b);
-    }
-}
+ private:
+  static const boost::filesystem::path default_model;
+
+ private:
+  boost::filesystem::path m_path;
+  bool m_do_auto_remove;
+};
+
+inline void swap(tempfile &a, tempfile &b) noexcept { a.swap(b); }
+
+}  // namespace bunsan
