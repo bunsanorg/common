@@ -10,6 +10,79 @@
 #include <string>
 #include <type_traits>
 
+#define BUNSAN_FACTORY_PUBLIC_BODY(CLASS, ...)                                 \
+  struct unknown_##CLASS##_error : virtual ::bunsan::unknown_factory_error {}; \
+  template <typename T>                                                        \
+  using shared_ptr = std::shared_ptr<T>;                                       \
+  using CLASS##_ptr = shared_ptr<CLASS>;                                       \
+  using bunsan_factory =                                                       \
+      bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error>;      \
+  using factory_type = typename bunsan_factory::factory_type;                  \
+  static factory_type factory_optional(                                        \
+      const typename bunsan_factory::key_type &type) {                         \
+    return bunsan_factory::factory_optional(factories, type);                  \
+  }                                                                            \
+  static factory_type factory(const typename bunsan_factory::key_type &type) { \
+    return bunsan_factory::factory(factories, type);                           \
+  }                                                                            \
+  template <typename... Args>                                                  \
+  static typename std::enable_if<bunsan_factory::arguments_size::value ==      \
+                                     sizeof...(Args),                          \
+                                 CLASS##_ptr>::type                            \
+  instance_optional(const typename bunsan_factory::key_type &type,             \
+                    Args &&... args) {                                         \
+    return bunsan_factory::instance_optional(factories, type,                  \
+                                             std::forward<Args>(args)...);     \
+  }                                                                            \
+  template <typename... Args>                                                  \
+  static typename std::enable_if<bunsan_factory::arguments_size::value ==      \
+                                     sizeof...(Args),                          \
+                                 CLASS##_ptr>::type                            \
+  instance(const typename bunsan_factory::key_type &type, Args &&... args) {   \
+    return bunsan_factory::instance(factories, type,                           \
+                                    std::forward<Args>(args)...);              \
+  }                                                                            \
+  static typename bunsan_factory::const_range registered() {                   \
+    return bunsan_factory::registered(factories);                              \
+  }                                                                            \
+  template <typename T, typename... Args>                                      \
+  static shared_ptr<T> make_shared(Args &&... args) {                          \
+    return std::make_shared<T>(std::forward<Args>(args)...);                   \
+  }                                                                            \
+  static bool register_new(const typename bunsan_factory::key_type &type,      \
+                           const factory_type &f) {                            \
+    return bunsan_factory::register_new(factories, type, f);                   \
+  }
+
+#define BUNSAN_FACTORY_PRIVATE_BODY(CLASS) \
+  static typename bunsan_factory::map_ptr_type factories;
+
+/*!
+ * \def BUNSAN_FACTORY_PUBLIC_BODY(CLASS, ...)
+ *
+ * \brief Defines abstract factory's body.
+ *
+\code
+namespace bunsan {
+class factory_base {
+  BUNSAN_FACTORY_BODY(factory_base, const std::string &)
+ public:
+  virtual void f()=0;
+};
+BUNSAN_FACTORY_TYPES(factory_base)
+}  // namespace bunsan
+\endcode
+ */
+#define BUNSAN_FACTORY_BODY(CLASS, ...)          \
+ public:                                         \
+  BUNSAN_FACTORY_PUBLIC_BODY(CLASS, __VA_ARGS__) \
+ private:                                        \
+  BUNSAN_FACTORY_PRIVATE_BODY(CLASS)
+
+#define BUNSAN_FACTORY_TYPES(CLASS)       \
+  using CLASS##_ptr = CLASS::CLASS##_ptr; \
+  using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
+
 /*!
  * \def BUNSAN_FACTORY_BEGIN(CLASS, ...)
  *
@@ -20,61 +93,18 @@
  * for example
  *
 \code
-namespace bunsan
-{
-    class factory_base
-    BUNSAN_FACTORY_BEGIN(factory_base, const std::string &)
-    public:
-        virtual void f()=0;
-    BUNSAN_FACTORY_END(factory_base)
-}
+namespace bunsan {
+class factory_base
+BUNSAN_FACTORY_BEGIN(factory_base, const std::string &)
+ public:
+  virtual void f()=0;
+BUNSAN_FACTORY_END(factory_base)
+}  // namespace bunsan
 \endcode
  */
-#define BUNSAN_FACTORY_BEGIN(CLASS, ...)                                       \
-  {                                                                            \
-   public:                                                                     \
-    struct unknown_##CLASS##_error : virtual ::bunsan::unknown_factory_error { \
-    };                                                                         \
-    template <typename T>                                                      \
-    using shared_ptr = std::shared_ptr<T>;                                     \
-    using CLASS##_ptr = shared_ptr<CLASS>;                                     \
-    using bunsan_factory =                                                     \
-        bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error>;    \
-    using factory_type = typename bunsan_factory::factory_type;                \
-    static factory_type factory_optional(                                      \
-        const typename bunsan_factory::key_type &type) {                       \
-      return bunsan_factory::factory_optional(factories, type);                \
-    }                                                                          \
-    static factory_type factory(                                               \
-        const typename bunsan_factory::key_type &type) {                       \
-      return bunsan_factory::factory(factories, type);                         \
-    }                                                                          \
-    template <typename... Args>                                                \
-    static typename std::enable_if<bunsan_factory::arguments_size::value ==    \
-                                       sizeof...(Args),                        \
-                                   CLASS##_ptr>::type                          \
-    instance_optional(const typename bunsan_factory::key_type &type,           \
-                      Args &&... args) {                                       \
-      return bunsan_factory::instance_optional(factories, type,                \
-                                               std::forward<Args>(args)...);   \
-    }                                                                          \
-    template <typename... Args>                                                \
-    static typename std::enable_if<bunsan_factory::arguments_size::value ==    \
-                                       sizeof...(Args),                        \
-                                   CLASS##_ptr>::type                          \
-    instance(const typename bunsan_factory::key_type &type, Args &&... args) { \
-      return bunsan_factory::instance(factories, type,                         \
-                                      std::forward<Args>(args)...);            \
-    }                                                                          \
-    static typename bunsan_factory::const_range registered() {                 \
-      return bunsan_factory::registered(factories);                            \
-    }                                                                          \
-    template <typename T, typename... Args>                                    \
-    static shared_ptr<T> make_shared(Args &&... args) {                        \
-      return std::make_shared<T>(std::forward<Args>(args)...);                 \
-    }                                                                          \
-                                                                               \
-   private:
+#define BUNSAN_FACTORY_BEGIN(CLASS, ...) \
+  {                                      \
+    BUNSAN_FACTORY_BODY(CLASS, __VA_ARGS__)
 /*!
  * \def BUNSAN_FACTORY_END(CLASS)
  *
@@ -84,21 +114,9 @@ namespace bunsan
  *
  * \see BUNSAN_FACTORY_BEGIN
  */
-#ifdef BUNSAN_FACTORY_END
-#error ASSERTION: BUNSAN_FACTORY_END is in use
-#endif
-#define BUNSAN_FACTORY_END(CLASS)                                           \
-   public:                                                                  \
-    static bool register_new(const typename bunsan_factory::key_type &type, \
-                             const factory_type &f) {                       \
-      return bunsan_factory::register_new(factories, type, f);              \
-    }                                                                       \
-                                                                            \
-   private:                                                                 \
-    static typename bunsan_factory::map_ptr_type factories;                 \
-  };                                                                        \
-  using CLASS##_ptr = CLASS::CLASS##_ptr;                                   \
-  using unknown_##CLASS##_error = CLASS::unknown_##CLASS##_error;
+#define BUNSAN_FACTORY_END(CLASS) \
+  };                              \
+  BUNSAN_FACTORY_TYPES(CLASS)
 
 /*!
  * \def BUNSAN_FACTORY_DEFINE(CLASS)
@@ -115,10 +133,9 @@ namespace bunsan
 BUNSAN_FACTORY_DEFINE(bunsan::factory_base)
 \endcode
 \code
-namespace bunsan
-{
-    BUNSAN_FACTORY_DEFINE(factory_base)
-}
+namespace bunsan {
+  BUNSAN_FACTORY_DEFINE(factory_base)
+}  // namespace bunsan
 \endcode
  */
 #define BUNSAN_FACTORY_DEFINE(CLASS) \

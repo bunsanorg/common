@@ -74,13 +74,17 @@ class base {
   virtual std::string g() = 0;
 };
 
-class fact : public base BUNSAN_FACTORY_BEGIN(fact, const std::string &,
-                                              const std::string &) public
-             : virtual std::string f() = 0;
-BUNSAN_FACTORY_END(fact)
+class fact : public base {
+  BUNSAN_FACTORY_BODY(fact, const std::string &, const std::string &)
+ public:
+  virtual std::string f() = 0;
+};
+BUNSAN_FACTORY_TYPES(fact)
 
-class fact2 BUNSAN_FACTORY_BEGIN(fact2) public : virtual int code() = 0;
-BUNSAN_FACTORY_END(fact2)
+class fact2 {
+  BUNSAN_FACTORY_BODY(fact2) public : virtual int code() = 0;
+};
+BUNSAN_FACTORY_TYPES(fact2)
 
 class fact_derived : public fact {
  public:
