@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(basic) {
 }
 
 BOOST_AUTO_TEST_CASE(null) {
-  typedef bunsan::factory<std::shared_ptr<int>()> bunsan_factory;
+  using bunsan_factory = bunsan::factory<std::shared_ptr<int>()>;
   typename bunsan_factory::map_ptr_type map;
   BOOST_CHECK(bunsan_factory::registered(map).empty());
 }
