@@ -64,7 +64,7 @@ class basic_object_connection : private boost::noncopyable {
         ia >> obj;
       } catch (std::exception &) {
         boost::system::error_code error(boost::asio::error::invalid_argument);
-        handler(ec);
+        handler(error);
         return;
       }
       handler(ec);

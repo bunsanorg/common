@@ -347,6 +347,26 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection, ObjectConnection,
   BOOST_CHECK(oc2_completed);
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection_serialize_error,
+                              ObjectConnection, object_connections) {
+  const std::string nan_int = "NaN-int";
+  bool completed = false;
+  message<int> oc1_msg, oc2_msg;
+  ba::block_connection<socket_pair_fixture::socket> bc1(socket1);
+  ObjectConnection oc2(socket2);
+  bc1.async_write(nan_int, [&](const boost::system::error_code &ec) {
+    BOOST_REQUIRE(!ec);
+    bc1.close();
+    oc2_msg = 11;
+    oc2.async_read(oc2_msg, [&](const boost::system::error_code &ec) {
+      BOOST_CHECK(ec == boost::asio::error::invalid_argument);
+      completed = true;
+    });
+  });
+  io_service.run();
+  BOOST_CHECK(completed);
+}
+
 BOOST_AUTO_TEST_SUITE_END()  // serialization
 
 BOOST_FIXTURE_TEST_SUITE(queued_writer, socket_pair_fixture)
