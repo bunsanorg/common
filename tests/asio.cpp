@@ -54,6 +54,8 @@ struct socket_pair_fixture : local_socket_fixture {
 BOOST_FIXTURE_TEST_SUITE(serialization, socket_pair_fixture)
 
 BOOST_AUTO_TEST_CASE(block_connection) {
+  bool bc1_completed = false;
+  bool bc2_completed = false;
   std::string bc1_data, bc2_data;
   ba::block_connection<socket> bc1(socket1), bc2(socket2);
   BOOST_CHECK_EQUAL(&bc1.get_io_service(), &io_service);
@@ -70,6 +72,7 @@ BOOST_AUTO_TEST_CASE(block_connection) {
               BOOST_REQUIRE(!ec);
               BOOST_CHECK_EQUAL(bc1_data, "second response");
               bc1.close();
+              bc1_completed = true;
             });
           });
     });
@@ -88,12 +91,15 @@ BOOST_AUTO_TEST_CASE(block_connection) {
               bc2.async_read(bc2_data,
                              [&](const boost::system::error_code &ec) {
                                BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+                               bc2_completed = true;
                              });
             });
       });
     });
   });
   io_service.run();
+  BOOST_CHECK(bc1_completed);
+  BOOST_CHECK(bc2_completed);
 }
 
 using object_connections =
@@ -148,8 +154,14 @@ struct session : boost::asio::coroutine {
       : oc(std::make_shared<ObjectConnection>(socket_)),
         msg(std::make_shared<message<int>>()) {}
 
+  void check_completed() {
+    BOOST_REQUIRE(completed);
+    BOOST_CHECK(*completed);
+  }
+
   std::shared_ptr<ObjectConnection> oc;
   std::shared_ptr<message<int>> msg;
+  std::shared_ptr<bool> completed{std::make_shared<bool>(false)};
 };
 
 template <typename ObjectConnection>
@@ -177,6 +189,7 @@ struct server_session : session<ObjectConnection> {
       BOOST_CHECK_EQUAL(*msg, 200);
 
       oc->close();
+      *this->completed = true;
     }
   }
 #include <boost/asio/unyield.hpp>
@@ -212,6 +225,7 @@ struct client_session : session<ObjectConnection> {
 
       yield oc->async_read(*msg, *this);
       BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+      *this->completed = true;
     }
   }
 #include <boost/asio/unyield.hpp>
@@ -229,10 +243,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection_coroutine, ObjectConnection,
   client();
 
   io_service.run();
+  server.check_completed();
+  client.check_completed();
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection_spawn, ObjectConnection,
                               object_connections) {
+  bool oc1_completed = false;
+  bool oc2_completed = false;
   boost::asio::spawn(io_service, [&](boost::asio::yield_context yield) {
     ObjectConnection oc(socket1);
     message<int> msg;
@@ -250,6 +268,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection_spawn, ObjectConnection,
     BOOST_CHECK_EQUAL(msg, 200);
 
     oc.close();
+    oc1_completed = true;
   });
 
   boost::asio::spawn(io_service, [&](boost::asio::yield_context yield) {
@@ -271,13 +290,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection_spawn, ObjectConnection,
     boost::system::error_code ec;
     oc.async_read(msg, yield[ec]);
     BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+    oc2_completed = true;
   });
 
   io_service.run();
+  BOOST_CHECK(oc1_completed);
+  BOOST_CHECK(oc2_completed);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection, ObjectConnection,
                               object_connections) {
+  bool oc1_completed = false;
+  bool oc2_completed = false;
   message<int> oc1_msg, oc2_msg;
   ObjectConnection oc1(socket1), oc2(socket2);
   oc1_msg = 10;
@@ -293,6 +317,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection, ObjectConnection,
           BOOST_REQUIRE(!ec);
           BOOST_CHECK_EQUAL(oc1_msg, 200);
           oc1.close();
+          oc1_completed = true;
         });
       });
     });
@@ -311,12 +336,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(object_connection, ObjectConnection,
           BOOST_REQUIRE(!ec);
           oc2.async_read(oc2_msg, [&](const boost::system::error_code &ec) {
             BOOST_REQUIRE_EQUAL(ec, boost::asio::error::eof);
+            oc2_completed = true;
           });
         });
       });
     });
   });
   io_service.run();
+  BOOST_CHECK(oc1_completed);
+  BOOST_CHECK(oc2_completed);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // serialization
@@ -490,6 +518,8 @@ BOOST_AUTO_TEST_SUITE_END()  // buffer_connection
 BOOST_FIXTURE_TEST_SUITE(line_connection, socket_pair_fixture)
 
 BOOST_AUTO_TEST_CASE(test) {
+  bool sink_completed = false;
+  bool source_completed = false;
   ba::line_connection<socket> sink(socket1), source(socket2);
 
   std::string msg, buf;
@@ -502,6 +532,7 @@ BOOST_AUTO_TEST_CASE(test) {
     sink.async_write(msg, [&](const boost::system::error_code &ec) {
       BOOST_REQUIRE(!ec);
       sink.close();
+      sink_completed = true;
     });
   });
 
@@ -515,11 +546,14 @@ BOOST_AUTO_TEST_CASE(test) {
 
       source.async_read(buf, [&](const boost::system::error_code &ec) {
         BOOST_REQUIRE(ec == boost::asio::error::eof);
+        source_completed = true;
       });
     });
   });
 
   io_service.run();
+  BOOST_CHECK(sink_completed);
+  BOOST_CHECK(source_completed);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // line_connection
