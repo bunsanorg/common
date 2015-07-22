@@ -11,6 +11,7 @@ else()
 endif()
 
 if(UNIX)
+    set(runtime_scope PUBLIC)
     set(runtime_libs dl)
     set(runtime_srcs
         src/runtime/unix/stacktrace.cpp
@@ -25,6 +26,7 @@ if(UNIX)
              src/runtime/unix/stream-fallback.cpp)
     endif()
 elseif(WIN32)
+    set(runtime_scope PRIVATE)
     set(runtime_srcs
         src/runtime/win32/stacktrace.cpp
     )
@@ -38,6 +40,7 @@ elseif(WIN32)
              src/runtime/win32/stream-fallback.cpp)
     endif()
 else()
+    set(runtime_scope PRIVATE)
     set(runtime_srcs
         src/runtime/fallback/stacktrace.cpp
     )
@@ -61,7 +64,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/log/core.cpp
     src/log/trivial.cpp
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE ${runtime_libs})
+target_link_libraries(${PROJECT_NAME} ${runtime_scope} ${runtime_libs})
 bunsan_use_threads(${PROJECT_NAME})
 bunsan_use_boost(${PROJECT_NAME}
     system
