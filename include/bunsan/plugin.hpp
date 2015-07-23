@@ -2,6 +2,8 @@
 
 #include <boost/dll/alias.hpp>
 #include <boost/dll/shared_library.hpp>
+#include <boost/preprocessor/dec.hpp>
+#include <boost/preprocessor/if.hpp>
 
 #include <functional>
 #include <memory>
@@ -44,8 +46,7 @@ class plugin<T *(Args...)> {
 
 }  // namespace bunsan
 
-#define BUNSAN_PLUGIN_PUBLIC_BODY(KEY, CLASS, ...)          \
-  using plugin = ::bunsan::plugin<CLASS *(__VA_ARGS__)>;    \
+#define BUNSAN_PLUGIN_PUBLIC_BODY_DEFINES(KEY, CLASS)       \
   using CLASS##_uptr = plugin::unique_ptr;                  \
   using CLASS##_sptr = plugin::shared_ptr;                  \
   using CLASS##_wptr = plugin::weak_ptr;                    \
@@ -54,10 +55,20 @@ class plugin<T *(Args...)> {
     return plugin(std::forward<PluginArgs>(args)..., #KEY); \
   }
 
-// key, base, constructor parameter types
-#define BUNSAN_PLUGIN_BODY(...)          \
- public:                                 \
-  BUNSAN_PLUGIN_PUBLIC_BODY(__VA_ARGS__) \
+#define BUNSAN_PLUGIN_PUBLIC_BODY_ARGS(KEY, CLASS, ...)  \
+  using plugin = ::bunsan::plugin<CLASS *(__VA_ARGS__)>; \
+  BUNSAN_PLUGIN_PUBLIC_BODY_DEFINES(KEY, CLASS)
+
+#define BUNSAN_PLUGIN_PUBLIC_BODY_EMPTY(KEY, CLASS) \
+  using plugin = ::bunsan::plugin<CLASS *()>;       \
+  BUNSAN_PLUGIN_PUBLIC_BODY_DEFINES(KEY, CLASS)
+
+// key, base, constructor parameters
+#define BUNSAN_PLUGIN_BODY(KEY, ...)                             \
+ public:                                                         \
+  BOOST_PP_IF(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), \
+              BUNSAN_PLUGIN_PUBLIC_BODY_ARGS,                    \
+              BUNSAN_PLUGIN_PUBLIC_BODY_EMPTY)(KEY, __VA_ARGS__) \
  private:
 
 #define BUNSAN_PLUGIN_TYPES(CLASS)          \
