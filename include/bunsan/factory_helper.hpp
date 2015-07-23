@@ -3,6 +3,9 @@
 #include <bunsan/factory.hpp>
 
 #include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/dec.hpp>
+#include <boost/preprocessor/if.hpp>
+#include <boost/preprocessor/variadic/elem.hpp>
 
 #include <functional>
 #include <map>
@@ -10,13 +13,13 @@
 #include <string>
 #include <type_traits>
 
-#define BUNSAN_FACTORY_PUBLIC_BODY(CLASS, ...)                                 \
+#define BUNSAN_FACTORY_PUBLIC_BODY_PRE(CLASS)                                  \
   struct unknown_##CLASS##_error : virtual ::bunsan::unknown_factory_error {}; \
   template <typename T>                                                        \
   using shared_ptr = std::shared_ptr<T>;                                       \
-  using CLASS##_ptr = shared_ptr<CLASS>;                                       \
-  using bunsan_factory =                                                       \
-      bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error>;      \
+  using CLASS##_ptr = shared_ptr<CLASS>;
+
+#define BUNSAN_FACTORY_PUBLIC_BODY_POST(CLASS)                                 \
   using factory_type = typename bunsan_factory::factory_type;                  \
   static factory_type factory_optional(                                        \
       const typename bunsan_factory::key_type &type) {                         \
@@ -54,6 +57,18 @@
     return bunsan_factory::register_new(factories, type, f);                   \
   }
 
+#define BUNSAN_FACTORY_PUBLIC_BODY_ARGS(CLASS, ...)                       \
+  BUNSAN_FACTORY_PUBLIC_BODY_PRE(CLASS)                                   \
+  using bunsan_factory =                                                  \
+      bunsan::factory<CLASS##_ptr(__VA_ARGS__), unknown_##CLASS##_error>; \
+  BUNSAN_FACTORY_PUBLIC_BODY_POST(CLASS)
+
+#define BUNSAN_FACTORY_PUBLIC_BODY_EMPTY(CLASS)                \
+  BUNSAN_FACTORY_PUBLIC_BODY_PRE(CLASS)                        \
+  using bunsan_factory =                                       \
+      bunsan::factory<CLASS##_ptr(), unknown_##CLASS##_error>; \
+  BUNSAN_FACTORY_PUBLIC_BODY_POST(CLASS)
+
 #define BUNSAN_FACTORY_PRIVATE_BODY(CLASS) \
   static typename bunsan_factory::map_ptr_type factories;
 
@@ -65,7 +80,7 @@
 \code
 namespace bunsan {
 class factory_base {
-  BUNSAN_FACTORY_BODY(factory_base, const std::string &)
+  BUNSAN_FACTORY_BODY(factory_base, const std::string &arg)
  public:
   virtual void f()=0;
 };
@@ -73,11 +88,13 @@ BUNSAN_FACTORY_TYPES(factory_base)
 }  // namespace bunsan
 \endcode
  */
-#define BUNSAN_FACTORY_BODY(CLASS, ...)          \
- public:                                         \
-  BUNSAN_FACTORY_PUBLIC_BODY(CLASS, __VA_ARGS__) \
- private:                                        \
-  BUNSAN_FACTORY_PRIVATE_BODY(CLASS)
+#define BUNSAN_FACTORY_BODY(...)                                 \
+ public:                                                         \
+  BOOST_PP_IF(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), \
+              BUNSAN_FACTORY_PUBLIC_BODY_ARGS,                   \
+              BUNSAN_FACTORY_PUBLIC_BODY_EMPTY)(__VA_ARGS__)     \
+ private:                                                        \
+  BUNSAN_FACTORY_PRIVATE_BODY(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__))
 
 #define BUNSAN_FACTORY_TYPES(CLASS)       \
   using CLASS##_ptr = CLASS::CLASS##_ptr; \
@@ -95,16 +112,17 @@ BUNSAN_FACTORY_TYPES(factory_base)
 \code
 namespace bunsan {
 class factory_base
-BUNSAN_FACTORY_BEGIN(factory_base, const std::string &)
+BUNSAN_FACTORY_BEGIN(factory_base, const std::string &arg)
  public:
   virtual void f()=0;
 BUNSAN_FACTORY_END(factory_base)
 }  // namespace bunsan
 \endcode
  */
-#define BUNSAN_FACTORY_BEGIN(CLASS, ...) \
-  {                                      \
-    BUNSAN_FACTORY_BODY(CLASS, __VA_ARGS__)
+#define BUNSAN_FACTORY_BEGIN(...) \
+  {                               \
+   BUNSAN_FACTORY_BODY(__VA_ARGS__)
+
 /*!
  * \def BUNSAN_FACTORY_END(CLASS)
  *
