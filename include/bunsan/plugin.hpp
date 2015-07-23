@@ -46,13 +46,17 @@ class plugin<T *(Args...)> {
 
 }  // namespace bunsan
 
-#define BUNSAN_PLUGIN_PUBLIC_BODY_DEFINES(KEY, CLASS)       \
-  using CLASS##_uptr = plugin::unique_ptr;                  \
-  using CLASS##_sptr = plugin::shared_ptr;                  \
-  using CLASS##_wptr = plugin::weak_ptr;                    \
-  template <typename... PluginArgs>                         \
-  static plugin load_plugin(PluginArgs &&... args) {        \
-    return plugin(std::forward<PluginArgs>(args)..., #KEY); \
+#define BUNSAN_PLUGIN_PUBLIC_BODY_DEFINES(KEY, CLASS)                         \
+  using CLASS##_uptr = plugin::unique_ptr;                                    \
+  using CLASS##_sptr = plugin::shared_ptr;                                    \
+  using CLASS##_wptr = plugin::weak_ptr;                                      \
+  template <typename... PluginArgs>                                           \
+  static plugin load_plugin(PluginArgs &&... args) {                          \
+    return plugin(std::forward<PluginArgs>(args)..., #KEY);                   \
+  }                                                                           \
+  template <typename... PluginArgs>                                           \
+  static std::shared_ptr<plugin> load_shared_plugin(PluginArgs &&... args) {  \
+    return std::make_shared<plugin>(std::forward<PluginArgs>(args)..., #KEY); \
   }
 
 #define BUNSAN_PLUGIN_PUBLIC_BODY_ARGS(KEY, CLASS, ...)  \

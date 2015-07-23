@@ -61,4 +61,11 @@ BOOST_AUTO_TEST_CASE(plugin) {
   BOOST_CHECK_EQUAL(plugin.shared_instance("world")->f(), "concrete world");
 }
 
+BOOST_AUTO_TEST_CASE(shared_plugin) {
+  const auto ptr1 = base::load_shared_plugin(boost::dll::program_location());
+  const auto ptr2 = ptr1;
+  BOOST_CHECK_EQUAL(ptr1->unique_instance("hello")->f(), "concrete hello");
+  BOOST_CHECK_EQUAL(ptr2->shared_instance("world")->f(), "concrete world");
+}
+
 BOOST_AUTO_TEST_SUITE_END()  // plugin
