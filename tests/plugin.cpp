@@ -8,7 +8,7 @@
 BOOST_AUTO_TEST_SUITE(plugin)
 
 class empty_base {
-  BUNSAN_PLUGIN_BODY(empty_plugin, empty_base)
+  BUNSAN_PLUGIN_AUTO_BODY(empty_base)
  public:
   virtual ~empty_base() {}
   virtual std::string f() = 0;
@@ -24,8 +24,8 @@ class empty_concrete : public empty_base {
   }
 };
 
-BUNSAN_PLUGIN_REGISTER(empty_plugin, empty_base, empty_concrete,
-                       empty_concrete::make_instance)
+BUNSAN_PLUGIN_AUTO_REGISTER(empty_base, empty_concrete,
+                            empty_concrete::make_instance)
 
 BOOST_AUTO_TEST_CASE(empty_plugin) {
   auto plugin = empty_base::load_plugin(boost::dll::program_location());
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(empty_plugin) {
 }
 
 class base {
-  BUNSAN_PLUGIN_BODY(base_plugin, base, const std::string &name)
+  BUNSAN_PLUGIN_AUTO_BODY(base, const std::string &name)
  public:
   virtual ~base() {}
   virtual std::string f() = 0;
@@ -53,7 +53,7 @@ class concrete : public base {
   std::string m_name;
 };
 
-BUNSAN_PLUGIN_REGISTER(base_plugin, base, concrete, concrete::make_instance)
+BUNSAN_PLUGIN_AUTO_REGISTER(base, concrete, concrete::make_instance)
 
 BOOST_AUTO_TEST_CASE(plugin) {
   auto plugin = base::load_plugin(boost::dll::program_location());

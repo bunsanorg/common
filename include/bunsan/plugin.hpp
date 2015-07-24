@@ -4,6 +4,7 @@
 #include <boost/dll/shared_library.hpp>
 #include <boost/preprocessor/dec.hpp>
 #include <boost/preprocessor/if.hpp>
+#include <boost/preprocessor/variadic/elem.hpp>
 
 #include <functional>
 #include <memory>
@@ -75,6 +76,13 @@ class plugin<T *(Args...)> {
               BUNSAN_PLUGIN_PUBLIC_BODY_EMPTY)(KEY, __VA_ARGS__) \
  private:
 
+#define BUNSAN_PLUGIN_AUTO_KEY(CLASS) BOOST_PP_CAT(bunsan_plugin_, CLASS)
+
+#define BUNSAN_PLUGIN_AUTO_BODY(...)                                  \
+  BUNSAN_PLUGIN_BODY(                                                 \
+      BUNSAN_PLUGIN_AUTO_KEY(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), \
+      __VA_ARGS__)
+
 #define BUNSAN_PLUGIN_TYPES(CLASS)          \
   using CLASS##_uptr = CLASS::CLASS##_uptr; \
   using CLASS##_wptr = CLASS::CLASS##_sptr; \
@@ -82,3 +90,7 @@ class plugin<T *(Args...)> {
 
 #define BUNSAN_PLUGIN_REGISTER(KEY, BASE, CONCRETE, UNIQUE_CTOR) \
   BOOST_DLL_ALIAS(UNIQUE_CTOR, KEY)
+
+#define BUNSAN_PLUGIN_AUTO_REGISTER(BASE, CONCRETE, UNIQUE_CTOR)       \
+  BUNSAN_PLUGIN_REGISTER(BUNSAN_PLUGIN_AUTO_KEY(BASE), BASE, CONCRETE, \
+                         UNIQUE_CTOR)
