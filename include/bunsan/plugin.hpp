@@ -24,6 +24,7 @@ class plugin<T *(Args...)> {
   using unique_constructor = unique_ptr(Args...);
   using shared_constructor = unique_ptr(Args...);
 
+  // TODO make shared_library_ptr ctor
   explicit plugin(boost::dll::shared_library library, const std::string &key)
       : m_library(std::move(library)),
         m_constructor(m_library.get_alias<unique_constructor>(key)) {}
@@ -78,10 +79,18 @@ class plugin<T *(Args...)> {
 
 #define BUNSAN_PLUGIN_AUTO_KEY(CLASS) BOOST_PP_CAT(bunsan_plugin_, CLASS)
 
+#define BUNSAN_PLUGIN_AUTO_KEY_NESTED(PREFIX, CLASS) \
+  BUNSAN_PLUGIN_AUTO_KEY(BOOST_PP_CAT(BOOST_PP_CAT(PREFIX, __), CLASS))
+
 #define BUNSAN_PLUGIN_AUTO_BODY(...)                                  \
   BUNSAN_PLUGIN_BODY(                                                 \
       BUNSAN_PLUGIN_AUTO_KEY(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), \
       __VA_ARGS__)
+
+#define BUNSAN_PLUGIN_AUTO_BODY_NESTED(PREFIX, ...)                       \
+  BUNSAN_PLUGIN_BODY(BUNSAN_PLUGIN_AUTO_KEY_NESTED(                       \
+                         PREFIX, BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), \
+                     __VA_ARGS__)
 
 #define BUNSAN_PLUGIN_TYPES(CLASS)          \
   using CLASS##_uptr = CLASS::CLASS##_uptr; \
@@ -94,3 +103,8 @@ class plugin<T *(Args...)> {
 #define BUNSAN_PLUGIN_AUTO_REGISTER(BASE, CONCRETE, UNIQUE_CTOR)       \
   BUNSAN_PLUGIN_REGISTER(BUNSAN_PLUGIN_AUTO_KEY(BASE), BASE, CONCRETE, \
                          UNIQUE_CTOR)
+
+#define BUNSAN_PLUGIN_AUTO_REGISTER_NESTED(PREFIX, BASE, CONCRETE,          \
+                                           UNIQUE_CTOR)                     \
+  BUNSAN_PLUGIN_REGISTER(BUNSAN_PLUGIN_AUTO_KEY_NESTED(PREFIX, BASE), BASE, \
+                         CONCRETE, UNIQUE_CTOR)
