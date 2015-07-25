@@ -31,7 +31,9 @@ class plugin<T *(Args...)> {
 
   explicit plugin(const boost::filesystem::path &library_path,
                   const std::string &key)
-      : plugin(boost::dll::shared_library(library_path), key) {}
+      : plugin(boost::dll::shared_library(
+                   library_path, boost::dll::load_mode::append_decorations),
+               key) {}
 
   unique_ptr unique_instance(Args... args) {
     return m_constructor(std::forward<Args>(args)...);
