@@ -4,6 +4,7 @@
 #include <bunsan/runtime/detail/format.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/nowide/convert.hpp>
 #include <boost/optional.hpp>
 #include <boost/scope_exit.hpp>
 
@@ -19,6 +20,8 @@
 #include <dbghelp.h>
 #endif
 
+using boost::nowide::widen;
+
 namespace bunsan {
 namespace runtime {
 
@@ -33,12 +36,11 @@ stacktrace stacktrace::get(const std::size_t skip_,
 #else
   const static capture_func_type capture_stack_trace =
       []() -> capture_func_type {
-        const HMODULE h = GetModuleHandle("kernel32.dll");
-        if (h)
-          return (capture_func_type)GetProcAddress(h,
-                                                   "RtlCaptureStackBackTrace");
-        return nullptr;
-      }();
+    const HMODULE h = GetModuleHandleW(widen("kernel32.dll").c_str());
+    if (h)
+      return (capture_func_type)GetProcAddress(h, "RtlCaptureStackBackTrace");
+    return nullptr;
+  }();
 #endif
   constexpr std::size_t UNWIND_LIMIT = 62;  // see msdn
   if (capture_stack_trace && skip < UNWIND_LIMIT) {
