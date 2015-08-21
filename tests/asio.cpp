@@ -1,3 +1,6 @@
+#include <boost/system/api_config.hpp>
+
+#if defined(BOOST_POSIX_API)
 #define BOOST_TEST_MODULE asio
 #include <boost/test/unit_test.hpp>
 
@@ -579,3 +582,6 @@ BOOST_AUTO_TEST_CASE(test) {
 BOOST_AUTO_TEST_SUITE_END()  // line_connection
 
 BOOST_AUTO_TEST_SUITE_END()  // asio
+#else
+int main() {}
+#endif
