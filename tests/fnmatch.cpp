@@ -46,6 +46,12 @@ BOOST_AUTO_TEST_CASE(fnmatch) {
   BOOST_CHECK(bunsan::fnmatch("a[]]b", "a]b"));
 }
 
+BOOST_AUTO_TEST_CASE(border) {
+  BOOST_CHECK(bunsan::fnmatch("hello", "hello"));
+  BOOST_CHECK(!bunsan::fnmatch("hello", "hello world"));
+  BOOST_CHECK(!bunsan::fnmatch("world", "hello world"));
+}
+
 BOOST_AUTO_TEST_CASE(fnmatch_icase) {
   BOOST_CHECK(!bunsan::fnmatch("abc", "aBc", bunsan::fnmatcher::defaults));
   BOOST_CHECK(bunsan::fnmatch("abc", "aBc", bunsan::fnmatcher::icase));
