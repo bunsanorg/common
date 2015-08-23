@@ -50,6 +50,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/error.cpp
     src/categorized_error.cpp
     src/system_error.cpp
+    src/fnmatch.cpp
 
     src/application/application.cpp
     src/application/global_registry.cpp
@@ -72,6 +73,7 @@ bunsan_use_boost(${PROJECT_NAME}
     log
     log_setup
     program_options
+    regex
     serialization
     thread
 )
