@@ -25,6 +25,13 @@ struct system_error : bunsan::system_error, virtual error {
   using bunsan::system_error::system_error;
 };
 
+struct read_data_error : virtual error {};
+struct read_data_size_limit_exceeded_error : virtual read_data_error {
+  using size_limit = boost::error_info<struct tag_size_limit, std::size_t>;
+};
+
+struct write_data_error : virtual error {};
+
 }  // namespace filesystem
 }  // namespace bunsan
 

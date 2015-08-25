@@ -46,5 +46,13 @@ void copy_tree(const boost::filesystem::path &from,
                const BOOST_SCOPED_ENUM(copy_option) option,
                boost::system::error_code &ec);
 
+constexpr std::size_t bytes_in_mebibyte = 1024 * 1024;
+constexpr std::size_t default_size_limit = 50 * bytes_in_mebibyte;
+
+std::string read_data(const boost::filesystem::path &path,
+                      std::size_t size_limit = default_size_limit);
+
+void write_data(const boost::filesystem::path &path, const std::string &data);
+
 }  // namespace filesystem
 }  // namespace bunsan

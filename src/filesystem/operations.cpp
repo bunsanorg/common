@@ -2,6 +2,7 @@
 
 #include <bunsan/enable_error_info.hpp>
 #include <bunsan/filesystem/error.hpp>
+#include <bunsan/filesystem/fstream.hpp>
 
 #include <deque>
 
@@ -90,6 +91,46 @@ void copy_tree(const boost::filesystem::path &from,
       }
     }
   } BUNSAN_EXCEPTIONS_WRAP_END_COPY_TREE()
+}
+
+std::string read_data(const boost::filesystem::path &path,
+                      const std::size_t size_limit) {
+  try {
+    ifstream fin(path);
+    std::string data;
+    char buf[BUFSIZ];
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fin) {
+      do {
+        fin.read(buf, BUFSIZ);
+        if (data.size() + fin.gcount() > size_limit) {
+          BOOST_THROW_EXCEPTION(
+              read_data_size_limit_exceeded_error()
+              << read_data_size_limit_exceeded_error::path(path)
+              << read_data_size_limit_exceeded_error::size_limit(size_limit));
+        }
+        data.append(buf, fin.gcount());
+      } while (fin);
+    } BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fin)
+    fin.close();
+    return data;
+  } catch (read_data_error &) {
+    throw;
+  } catch (std::exception &) {
+    BOOST_THROW_EXCEPTION(read_data_error() << read_data_error::path(path)
+                                            << enable_nested_current());
+  }
+}
+
+void write_data(const boost::filesystem::path &path, const std::string &data) {
+  try {
+    ofstream fout(path);
+    BUNSAN_FILESYSTEM_FSTREAM_WRAP_BEGIN(fout) {
+      fout.write(data.data(), data.size());
+    } BUNSAN_FILESYSTEM_FSTREAM_WRAP_END(fout)
+    fout.close();
+  } catch (std::exception &) {
+    BOOST_THROW_EXCEPTION(write_data_error() << write_data_error::path(path));
+  }
 }
 
 }  // namespace filesystem
