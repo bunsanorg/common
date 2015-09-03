@@ -5,6 +5,7 @@
 #include <boost/log/attributes/attribute_set.hpp>
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/core/record.hpp>
+#include <boost/log/utility/strictest_lock.hpp>
 #include <boost/scope_exit.hpp>
 
 namespace bunsan {
@@ -47,6 +48,13 @@ class attribute_setter {
 template <typename BaseT>
 class scope_feature : public BaseT {
  public:
+  using char_type = typename BaseT::char_type;
+  using threading_model = typename BaseT::threading_model;
+  using open_record_lock = typename boost::log::strictest_lock<
+      boost::lock_guard<threading_model>, typename BaseT::open_record_lock,
+      typename BaseT::add_attribute_lock,
+      typename BaseT::remove_attribute_lock>::type;
+
   using BaseT::BaseT;
 
  protected:

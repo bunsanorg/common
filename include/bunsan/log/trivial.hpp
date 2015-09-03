@@ -7,6 +7,7 @@
 #include <boost/current_function.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 namespace bunsan {
 namespace log {
@@ -15,8 +16,8 @@ namespace trivial {
 template <typename Level = int>
 class logger
     : public boost::log::sources::basic_composite_logger<
-          char, logger<Level>, boost::log::sources::multi_thread_model<
-                                   boost::log::aux::light_rw_mutex>,
+          char, logger<Level>,
+          boost::log::sources::multi_thread_model<boost::shared_mutex>,
           boost::log::sources::features<boost::log::sources::severity<Level>,
                                         sources::scope>> {};
 
