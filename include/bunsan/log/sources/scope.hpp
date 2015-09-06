@@ -7,6 +7,7 @@
 #include <boost/log/core/record.hpp>
 #include <boost/log/utility/strictest_lock.hpp>
 #include <boost/scope_exit.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 namespace bunsan {
 namespace log {
