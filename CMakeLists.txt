@@ -12,7 +12,7 @@ endif()
 
 if(UNIX)
     set(runtime_scope PUBLIC)
-    set(runtime_libs dl)
+    set(runtime_libs ${CMAKE_DL_LIBS})
     set(runtime_srcs
         src/runtime/unix/stacktrace.cpp
     )
