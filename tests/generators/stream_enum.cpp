@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(stream_enum)
                 iprintln("BOOST_CHECK_THROW(boost::lexical_cast<" + enum_name +
                          ">(\"unknown\"),");
                 iprintln("                  " + enum_name +
-                         "_invalid_string_representation_error)");
+                         "_invalid_string_representation_error);");
                 iprintln("BOOST_CHECK_EQUAL(static_cast<int>(" + item_prefix +
                          "FIRST), " + ss(value_1) + ");");
                 iprintln("BOOST_CHECK_EQUAL(static_cast<int>(" + item_prefix +
