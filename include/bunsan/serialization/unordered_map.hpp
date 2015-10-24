@@ -1,5 +1,13 @@
 #pragma once
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 105900
+
+#include <boost/serialization/unordered_map.hpp>
+
+#else
+
 #include <boost/serialization/collections_save_imp.hpp>
 #include <boost/serialization/collections_load_imp.hpp>
 #include <boost/serialization/split_free.hpp>
@@ -38,3 +46,5 @@ void load(Archive &ar, std::unordered_map<Key, Tp, Hash, Pred, Alloc> &map,
 
 }  // namespace serialization
 }  // namespace boost
+
+#endif
