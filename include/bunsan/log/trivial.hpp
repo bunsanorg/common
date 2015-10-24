@@ -3,6 +3,7 @@
 #include <bunsan/log/keywords/scope.hpp>
 #include <bunsan/log/severity.hpp>
 #include <bunsan/log/sources/scope.hpp>
+#include <bunsan/log/workaround/all.hpp>
 
 #include <boost/current_function.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
